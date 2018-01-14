@@ -65,7 +65,7 @@ to begin your exploration with a bird-eye view of the project.
 .. References:
 
 .. _`Install Agda`: http://agda.readthedocs.io/en/v2.5.3/getting-started/installation.html
-.. _`Configure the Standard Library`: http://agda.readthedocs.io/en/v2.5.2/tools/package-system.html#example-using-the-standard-library
+.. _`Setup the Standard Library`: http://agda.readthedocs.io/en/v2.5.2/tools/package-system.html#example-using-the-standard-library
 .. _`Emacs mode`: http://agda.readthedocs.io/en/latest/tools/emacs-mode.html
 .. _`Agda manual`: https://agda.readthedocs.io/en/v2.5.3/
 .. _`Evolution of a Typechecker`: https://github.com/pedagand/typechecker-evolution
