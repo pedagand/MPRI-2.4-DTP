@@ -1,3 +1,9 @@
+..
+  ::
+  {-# OPTIONS --allow-unsolved-metas #-}
+
+  module 02-dependent.Indexed where
+
 ================================================================
 Indexed functional programming
 ================================================================
@@ -19,3 +25,7 @@ Takeaways:
   * You are _able_ to define an inductive family that captures exactly some structural invariant
   * You are _able_ to write a dependently-typed program
   * You _may_ be _familiar_ with normalization-by-evaluation proof for the simply-typed calculus
+
+.. Local Variables:
+.. mode: agda2
+.. End:

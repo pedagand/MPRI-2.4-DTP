@@ -2,6 +2,15 @@
 MPRI 2.4 : Dependently-typed Functional Programming
 ================================================================
 
+..
+  Make sure that everything compiles::
+
+  open import 00-agda.Warmup
+  open import 01-effectful.Monad
+  open import 02-dependent.Indexed
+  open import 03-total.Recursion
+  open import 04-generic.Desc
+  open import 05-open.Problems
 
 This course is organized as follows:
 
@@ -23,9 +32,9 @@ You will need
   * Agda (tested with version 2.5.3)
   * Sphinx (tested with version 1.6.4)
 
-Type::
+Type:
 
-    make html
+    ``make html``
 
 which will produce the lecture notes in ``build/html/index.html``.
 
@@ -64,3 +73,7 @@ These lecture notes are available under an `MIT License`_.
 .. _`doi`: https://www.doi.org/
 .. _`Pierre-Évariste Dagand`: https://pages.lip6.fr/Pierre-Evariste.Dagand/
 .. _`MIT License`: https://tldrlegal.com/license/mit-license
+
+.. Local Variables:
+.. mode: agda2
+.. End:

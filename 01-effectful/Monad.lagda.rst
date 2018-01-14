@@ -1,3 +1,9 @@
+..
+  ::
+  {-# OPTIONS --allow-unsolved-metas #-}
+
+  module 01-effectful.Monad where
+
 ================================================================
 Effectful functional programming
 ================================================================

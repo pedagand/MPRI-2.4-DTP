@@ -43,7 +43,7 @@ source_suffix = ['.lagda.rst', '.rst']
 source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = 'Index'
 
 # General information about the project.
 project = u'mpri24-DFP'
