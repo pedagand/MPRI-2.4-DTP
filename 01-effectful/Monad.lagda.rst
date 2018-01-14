@@ -1548,26 +1548,18 @@ pseudo-random number generator. This amounts to a state monad storing
 a particular seed and generating a new one every time ``rand`` is
 called. In OCaml (courtesy of X. Leroy), this amounts to:
 
-..
-  ::
-  {-
+.. code-block:: guess
 
-::
-
-  module Random_Simulation = struct
-    type α mon = int → α × int
-    let ret a = fun s -> (a, s)
-    let bind m f = fun s -> match m s with (x, s) -> f x s
-    let next_state s = s * 25173 + 1725
-    let rand n = fun s -> ((abs s) mod n, next_state s)
-    let choose p a b = fun s ->
-      if float (abs s) <= p *. float max_int
-      then a (next_state s) else b (next_state s)
-  end
-
-..
-  ::
-  -}
+    module Random_Simulation = struct
+      type α mon = int → α × int
+      let ret a = fun s → (a, s)
+      let bind m f = fun s → match m s with (x, s) → f x s
+      let next_state s = s * 25173 + 1725
+      let rand n = fun s → ((abs s) mod n, next_state s)
+      let choose p a b = fun s →
+        if float (abs s) <= p *. float max_int
+        then a (next_state s) else b (next_state s)
+    end
 
 ..
   ::
