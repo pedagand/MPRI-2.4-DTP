@@ -69,7 +69,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = []
+exclude_patterns = ['teaching']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -157,8 +157,11 @@ latex_elements = {
 latex_documents = [
     (master_doc, 'mpri24-DFP.tex', u'MPRI24: Dependently-typed Functional Programming',
      u'Pierre-Évariste Dagand', 'manual'),
-    ("01-effectful/Monad", 'Monad.tex', u'Effectful functional programming',
+    ("01-effectful/Monad", 'Monad.tex', u'Monadic Programming',
      u'Pierre-Évariste Dagand', 'manual'),
+    ("02-dependent/Indexed", 'Indexed.tex', u'Indexed Programming',
+     u'Pierre-Évariste Dagand', 'manual'),
+
 ]
 
 
