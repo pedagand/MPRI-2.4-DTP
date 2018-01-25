@@ -78,7 +78,9 @@ Nowadays:
   open import Level hiding (suc)
 
   open import Data.Unit hiding (setoid ; _≟_)
-  open import Data.Nat hiding (_*_)
+  open import Data.Nat renaming (_*_ to _*ℕ_)
+  open import Data.Nat.DivMod
+  open import Data.Fin hiding (_+_ ; raise ; _-_)
   open import Data.Product
 
   open import Function
@@ -170,7 +172,7 @@ signature is through the following constructs::
       inl : F X → (F ⊕ G) X
       inr : G X → (F ⊕ G) X
 
-which gives ``ΣState ≡ ΣGet ⊜ ΣSet``.
+which gives ``ΣState ≡ ΣGet ⊕ ΣSet``.
 
 It is too early to follow that path but we shall bear in mind this
 more elementary decomposition.
@@ -292,7 +294,9 @@ mutually recursive functions.
 
 .. END HIDE
 
+.. BEGIN HIDE
 .. TODO: discuss inefficiency of this implementation. Exercise: codensity
+.. END HIDE
 
 **Remark** there is nothing special about ``StateF``: given any
 (well-behaved) endofunctor ``F : Set → Set``, we can build another
@@ -330,6 +334,13 @@ as::
             set s >>= λ _ → 
             return s
 
+    random : StateF ℕ
+    random = get tt >>= λ seed → 
+             let n = toℕ ((seed *ℕ 25173 + 1725) mod 65536) in
+             set n >>= λ _ →
+             return n
+
+    
 --------------------------------
 Monad laws
 --------------------------------
@@ -498,7 +509,10 @@ In English, this amounts to the following rules:
   completion algorithm`_ to find a confluent equational theory/term
   rewriting system.
 
-  **Remark** coming from a mathematical background, one may understand this formalism as a generalization of algebraic structures such as monoids, groups, etc.:
+  **Remark** coming from a mathematical background, one may understand
+  this formalism as a generalization of algebraic structures such as
+  monoids, groups, etc.:
+
     - we start with a signature of operations, such as "there is
       a unary symbol ``1`` and a binary symbol ``.``".
     - then, we give a set of axioms equating open terms, such as
@@ -564,7 +578,9 @@ also at the heart of compiler optimizations, code refactoring, etc.::
       prog-equiv : prog1 ∼ prog2
       prog-equiv = {!!}
 
+.. BEGIN HIDE
 .. TODO: I cannot be bothered to produce the witness. 
+.. END HIDE
 
 ************************************************
 Semantics: ``State ≡ StateF/∼``
@@ -599,7 +615,7 @@ of constructive mathematics, we should do so computationally, thus
 inheriting a program computing these normal forms (also known as an
 evaluator) as well as a proof that this program is correct. We eschew
 to a technique called `normalization-by-evaluation`_, with is spicy
-8.ot Curry-Howard in action.
+hot Curry-Howard in action.
 
 .. BEGIN HIDE
   ::
@@ -1120,7 +1136,7 @@ The ``Tick`` monad has a single operation, ``tick`` which lets us add
 some amount ``r : R`` to a global accumulator::
 
     data ΣTick (X : Set) : Set where
-      `tick : R × X → ΣTick X
+      `tick : R × (⊤ → X) → ΣTick X
 
 --------------------------------
 Free term algebra
@@ -1159,7 +1175,7 @@ using the free term algebra::
         op : ΣTick (TickF V) → TickF V
 
       tick : R → TickF ⊤
-      tick r = op (`tick (r , return tt))
+      tick r = op (`tick (r , return))
 
       mutual
         _>>=_ : ∀{A B} → TickF A → (A → TickF B) → TickF B
@@ -1167,7 +1183,7 @@ using the free term algebra::
         op fa >>= mf = op (ΣTickmap mf fa)
 
         ΣTickmap : ∀{A B} → (A → TickF B) → ΣTick (TickF A) → ΣTick (TickF B)
-        ΣTickmap mf (`tick (r , k)) = `tick (r , k >>= mf)
+        ΣTickmap mf (`tick (r , k)) = `tick (r , λ tt → k tt >>= mf)
 
     open Solution-Tick-sig
 
@@ -1201,28 +1217,30 @@ accumulating the sum of all sub-ticks::
     Tick : Set → Set 
     Tick X = ΣTick X
 
+This type being isomorphic to::
+
+    TICK : Set → Set
+    TICK A = R × A
+
 **Exercise (difficulty: 3)** Establish this *a posteriori* by normalization-by-evaluation.
 
 .. BEGIN HIDE
   ::
-    TICK : Set → Set
-    TICK A = R × A
-
     eval : ∀{A} → TickF A → R × A
     eval (return a) = ε , a
     eval {A} (op (`tick (r , k))) = 
       let p : R × A 
-          p = eval k in
+          p = eval (k tt) in
        r ∙ (proj₁ p) , proj₂ p
 
     reify : ∀{A} → R × A → Tick A
-    reify {A} (r , a) = `tick (r , a)
+    reify {A} (r , a) = `tick (r , λ _ → a)
 
     norm : ∀{A} → TickF A → Tick A
     norm p = reify (eval p)
 
     ⌈_⌉ : ∀{A} → Tick A → TickF A 
-    ⌈ `tick (r , a) ⌉ = tick r >>= λ _ → return a
+    ⌈ `tick (r , a) ⌉ = tick r >>= λ tt → return (a tt)
 
 .. TODO proof of soundness/completeness left as an exercise
 
