@@ -2,11 +2,17 @@
 MPRI 2.4 : Dependently-typed Functional Programming
 ================================================================
 
+
+
 ..
   Make sure that everything compiles::
 
   open import 00-agda.Warmup
   open import 01-effectful.Monad
+
+.. BEGIN HIDE
+  ::
+
   open import 02-dependent.Indexed
   open import 03-total.Recursion
   open import 04-generic.Desc
@@ -37,6 +43,8 @@ Type:
     ``make html``
 
 which will produce the lecture notes in ``build/html/index.html``.
+
+.. END HIDE
 
 ************************************************
 Contributing
