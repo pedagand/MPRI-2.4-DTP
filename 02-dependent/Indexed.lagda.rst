@@ -502,7 +502,7 @@ to typed embeddings::
     rename wk (fst p)    = fst (rename wk p)
     rename wk (snd p)    = snd (rename wk p)
 
-    sub : ∀ {Γ Δ T} → Γ ⊢ T → (∀ {T} → T ∈ Γ →  Δ ⊢ T) → Δ ⊢ T
+    sub : ∀ {Γ Δ T} → Γ ⊢ T → (∀ {S} → S ∈ Γ →  Δ ⊢ S) → Δ ⊢ T
     sub (lam t) ρ    = lam (sub t (λ { here      → var here ;
                                        (there v) → rename (weak1 id) (ρ v) }))
     sub (var v) ρ    = ρ v
