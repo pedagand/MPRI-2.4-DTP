@@ -35,7 +35,7 @@ The vision: `The Proof Assistant as an Integrated Development Environment`_
 
 
 ************************************************
-Typing ``printf``
+Typing ``sprintf``
 ************************************************
 
 ..
@@ -50,14 +50,14 @@ Typing ``printf``
 
 Our introductory example is a Classic, introduced by Lennart
 Augustsson in his seminal paper on `Cayenne`_. In plain ML (*ie.*
-without GADTs), the ``printf`` function cannot be given an ML type:
+without GADTs), the ``sprintf`` function cannot be given an ML type:
 the value of its arguments depending on the user-provided format.
 
 .. code-block:: guess
 
-   printf "foo %d"    : ℕ → String
-   printf "bar %s"    : String → String
-   printf "baz %d %s" : ℕ → String → String
+   sprintf "foo %d"    : ℕ → String
+   sprintf "bar %s"    : String → String
+   sprintf "baz %d %s" : ℕ → String → String
 
 Formats are not random strings of characters:
   - structure = syntax (`format`)
@@ -104,14 +104,14 @@ And we can easily realize this semantics::
     eval (symb c k) acc = eval k (acc ++ fromList (c ∷ []))
     eval end acc        = acc
 
-    printf : (fmt : String) → ⟦p fmt ⟧
-    printf fmt = eval (parse (toList fmt)) ""
+    sprintf : (fmt : String) → ⟦p fmt ⟧
+    sprintf fmt = eval (parse (toList fmt)) ""
 
-``printf`` can thus be seen as an interpreter for a small language
+``sprintf`` can thus be seen as an interpreter for a small language
 (whose AST is described by ``format``) to the semantic domain
 described by ``⟦_⟧``. And it works::
 
-    test : printf "test %%d & %%s: %d & %s" 2 "hello world!"
+    test : sprintf "test %%d & %%s: %d & %s" 2 "hello world!"
            ≡ "test %d & %s: S(S(0)) & hello world!"
     test = refl
 
