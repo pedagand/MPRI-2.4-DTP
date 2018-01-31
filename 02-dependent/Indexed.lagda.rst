@@ -1421,8 +1421,8 @@ the class of functors from the opposite category of ``C`` to ``Set``::
       open Cat C
       open PSh P
       field
-        Fmap-id : ∀ {X} → ren (idC {X}) ≡ λ x → x
-        Fmap-∘ : ∀ {X Y Z x} → (g : Hom[ Y ∶ Z ])(f : Hom[ X ∶ Y ]) →
+        ren-id : ∀ {X} → ren (idC {X}) ≡ λ x → x
+        ren-∘ : ∀ {X Y Z x} → (g : Hom[ Y ∶ Z ])(f : Hom[ X ∶ Y ]) →
                  ren (g ∘C f) x ≡ ren f (ren g x)
 
 A presheaf itself is a category, whose morphisms are natural
@@ -1470,15 +1470,16 @@ embedding gives us the ability to produce a presheaf from **any**
 function::
 
     Yoneda : (F : context → Set) → PSh[context]
-    Yoneda F = record { _⊢ = λ Γ → ∀ {Δ} → Δ ⊇ Γ → F Δ
+    Yoneda F = record { _⊢ = λ Γ → ∀ {Δ} → Hom[ Δ ∶ Γ ] → F Δ
                       ; ren = λ wk₁ k wk₂ → k (wk₁ ∘wk wk₂) }
+           where open Cat Context-Cat
 
     Yoneda-IsPSh : {F : context → Set} → IsPSh (Yoneda F)
-    Yoneda-IsPSh = record { Fmap-id = λ {X} → ext λ ρ →
+    Yoneda-IsPSh = record { ren-id = λ {X} → ext λ ρ →
                                               ext-impl (λ Γ →
                                               ext λ wk →
                                               cong (ρ {Γ}) (lemma-left-unit wk))
-                          ; Fmap-∘ = λ {Δ}{∇}{Ω}{k} wk₁ wk₂ →
+                          ; ren-∘ = λ {Δ}{∇}{Ω}{k} wk₁ wk₂ →
                                               ext-impl λ Γ →
                                               ext λ wk₃ →
                                               cong k (lemma-assoc wk₃ wk₂ wk₁) }
