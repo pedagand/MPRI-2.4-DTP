@@ -780,10 +780,14 @@ role of ``reflect``::
       reflect (A * B) nf  = reflect A (fst nf) , reflect B (snd nf)
       reflect (S ⇒ T) neu = λ s → reflect T (neu ! reify s)
 
-Given a closed λ-term, we can thus compute its normal form::
+Given a λ-term, we can thus compute its normal form::
 
-      norm :  ∀{T} → ε ⊢ T → term
-      norm Δ = reify (eval Δ tt)
+      norm :  ∀{Γ T} → Γ ⊢ T → term
+      norm {Γ} Δ = reify (eval Δ (idC Γ))
+        where idC : ∀ Γ → ⟦ Γ ⟧context
+              idC ε       = tt
+              idC (Γ ▹ T) = idC Γ , reflect T (var (gensym tt))
+
 
 Just like in the previous lecture (and assuming that we have proved
 the soundness of this procedure with respect to the equational theory
