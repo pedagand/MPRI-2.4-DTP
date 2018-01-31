@@ -941,11 +941,11 @@ To remedy this, let us
     data _⊢Nf_ (Γ : context) where
          lam    : ∀ {S T} → (b : Γ ▹ S ⊢Nf T) → Γ ⊢Nf S ⇒ T
          pair   : ∀ {A B} → Γ ⊢Nf A → Γ ⊢Nf B → Γ ⊢Nf A * B
+         tt     : Γ ⊢Nf unit
          ground : (grnd : Γ ⊢Ne unit) → Γ ⊢Nf unit
 
     data _⊢Ne_ (Γ : context) where
        var : ∀{T} → (v : T ∈ Γ) → Γ ⊢Ne T
-       tt  : Γ ⊢Ne unit -- XXX: here?
        _!_ : ∀{S T} → (f : Γ ⊢Ne S ⇒ T)(s : Γ ⊢Nf S) → Γ ⊢Ne T
        fst : ∀ {A B} → (p : Γ ⊢Ne A * B) → Γ ⊢Ne A
        snd : ∀ {A B} → (p : Γ ⊢Ne A * B) → Γ ⊢Ne B
@@ -956,12 +956,12 @@ To remedy this, let us
     ⌊ lam b ⌋Nf       = lam ⌊ b ⌋Nf
     ⌊ ground grnd ⌋Nf = ⌊ grnd ⌋Ne
     ⌊ pair a b ⌋Nf    = pair ⌊ a ⌋Nf ⌊ b ⌋Nf
+    ⌊ tt ⌋Nf          = tt
 
     ⌊ var v ⌋Ne       = var v
     ⌊ f ! s ⌋Ne       = ⌊ f ⌋Ne ! ⌊ s ⌋Nf
     ⌊ fst p ⌋Ne       = fst ⌊ p ⌋Ne
     ⌊ snd p ⌋Ne       = snd ⌊ p ⌋Ne
-    ⌊ tt ⌋Ne          = tt
 
 
 We are going to construct a context-and-type-indexed model
@@ -1044,10 +1044,10 @@ interface::
     rename-Nf wk (lam b)       = lam (rename-Nf (weak2 wk) b)
     rename-Nf wk (ground grnd) = ground (rename-Ne wk grnd)
     rename-Nf wk (pair a b)    = pair (rename-Nf wk a) (rename-Nf wk b)
+    rename-Nf wk tt            = tt
 
     rename-Ne wk (var v)       = var (shift wk v)
     rename-Ne wk (f ! s)       = (rename-Ne wk f) ! (rename-Nf wk s)
-    rename-Ne wk tt            = tt
     rename-Ne wk (fst p)       = fst (rename-Ne wk p)
     rename-Ne wk (snd p)       = snd (rename-Ne wk p)
 
@@ -1066,7 +1066,7 @@ the normal forms of type unit::
     ⊤̂ =  Nf̂ unit
 
     TT : ∀ {P} → P ⟶ ⊤̂
-    TT ρ = ground tt
+    TT ρ = tt
 
 Similarly, we will interpret the ``_*_`` type as a product in
 ``Sem``, defined in a pointwise manner::
