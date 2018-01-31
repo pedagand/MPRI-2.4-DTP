@@ -1099,6 +1099,10 @@ We may be tempted to define the exponential in a pointwise manner too:
 However, we are bitten by the contra-variance of the domain: there is
 no way to implement ``ren`` with such a definition.
 
+-------------------------------------
+Interlude: Yoneda lemma
+-------------------------------------
+
 ..
   ::
 
@@ -1164,9 +1168,10 @@ renaming merely lifts composition of weakening::
 Note that ``Y`` does not depend on ``ren-T``: it is actually baked in
 the very definition of ``_⊢``!
 
-..
-  ::
-    open Yoneda
+-------------------------------------
+Back to the Sea
+-------------------------------------
+
 
 Let us assume that the exponential ``P ⇒̂ Q : Sem`` exists. This means,
 in particular, that it satisfies the following isomorphism for all ``R
