@@ -445,6 +445,22 @@ Coq`_.
 Interlude: substitution, structurally
 -------------------------------------
 
+Substitution for de Bruijn λ-terms is usually (offhandedly) specified
+in the following manner:
+
+.. code-block:: guess
+
+    n [σ]    = σ(n)
+    (M N)[σ] = M[σ] N[σ]
+    (λ M)[σ] = λ (M[0 · (σ ∘ λ n. suc n)])
+
+    σ ∘ ρ    = λ n. (σ n)[ρ]
+
+However, this definition contains a fair amount of mutual recursion,
+whose validity is not obvious and will be a hard sell to a termination
+checker. Let us exhibit this structure and, at the same time, exercise
+ourselves in the art of unearthing initial models.
+
 ..
   ::
 
