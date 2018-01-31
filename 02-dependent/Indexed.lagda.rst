@@ -1476,13 +1476,13 @@ function::
 
     Yoneda-IsPSh : {F : context → Set} → IsPSh (Yoneda F)
     Yoneda-IsPSh = record { ren-id = λ {X} → ext λ ρ →
-                                              ext-impl (λ Γ →
-                                              ext λ wk →
-                                              cong (ρ {Γ}) (lemma-left-unit wk))
+                                             ext-impl (λ Γ →
+                                             ext λ wk →
+                                             cong (ρ {Γ}) (lemma-left-unit wk))
                           ; ren-∘ = λ {Δ}{∇}{Ω}{k} wk₁ wk₂ →
-                                              ext-impl λ Γ →
-                                              ext λ wk₃ →
-                                              cong k (lemma-assoc wk₃ wk₂ wk₁) }
+                                             ext-impl λ Γ →
+                                             ext λ wk₃ →
+                                             cong k (lemma-assoc wk₃ wk₂ wk₁) }
 
 A precise treatment of the categorical aspects of
 normalization-by-evaluation for the λ-calculus can be found in the
