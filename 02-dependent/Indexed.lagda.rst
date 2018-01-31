@@ -1458,7 +1458,7 @@ function::
                                               ext λ wk₃ →
                                               cong k (lemma-assoc wk₃ wk₂ wk₁) }
 
-A precise treatments of the categorical aspects of
+A precise treatment of the categorical aspects of
 normalization-by-evaluation for the λ-calculus can be found in the
 excellent `Normalization and the Yoneda embedding`_ or, in a different
 style, in `Semantics Analysis of Normalisation by Evaluation for Typed
