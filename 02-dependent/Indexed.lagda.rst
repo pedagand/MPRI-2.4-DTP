@@ -460,10 +460,10 @@ cardinality ``n`` is defined by an inductive family:
     zero : {n : ℕ} → Fin (suc n)
     suc  : {n : ℕ} (i : Fin n) → Fin (suc n)
 
-We are interested in **monotone** functions from ``Fin n`` to ``Fin
-m``. We could obviously formalize this class of functions as "any
-function from ``Fin n`` to ``Fin m`` as long as it is monotone"
-however a more *intentional* caracterization can be given by means of
+We are interested in **monotone** functions from ``Fin m`` to ``Fin
+n``. We could obviously formalize this class of functions as "any
+function from ``Fin m`` to ``Fin n`` as long as it is monotone"
+however a more *intentional* characterization can be given by means of
 an inductive family::
 
       data _⊇_ : (m : ℕ)(n : ℕ) → Set where
