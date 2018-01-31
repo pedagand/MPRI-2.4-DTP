@@ -974,6 +974,7 @@ We are going to construct a context-and-type-indexed model
 
     [_]⊩_ : context → type → Set
 
+(reading ``[ Γ ]⊩ T`` as "an interpretation of ``T`` in context ``Γ``)
 so as to ensure that the normal forms we produce by reification are
 well-typed and well-scoped (and, conversely, to ensure that the
 neutral terms we reflect are necessarily well-typed and
@@ -1031,13 +1032,12 @@ with renaming operation::
         _⊢ : context → Set
         ren : ∀ {Γ Δ} → Γ ⊇ Δ → Δ ⊢ → Γ ⊢
 
-A morphism in ``Sem`` is a family of morphisms for each context::
+An implication in ``Sem`` is a family of implications for each context::
 
     _⟶_ : (P Q : Sem) → Set
     P ⟶ Q = ∀ {Γ} → Γ ⊢P → Γ ⊢Q
       where open Sem P renaming (_⊢ to _⊢P)
             open Sem Q renaming (_⊢ to _⊢Q)
-
 
 We easily check that normal forms and neutral terms implement this
 interface::
