@@ -351,7 +351,9 @@ structuring compilers and proving them correct`_, (1980). This
 reflects the influence it had on a generation of computer scientists
 interested in language design on one hand (they gave us algebraic
 datatypes) and verified compilation on the other hand (they gave us
-denotational models).
+denotational models). I learned these ideas from `Conor
+McBride <http://strictlypositive.org/>`_, who had learned them from
+`James McKinna <http://homepages.inf.ed.ac.uk/jmckinna/>`_.
 
 ************************************************
 Computing normal forms of λ-terms
