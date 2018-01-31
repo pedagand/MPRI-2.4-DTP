@@ -10,6 +10,7 @@
   open import Data.Maybe
   open import Data.Product
   open import Data.List hiding (_++_)
+  open import Data.String
 
   open import Function hiding (id ; const)
 
@@ -34,6 +35,12 @@ Today, we shall:
 The vision: `The Proof Assistant as an Integrated Development Environment`_
 
 
+..
+  ::
+  showNat : ℕ → String
+  showNat zero    = "0"
+  showNat (suc n) = "S(" ++ showNat n ++ ")"
+
 ************************************************
 Typing ``sprintf``
 ************************************************
@@ -44,7 +51,6 @@ Typing ``sprintf``
   module Format where
 
     open import Data.Char
-    open import Data.String
 
     open import Function
 
@@ -90,11 +96,6 @@ within Agda itself::
     ⟦p_⟧ : String → Set
     ⟦p_⟧ = ⟦_⟧ ∘ parse ∘ toList
 
-..
-  ::
-    showNat : ℕ → String
-    showNat zero    = "0"
-    showNat (suc n) = "S(" ++ showNat n ++ ")"
 
 And we can easily realize this semantics::
 
@@ -662,19 +663,37 @@ We can represent the equation theory as an inductive family::
         --------------
         Γ ⊢ T ∋ t ∼βη t''
 
-      struct-λam : ∀{Γ S T b b'} →
+      struct-lam : ∀{Γ S T b b'} →
 
         Γ ▹ S ⊢ T ∋ b ∼βη b' →
         ----------------
         Γ ⊢ S ⇒ T ∋ lam b ∼βη lam b'
 
-      struct-∙ : ∀{Γ S T f f' s s'} →
+      struct-! : ∀{Γ S T f f' s s'} →
 
         Γ ⊢ S ⇒ T ∋ f ∼βη f' →
         Γ ⊢ S ∋ s ∼βη s' →
         -----------------
         Γ ⊢ T ∋ f ! s ∼βη f' ! s'
 
+      struct-pair : ∀{Γ A B a a' b b'} →
+
+        Γ ⊢ A ∋ a ∼βη a' →
+        Γ ⊢ B ∋ b ∼βη b' →
+        ----------------
+        Γ ⊢ A * B ∋ pair a b ∼βη pair a' b'
+
+      struct-fst : ∀{Γ A B p p'} →
+
+        Γ ⊢ A * B ∋ p ∼βη p' →
+        ------------------------
+        Γ ⊢ A ∋ fst p ∼βη fst p'
+
+      struct-snd : ∀{Γ A B p p'} →
+
+        Γ ⊢ A * B ∋ p ∼βη p' →
+        ------------------------
+        Γ ⊢ B ∋ snd p ∼βη snd p'
 
 ..
   ::
@@ -691,8 +710,8 @@ Compute η-long β-normal forms for the simply typed λ-calculus:
 ::
 
     data term : Set where
-       lam  : (b : term) → term
-       var  : (v : ℕ) → term
+       lam  : (v : String)(b : term) → term
+       var  : (v : String) → term
        _!_  : (f : term)(s : term) → term
        tt   : term
        pair : (x y : term) → term
@@ -739,7 +758,7 @@ in `Intuitionistic Model Constructions and Normalization Proofs`_.
 Let us, for simplicity, assume that we have access to fresh name
 generator, ``gensym``::
 
-      postulate gensym : ⊤ → ℕ
+      postulate gensym : ⊤ → String
 
 This would be the case if we were to write this program in OCaml, for
 instance.
@@ -754,7 +773,8 @@ role of ``reflect``::
 
       reify {unit} nf       = nf
       reify {A * B} (x , y) = pair (reify x) (reify y)
-      reify {S ⇒ T} f       = lam (reify (f (reflect S (var (gensym tt)))))
+      reify {S ⇒ T} f       = let s = gensym tt in
+                              lam s (reify (f (reflect S (var s))))
 
       reflect unit nf     = nf
       reflect (A * B) nf  = reflect A (fst nf) , reflect B (snd nf)
@@ -837,8 +857,8 @@ This might not deter the brave monadic programmer: we can emulate
       Fresh : Set → Set
       Fresh A = ℕ → A × ℕ
 
-      gensym : ⊤ → Fresh ℕ
-      gensym tt = λ n → n , 1 + n
+      gensym : ⊤ → Fresh String
+      gensym tt = λ n → showNat n , 1 + n
 
       return : ∀ {A} → A → Fresh A
       return a = λ n → (a , n)
@@ -858,10 +878,10 @@ computer could do it automatically::
         reify {A * B} (a , b) = reify a >>= λ a →
                                 reify b >>= λ b →
                                 return (pair a b)
-        reify {S ⇒ T} f       = gensym tt >>= λ v →
-                                reflect S (var v) >>= λ t →
+        reify {S ⇒ T} f       = gensym tt >>= λ s →
+                                reflect S (var s) >>= λ t →
                                 reify (f t) >>= λ b →
-                                return (lam b) --
+                                return (lam s b)
 
         reflect : (T : type) → term → Fresh ⟦ T ⟧Type
         reflect unit nf     = return nf
