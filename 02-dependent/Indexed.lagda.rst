@@ -461,9 +461,9 @@ cardinality ``n`` is defined by an inductive family:
     zero : {n : ℕ} → Fin (suc n)
     suc  : {n : ℕ} (i : Fin n) → Fin (suc n)
 
-We are interested in **monotone** functions from ``Fin m`` to ``Fin
-n``. We could obviously formalize this class of functions as "any
-function from ``Fin m`` to ``Fin n`` as long as it is monotone"
+We are interested in **monotone** functions from ``Fin n`` to ``Fin
+m``. We could obviously formalize this class of functions as "any
+function from ``Fin n`` to ``Fin m`` as long as it is monotone"
 however a more *intentional* characterization can be given by means of
 an inductive family::
 
@@ -473,12 +473,39 @@ an inductive family::
 Intuitively, this datatype provides a grammar of monotone functions,
 which we can then interpret back into actual (monotone) functions::
 
-      ⟦_⟧ : ∀ {m n} → m ⊇ n → Fin m → Fin n
+      ⟦_⟧ : ∀ {m n} → m ⊇ n → Fin n → Fin m
       ⟦ wk ⟧ k = {!!}
 
       lemma-valid : ∀{m n k l} → (wk : m ⊇ n) → k ≤ l → ⟦ wk ⟧ k ≤ ⟦ wk ⟧ l
       lemma-valid = {!!}
 
+.. BEGIN HIDE
+  ::
+
+    module Solution-mono where
+
+      open import Data.Fin
+
+      data _⊇_ : (m : ℕ)(n : ℕ) → Set where
+        id    : ∀ {m} → m ⊇ m
+        weak1 : ∀ {m n} → (wk : m ⊇ n) → suc m ⊇ n
+        weak2 : ∀ {m n} → (wk : m ⊇ n) → suc m ⊇ suc n
+
+
+      ⟦_⟧ : ∀ {m n} → m ⊇ n → Fin n → Fin m
+      ⟦ id ⟧ k = k
+      ⟦ weak1 wk ⟧ v = suc (⟦ wk ⟧ v)
+      ⟦ weak2 wk ⟧ zero = zero
+      ⟦ weak2 wk ⟧ (suc k) = suc (⟦ wk ⟧ k)
+
+      lemma-valid : ∀{m n k l} → (wk : m ⊇ n) → k ≤ l → ⟦ wk ⟧ k ≤ ⟦ wk ⟧ l
+      lemma-valid id p = p
+      lemma-valid (weak1 wk) p = s≤s (lemma-valid wk p)
+      lemma-valid {k = zero}  (weak2 wk) x = z≤n
+      lemma-valid {k = suc k} {zero} (weak2 wk) ()
+      lemma-valid {k = suc k} {suc l} (weak2 wk) (s≤s p) = s≤s (lemma-valid wk p)
+
+.. END HIDE
 
 We can adapt this intentional characterization of monotone functions
 to typed embeddings::
