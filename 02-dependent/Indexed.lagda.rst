@@ -54,7 +54,7 @@ without GADTs), the ``printf`` function cannot be given an ML type:
 the value of its arguments depending on the user-provided format.
 
 .. code-block:: guess
-   
+
    printf "foo %d"    : ℕ → String
    printf "bar %s"    : String → String
    printf "baz %d %s" : ℕ → String → String
@@ -137,7 +137,7 @@ Mostly correct-by-construction compiler
 
 Using dependent types (in particular, inductive families), we can bake
 our invariants in the datatypes we manipulate and make sure that they
-are preserved as we process them. The advantage is twofold: 
+are preserved as we process them. The advantage is twofold:
 
   - build *initial* models of a domain of interest (syntax!)
   - total denotational semantics in Agda itself (interpreter!)
@@ -338,7 +338,7 @@ take advantage of tactics to automate the tedium.
 
 
 This exercise has its roots in the very origin of most programming and
-reasoning techniques we take for granted today: 
+reasoning techniques we take for granted today:
 
   - the role of initiality in formal reasoning
   - the importance of equational reasoning for proving program correctness
@@ -412,26 +412,26 @@ well-scoped and well-typed λ-terms::
           --------------------------
           Γ ⊢ T
 
-      tt : 
+      tt :
 
           --------
           Γ ⊢ unit
 
-      pair : ∀{A B} → 
+      pair : ∀{A B} →
 
-          (a : Γ ⊢ A)(b : Γ ⊢ B) → 
+          (a : Γ ⊢ A)(b : Γ ⊢ B) →
           ----------------------
           Γ ⊢ A * B
 
-      fst : ∀{A B} → 
+      fst : ∀{A B} →
 
-          Γ ⊢ A * B → 
+          Γ ⊢ A * B →
           ---------
           Γ ⊢ A
 
-      snd : ∀{A B} → 
+      snd : ∀{A B} →
 
-          Γ ⊢ A * B → 
+          Γ ⊢ A * B →
           ---------
           Γ ⊢ B
 
@@ -448,7 +448,7 @@ Interlude: substitution, structurally
   ::
 
     module Exercise-mono where
-  
+
       open import Data.Fin
 
 **Exercise (difficulty: 2)** In Agda, the type of finite sets of
@@ -508,7 +508,7 @@ to typed embeddings::
     sub (var v) ρ    = ρ v
     sub (f ! s) ρ    = sub f ρ ! sub s ρ
     sub tt ρ         = tt
-    sub (pair a b) ρ = pair (sub a ρ) (sub b ρ) 
+    sub (pair a b) ρ = pair (sub a ρ) (sub b ρ)
     sub (fst p) ρ    = fst (sub p ρ)
     sub (snd p) ρ    = snd (sub p ρ)
 
@@ -642,7 +642,7 @@ We can represent the equation theory as an inductive family::
         Γ ⊢ T ∋ t₁ ↝βη t₂ →
         -----------------
         Γ ⊢ T ∋ t₁ ∼βη t₂
-      
+
 
       reflexivity : ∀{Γ T t} →
 
@@ -771,12 +771,12 @@ the soundness of this procedure with respect to the equational theory
 the same congruence class by comparing their normal forms::
 
       term₁ : ε ⊢ (unit ⇒ unit) ⇒ unit ⇒ unit
-      term₁ = 
+      term₁ =
         -- λ s. λ z. s (s z)
         lam (lam (var (there here) ! (var (there here) ! var here)))
 
       term₂ : ε ⊢ (unit ⇒ unit) ⇒ unit ⇒ unit
-      term₂ = 
+      term₂ =
         -- λ s. (λ r λ z. r (s z)) (λ x. s x)
         lam (lam (lam (var (there here) ! (var (there (there here)) ! var here))) ! lam (var (there here) ! var here))
 
@@ -787,12 +787,12 @@ For instance, thanks to a suitable model construction, we have
 surjective pairing::
 
       term₃ : ε ⊢ unit * unit ⇒ unit * unit
-      term₃ = 
+      term₃ =
         -- λ p. p
         lam (var here)
 
       term₄ : ε ⊢ unit * unit ⇒ unit * unit
-      term₄ = 
+      term₄ =
         -- λ p. (fst p, snd p)
         lam (pair (fst (var here)) (snd (var here)))
 
@@ -814,12 +814,12 @@ that ``gensym`` is not actually producing unique names but always the
 
 
       term₅ : ε ⊢ unit ⇒ unit ⇒ unit
-      term₅ = 
+      term₅ =
         -- λ z₁ z₂. z₁
         lam (lam (var (there here)))
 
       term₆ : ε ⊢ unit ⇒ unit ⇒ unit
-      term₆ = 
+      term₆ =
         -- λ z₁.z₂. z₂
         lam (lam (var here))
 
@@ -828,7 +828,7 @@ that ``gensym`` is not actually producing unique names but always the
 
 ..
   ::
-    
+
     module Impossible where
 
 This might not deter the brave monadic programmer: we can emulate
@@ -842,7 +842,7 @@ This might not deter the brave monadic programmer: we can emulate
 
       return : ∀ {A} → A → Fresh A
       return a = λ n → (a , n)
-    
+
       _>>=_ : ∀ {A B} → Fresh A → (A → Fresh B) → Fresh B
       m >>= k = λ n → let (a , n') = m n in k a n'
 
@@ -855,20 +855,20 @@ computer could do it automatically::
       mutual
         reify : ∀{T} → ⟦ T ⟧Type → Fresh term
         reify {unit} nf       = return nf
-        reify {A * B} (a , b) = reify a >>= λ a → 
-                                reify b >>= λ b → 
+        reify {A * B} (a , b) = reify a >>= λ a →
+                                reify b >>= λ b →
                                 return (pair a b)
         reify {S ⇒ T} f       = gensym tt >>= λ v →
                                 reflect S (var v) >>= λ t →
                                 reify (f t) >>= λ b →
                                 return (lam b) --
-  
+
         reflect : (T : type) → term → Fresh ⟦ T ⟧Type
         reflect unit nf     = return nf
         reflect (A * B) nf  = reflect A (fst nf) >>= λ a →
                               reflect B (snd nf) >>= λ b →
                               return (a , b)
-        reflect (S ⇒ T) neu = return (λ s → {!!}) 
+        reflect (S ⇒ T) neu = return (λ s → {!!})
           -- XXX: cannot conclude with `reflect T (neu ! reify s)`
 
 Excepted that, try as we might, we cannot reflect a function.
@@ -900,7 +900,7 @@ The Rising Sea
     infix 50 _×̂_
     infix 30 _⊩_
 
-  
+
 Rather than hack our model, I propose to gear up and let the sea rise
 because "when the time is ripe, hand pressure is enough". Another
 argument against incrementally improving our model is its fragility:
@@ -909,7 +909,7 @@ whilst our source language is well structured (well-scoped, well-typed
 destructured, guaranteeing neither that we actually produce normal
 forms, nor that it is well-typed not even proper scoping.
 
-To remedy this, let us 
+To remedy this, let us
   - precisely describe η-long β-normal forms
   - check that they embed back into well-typed, well-scoped terms
 
@@ -944,7 +944,7 @@ To remedy this, let us
     ⌊ tt ⌋Ne          = tt
 
 
-We are going to construct a context-and-type-indexed model 
+We are going to construct a context-and-type-indexed model
 
 .. code-block:: guess
 
@@ -1032,11 +1032,11 @@ interface::
     rename-Ne wk (snd p)       = snd (rename-Ne wk p)
 
     Nf̂ : type → Sem
-    Nf̂ T = record { _⊢ = λ Γ → Γ ⊢Nf T  
+    Nf̂ T = record { _⊢ = λ Γ → Γ ⊢Nf T
                   ; ren = rename-Nf }
 
     Nê : type → Sem
-    Nê T = record { _⊢ = λ Γ → Γ ⊢Ne T  
+    Nê T = record { _⊢ = λ Γ → Γ ⊢Ne T
                   ; ren = rename-Ne }
 
 Following our earlier model, we will interpret the ``unit`` type as
@@ -1104,7 +1104,7 @@ the ``id`` continuation::
 One could then prove that this establishes an isomorphism, for all
 ``Γ``::
 
-      postulate 
+      postulate
         ψ∘φ≡id : ψ ∘ φ ≡ λ k → k
         φ∘ψ≡id : φ ∘ ψ ≡ λ t → t
 
@@ -1122,7 +1122,7 @@ isomorphism between the object ``Γ ⊢T`` and the morphisms in ``⊇[ Γ ]
 ⟶ T``::
 
       ⊇[_] : context → Sem
-      ⊇[ Γ ] = record { _⊢ = λ Δ → Δ ⊇ Γ  
+      ⊇[ Γ ] = record { _⊢ = λ Δ → Δ ⊇ Γ
                       ; ren = λ wk₁ wk₂ → wk₂ ∘wk wk₁ }
 
       ψ' : Γ ⊢T → ⊇[ Γ ] ⟶ T
@@ -1178,7 +1178,7 @@ can easily be equipped with a renaming: we therefore take it as the
 
     LAM : ∀ {P Q R} → P ×̂ Q ⟶ R → P ⟶ Q ⇒̂ R
     LAM {P} η p = λ wk q → η (ren-P wk p , q)
-      where open Sem P renaming (ren to ren-P) 
+      where open Sem P renaming (ren to ren-P)
 
     APP : ∀ {P Q R} → P ⟶ Q ⇒̂ R → P ⟶ Q → P ⟶ R
     APP η μ = λ px → η px id (μ px)
@@ -1277,14 +1277,14 @@ f`` using function application and weakening, without explicitly using
 the structure of ``f : [ Γ ]⊩ S ⇒̂ T``. However, there is also a direct
 implementation::
 
-    remark-reify-fun : ∀ {Γ S T} → (f : [ Γ ]⊩ (S ⇒ T)) → 
+    remark-reify-fun : ∀ {Γ S T} → (f : [ Γ ]⊩ (S ⇒ T)) →
         reify {S ⇒ T} f ≡ lam (reify (f (weak1 id) (reflect S (var here))))
     remark-reify-fun f = refl
 
 
 .. BEGIN HIDE
 
-.. 
+..
   ::
 
     test-nbe : norm NBE-gensym.Axiom.term₁ ≡ norm NBE-gensym.Axiom.term₂
@@ -1300,7 +1300,7 @@ implementation::
 
 By defining a richly-structured model, we have seen how we could
 implement a typed model of the λ-calculus and manipulate binders in
-the model. 
+the model.
 
 Takeaways:
   * You are *familiar* with the construction of denotational models in type theory
@@ -1336,7 +1336,7 @@ Optional: Categorical spotting
     open STLC
     open NBE-Presheaf
 
-    postulate 
+    postulate
       ext : Extensionality zeroℓ zeroℓ
       ext-impl : {X : Set}{Y : X → Set}
           → {f g : {x : X} → Y x}
@@ -1366,11 +1366,11 @@ First, we model the notion of category::
     record IsCat (C : Cat) : Set where
       open Cat C
       field
-        left-id : ∀ {A B} → ∀ (f : Hom[ A ∶ B ]) → 
+        left-id : ∀ {A B} → ∀ (f : Hom[ A ∶ B ]) →
                   idC ∘C f ≡ f
-        right-id : ∀ {A B} → ∀ (f : Hom[ A ∶ B ]) → 
+        right-id : ∀ {A B} → ∀ (f : Hom[ A ∶ B ]) →
                    f ∘C idC ≡ f
-        assoc : ∀ {A B C D} → ∀ (f : Hom[ A ∶ B ])(g : Hom[ B ∶ C ])(h : Hom[ C ∶ D ]) → 
+        assoc : ∀ {A B C D} → ∀ (f : Hom[ A ∶ B ])(g : Hom[ B ∶ C ])(h : Hom[ C ∶ D ]) →
                 (h ∘C g) ∘C f ≡ h ∘C (g ∘C f)
 
 Contexts form a category, hence the emphasis we have put on defining
@@ -1379,8 +1379,8 @@ composition of weakenings::
     Context-Cat : Cat
     Context-Cat = record { Obj = context ;
                            Hom[_∶_] = _⊇_ ;
-                           idC = id ; 
-                           _∘C_ = _∘wk_ } 
+                           idC = id ;
+                           _∘C_ = _∘wk_ }
 
 Our model of semantics objects is actually an instance of a more
 general object, called a "presheaf", and defined over any category as
@@ -1421,10 +1421,10 @@ transformations::
     PSh-Cat C = record { Obj = PSh C
                        ; Hom[_∶_] = λ P Q → Hom[ C ][ P ∶ Q ]
                        ; idC = λ x → x
-                       ; _∘C_ = λ f g x → f (g x) } 
+                       ; _∘C_ = λ f g x → f (g x) }
 
     PSh-IsCat : (C : Cat) → IsCat (PSh-Cat C)
-    PSh-IsCat C = record { left-id = λ f → refl 
+    PSh-IsCat C = record { left-id = λ f → refl
                          ; right-id = λ f → refl
                          ; assoc = λ f g h → refl }
 
@@ -1449,20 +1449,20 @@ function::
                       ; ren = λ wk₁ k wk₂ → k (wk₁ ∘wk wk₂) }
 
     Yoneda-IsPSh : {F : context → Set} → IsPSh (Yoneda F)
-    Yoneda-IsPSh = record { Fmap-id = λ {X} → ext λ ρ → 
-                                              ext-impl (λ Γ → 
-                                              ext λ wk → 
-                                              cong (ρ {Γ}) (lemma-left-unit wk)) 
-                          ; Fmap-∘ = λ {Δ}{∇}{Ω}{k} wk₁ wk₂ → 
+    Yoneda-IsPSh = record { Fmap-id = λ {X} → ext λ ρ →
+                                              ext-impl (λ Γ →
+                                              ext λ wk →
+                                              cong (ρ {Γ}) (lemma-left-unit wk))
+                          ; Fmap-∘ = λ {Δ}{∇}{Ω}{k} wk₁ wk₂ →
                                               ext-impl λ Γ →
-                                              ext λ wk₃ → 
-                                              cong k (lemma-assoc wk₃ wk₂ wk₁) }  
-    
+                                              ext λ wk₃ →
+                                              cong k (lemma-assoc wk₃ wk₂ wk₁) }
+
 A precise treatments of the categorical aspects of
 normalization-by-evaluation for the λ-calculus can be found in the
 excellent `Normalization and the Yoneda embedding`_ or, in a different
 style, in `Semantics Analysis of Normalisation by Evaluation for Typed
-Lambda Calculus`_. 
+Lambda Calculus`_.
 
 
 .. References (papers):
