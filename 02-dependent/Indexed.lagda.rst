@@ -258,7 +258,7 @@ machine::
     exec skip s                   = s
     exec (c₁ # c₂) s              = exec c₂ (exec c₁ s)
     exec (PUSH v) s               = v ∙ s
-    exec ADD (x₁ ∙ x₂ ∙ c)        = x₁ + x₂ ∙ c
+    exec ADD (x₁ ∙ x₂ ∙ s)        = x₁ + x₂ ∙ s
     exec (IFTE c₁ c₂) (true ∙ s)  = exec c₁ s
     exec (IFTE c₁ c₂) (false ∙ s) = exec c₂ s
 
