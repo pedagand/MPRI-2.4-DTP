@@ -840,7 +840,7 @@ that ``gensym`` is not actually producing unique names but always the
 
       term₆ : ε ⊢ unit ⇒ unit ⇒ unit
       term₆ =
-        -- λ z₁.z₂. z₂
+        -- λ z₁ z₂. z₂
         lam (lam (var here))
 
       test-nbe₃ : norm term₅ ≡ norm term₆
