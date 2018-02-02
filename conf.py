@@ -161,6 +161,8 @@ latex_documents = [
      u'Pierre-Évariste Dagand', 'manual'),
     ("02-dependent/Indexed", 'Indexed.tex', u'Indexed Programming',
      u'Pierre-Évariste Dagand', 'manual'),
+    ("03-total/Recursion", 'Recursion.tex', u'Total Programming',
+     u'Pierre-Évariste Dagand', 'manual'),
 
 ]
 
