@@ -211,7 +211,7 @@ evaluator would have to deal with type errors dynamically::
       ... | _ | _ | _ = nothing
 
 **Exercise (difficulty: 1)** The above implementation is needlessly
-verbose, use the Maybe monad to hide the treatment of errors.
+verbose, use the Maybe monad to abstract away error handling.
 
 The moral of this implementation is that we failed to encode our
 invariant in the datatype ``exp'`` and paid the price in the
