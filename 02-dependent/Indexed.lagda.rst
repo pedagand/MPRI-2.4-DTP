@@ -45,6 +45,8 @@ The vision: `The Proof Assistant as an Integrated Development Environment`_
 Typing ``sprintf``
 ************************************************
 
+.. TODO: type-system for formats?
+
 ..
   ::
 
@@ -1261,7 +1263,11 @@ can easily be equipped with a renaming: we therefore take it as the
 **Remark:** The above construction of the exponential is taken from
 MacLane & Moerdijk's `Sheaves in Geometry and Logic`_ (p.46).
 
-At this stage, we have enough structure to interpret types::
+.. BEGIN HIDE
+.. TODO renaming ⊤̂, ⇒̂, ×̂
+.. END HIDE
+
+At this stage, we have enough structure to interpret the types::
 
     ⟦_⟧ : type → Sem
     ⟦ unit ⟧  = ⊤̂
