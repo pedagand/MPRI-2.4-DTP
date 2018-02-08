@@ -921,24 +921,24 @@ This might not deter the brave monadic programmer: we can emulate
 We then simply translate the previous code to a monadic style, a
 computer could do it automatically::
 
-      mutual
-        reify : ∀{T} → ⟦ T ⟧Type → Fresh term
-        reify {unit} nf       = return nf
-        reify {A * B} (a , b) = reify a >>= λ a →
-                                reify b >>= λ b →
-                                return (pair a b)
-        reify {S ⇒ T} f       = gensym tt >>= λ s →
-                                reflect S (var s) >>= λ t →
-                                reify (f t) >>= λ b →
-                                return (lam s b)
+      reify : ∀{T} → ⟦ T ⟧Type → Fresh term
+      reflect : (T : type) → term → Fresh ⟦ T ⟧Type
 
-        reflect : (T : type) → term → Fresh ⟦ T ⟧Type
-        reflect unit nf     = return nf
-        reflect (A * B) nf  = reflect A (fst nf) >>= λ a →
-                              reflect B (snd nf) >>= λ b →
-                              return (a , b)
-        reflect (S ⇒ T) neu = return (λ s → {!!})
-          -- XXX: cannot conclude with `reflect T (neu ! reify s)`
+      reify {unit} nf       = return nf
+      reify {A * B} (a , b) = reify a >>= λ a →
+                              reify b >>= λ b →
+                              return (pair a b)
+      reify {S ⇒ T} f       = gensym tt >>= λ s →
+                              reflect S (var s) >>= λ t →
+                              reify (f t) >>= λ b →
+                              return (lam s b)
+
+      reflect unit nf     = return nf
+      reflect (A * B) nf  = reflect A (fst nf) >>= λ a →
+                            reflect B (snd nf) >>= λ b →
+                            return (a , b)
+      reflect (S ⇒ T) neu = return (λ s → {!!})
+      -- XXX: cannot conclude with `reflect T (neu ! reify s)`
 
 Excepted that, try as we might, we cannot reflect a function.
 
