@@ -1,0 +1,238 @@
+--- 01-effectful/Monad.student	2018-02-09 19:32:54.174167064 +0100
++++ 01-effectful/Monad.lagda.rst.orig	2018-01-26 09:45:02.005053944 +0100
+@@ -113,9 +113,7 @@
+ We formalize this intuition with the following signature::
+ 
+     data ΣState (X : Set) : Set where
+-      `get : ⊤ × (S → X) → ΣState X
+-      `set : S × (⊤ → X) → ΣState X
+-
++      {- COMPLETE -}
+ 
+ 
+ 
+@@ -166,15 +164,17 @@
+ inductive type::
+ 
+     data StateF (V : Set) : Set where
+-      return : V → StateF V
+-      op : ΣState (StateF V) → StateF V
++      {- COMPLETE -}
++
++    return : ∀ {V} → V → StateF V
++    return = {!!}
+ 
+ In this (very small) language, we have two smart constructors, ``get``
+ and ``set``, whose definition can be `automatically derived from the
+ signature <https://doi.org/10.1023/A:1023064908962>`_::
+ 
+     get : ⊤ → StateF S
+-    get tt = op (`get (tt , λ s → return s))
++    get tt = {!!}
+ 
+ 
+ 
+@@ -240,27 +240,27 @@
+ as::
+ 
+     test0 : StateF S
+-    test0 = get tt >>= λ s →
+-            set s >>= λ _ →
+-            get tt >>= λ s' →
+-            return s'
++    test0 = {!!} {- get tt >>= λ s → 
++            set s >>= λ _ → 
++            get tt >>= λ s' → 
++            return s' -}
+ 
+     test1 : StateF S
+-    test1 = get tt >>= λ s' →
+-            return  s'
++    test1 = {!!} {- get tt >>= λ s' → 
++            return  s' -}
+ 
+     test2 : StateF S
+-    test2 = get tt >>= λ s →
+-            set s >>= λ _ →
+-            return s
++    test2 = {!!} {- get tt >>= λ s → 
++            set s >>= λ _ → 
++            return s -}
+ 
+     random : StateF ℕ
+-    random = get tt >>= λ seed →
++    random = {!!} {- get tt >>= λ seed → 
+              let n = toℕ ((seed *ℕ 25173 + 1725) mod 65536) in
+              set n >>= λ _ →
+-             return n
+-
++             return n -}
+ 
++    
+ --------------------------------
+ Monad laws
+ --------------------------------
+@@ -349,19 +349,7 @@
+ embedded language. We want::
+ 
+     data _↝_ {V : Set} : StateF V → StateF V → Set where
+-
+-
+-      get-get : ∀{k : S → S → StateF V} →
+-              (get tt >>= (λ s → get tt >>= λ s' → k s s' )) ↝ (get tt >>= λ s → k s s )
+-
+-      set-set : ∀{k s₁ s₂} →
+-              (set s₁ >>= (λ _ → set s₂ >>= λ _ → k)) ↝ (set s₂ >>= λ _ → k)
+-
+-      get-set : ∀{k} →
+-              (get tt >>= λ s → set s >>= λ _ → k) ↝ k
+-
+-      set-get : ∀{k s} →
+-              (set s >>= (λ _ → get tt >>= k)) ↝ (set s >>= λ _ → k s)
++      {- COMPLETE -}
+ 
+ In English, this amounts to the following rules:
+   * rule ``get_get``: getting the current state twice is equivalent to getting it
+@@ -467,15 +455,15 @@
+ followed by a ``set``, concluded with a ``return``. We thus expect the
+ following normal form::
+ 
+-    State : Set → Set
+-    State V = ΣGet (ΣSet V)
++    State : Set → Set 
++    State V = {!!}
+ 
+ Unfolding the definition of ``ΣGet`` and ``ΣSet``, we realize that
+ this type is in fact isomorphic to ``S → S × V``: we have recovered
+ Haskell's ``State`` monad::
+ 
+     STATE : Set → Set
+-    STATE V = S → S × V
++    STATE V = {!!}
+ 
+ It remains to substantiate this claim that *every* stateful program is
+ equivalent to a ``get`` followed by a ``set``. In the great tradition
+@@ -519,15 +507,17 @@
+ The normalization procedure thus genuinely computes the normal form::
+ 
+     norm : ∀{A} → StateF A → State A
+-    norm p = reify (eval p)
++    norm p = {!!}
+ 
+ and these normal forms are indeed a subset of terms::
+ 
+-    ⌈_⌉ : ∀{A} → State A → StateF A
+-    ⌈ `get (tt , k) ⌉ = get tt >>= λ s → help (k s)
++    ⌈_⌉ : ∀{A} → State A → StateF A 
++    ⌈_⌉ = {!!}
++    {-
++    ⌈ `get (tt , k) ⌉ = get tt >>= λ s → help (k s) 
+       where help : ∀ {A} → ΣSet A → StateF A
+             help (`set (s , k)) = set s >>= λ _ → return (k tt)
+-
++    -}
+ 
+ Interpreting the statement *"for every stateful program, there exists a
+ normal form"* constructively means that we have a procedure for
+@@ -622,34 +612,16 @@
+ belong to the same congruence class::
+ 
+     sound : ∀ {V} (p q : StateF V) → ⌈ norm p ⌉ ≡ ⌈ norm q ⌉ → p ∼ q
+-    sound {V} p q r =
+-        begin
+-          p
+-         ≈⟨ pf-sound p ⟩
+-          ⌈ norm p ⌉
+-         ≡⟨ r ⟩
+-          ⌈ norm q ⌉
+-         ≈⟨ sym (pf-sound q) ⟩
+-          q
+-         ∎
++    sound {V} p q r = {!!}
+            where open import Relation.Binary.EqReasoning (setoid V)
+ 
+ Second, ``norm`` is complete: if two terms belong to the same congruence
+ class, they have the same normal form::
+ 
+     complete : ∀ {A} {p q : StateF A} → p ∼ q → ⌈ norm p ⌉ ≡ ⌈ norm q ⌉
+-    complete {p = p} {q} r =
+-        begin
+-          ⌈ norm p ⌉
+-        ≡⟨ refl ⟩
+-          ⌈ reify (eval p) ⌉
+-        ≡⟨ cong≡ (λ x → ⌈ reify x ⌉) (ext (λ z → pf-complete r)) ⟩
+-          ⌈ reify (eval q) ⌉
+-        ≡⟨ refl ⟩
+-          ⌈ norm q ⌉
+-        ∎
++    complete {p = p} {q} r = {!!}
+         where open ≡-Reasoning
+-              postulate ext : Extensionality Level.zero Level.zero
++              postulate ext : Extensionality Level.zero Level.zero 
+ 
+ Note that this last proof needs functional extensionality (which, in
+ Agda, is an axiom that does not compute). This is not a problem here
+@@ -672,10 +644,10 @@
+ ``test2`` are all equivalent::
+ 
+     test01 : test0 ∼ test1
+-    test01 = sound test0 test1 refl
++    test01 = {!!}
+ 
+     test12 : test1 ∼ test2
+-    test12 = sound test1 test2 refl
++    test12 = {!!}
+ 
+ The trick here is to rely on the soundness of normalization and
+ compare the norm forms for (propositional!) equality. This proof
+@@ -756,7 +728,7 @@
+ some amount ``r : R`` to a global accumulator::
+ 
+     data ΣTick (X : Set) : Set where
+-      `tick : R × (⊤ → X) → ΣTick X
++      {- COMPLETE -}
+ 
+ --------------------------------
+ Free term algebra
+@@ -768,6 +740,7 @@
+ using the free term algebra::
+ 
+     data TickF (V : Set) : Set where
++      {- COMPLETE -}
+ 
+     tick : R → TickF ⊤
+     tick r = {!!}
+@@ -789,15 +762,7 @@
+ thesis`_, is defined as follows::
+ 
+     data _↝_ {V : Set} : TickF V → TickF V → Set where
+-      -- 1. Counting ε ticks amounts to doing nothing:
+-      tick-eps : ∀{k : TickF V} →
+-        (tick ε >>= λ _ → k) ↝ k
+-
+-      -- 2. Counting r₁ ticks followed by r₂ ticks amounts to counting
+-      --    r₁ ∙ r₂ ticks:
+-      tick-com : ∀{k : TickF V}{r₁ r₂} →
+-        (tick r₁ >>= λ _ →
+-         tick r₂ >>= λ _ → k) ↝ (tick (r₁ ∙ r₂) >>= λ _ → k)
++      {- COMPLETE -}
+ 
+ --------------------------------
+ Normal forms
+@@ -806,13 +771,13 @@
+ We realize that every 'TickF' program amounts to a single tick
+ accumulating the sum of all sub-ticks::
+ 
+-    Tick : Set → Set
+-    Tick X = ΣTick X
++    Tick : Set → Set 
++    Tick X = {!!}
+ 
+ This type being isomorphic to::
+ 
+     TICK : Set → Set
+-    TICK A = R × A
++    TICK A = {!!}
+ 
+ **Exercise (difficulty: 3)** Establish this *a posteriori* by normalization-by-evaluation.
+ 

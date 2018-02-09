@@ -1,0 +1,373 @@
+--- 02-dependent/Indexed.student	2018-02-09 20:36:17.561528825 +0100
++++ 02-dependent/Indexed.lagda.rst.orig	2018-02-09 20:35:08.270139190 +0100
+@@ -74,26 +74,16 @@
+ ::
+ 
+     data format : Set where
+-      digit  : (k : format) → format
+-      string : (k : format) → format
+-      symb   : (c : Char)(k : format) → format
+-      end    : format
++      -- XXX: COMPLETE
+ 
+     parse : List Char → format
+-    parse ('%' ∷ 'd' ∷ cs ) = digit (parse cs)
+-    parse ('%' ∷ 's' ∷ cs ) = string (parse cs)
+-    parse ('%' ∷ c ∷ cs )   = symb c (parse cs)
+-    parse ( c ∷ cs)         = symb c (parse cs)
+-    parse []                = end
++    parse s = {!!}
+ 
+ We can *embed* the semantics of a format by describing its meaning
+ within Agda itself::
+ 
+     ⟦_⟧ : format → Set
+-    ⟦ digit k ⟧  = ℕ → ⟦ k ⟧
+-    ⟦ string k ⟧ = String → ⟦ k ⟧
+-    ⟦ symb c k ⟧ = ⟦ k ⟧
+-    ⟦ end ⟧      = String
++    ⟦ fmt ⟧  = {!!}
+ 
+     ⟦p_⟧ : String → Set
+     ⟦p_⟧ = ⟦_⟧ ∘ parse ∘ toList
+@@ -102,10 +92,7 @@
+ And we can easily realize this semantics::
+ 
+     eval : (fmt : format) → String → ⟦ fmt ⟧
+-    eval (digit k) acc  = λ n → eval k (acc ++ showNat n)
+-    eval (string k) acc = λ s → eval k (acc ++ s)
+-    eval (symb c k) acc = eval k (acc ++ fromList (c ∷ []))
+-    eval end acc        = acc
++    eval fmt s = {!!}
+ 
+     sprintf : (fmt : String) → ⟦p fmt ⟧
+     sprintf fmt = eval (parse (toList fmt)) ""
+@@ -116,7 +103,7 @@
+ 
+     test : sprintf "test %%d & %%s: %d & %s" 2 "hello world!"
+            ≡ "test %d & %s: S(S(0)) & hello world!"
+-    test = refl
++    test = {!!}
+ 
+ **Exercise (difficulty: 1)** Print ``%d`` using decimal numbers instead of Peano numbers
+ 
+@@ -163,21 +150,18 @@
+        nat bool : typ
+ 
+     sem : typ → Set
+-    sem nat  = ℕ
+-    sem bool = Bool
++    sem T  = ?
+ 
+     data exp : typ → Set where
+-      val  : ∀ {T} → (v : sem T) → exp T
+-      plus : (e₁ e₂ : exp nat) → exp nat
+-      ifte : ∀ {T} → (c : exp bool)(e₁ e₂ : exp T) → exp T
++      val  : ∀ {T} → (v : sem ?) → exp ?
++      plus : (e₁ e₂ : exp ?) → exp ?
++      ifte : ∀ {T} → (c : exp ?)(e₁ e₂ : exp ?) → exp ?
+ 
+ We define the semantics of this language by interpretation within
+ Agda::
+ 
+     eval : ∀ {T} → exp T → sem T
+-    eval (val v)        = v
+-    eval (plus e₁ e₂)   = eval e₁ + eval e₂
+-    eval (ifte c e₁ e₂) = if eval c then eval e₁ else eval e₂
++    eval t = ?
+ 
+ If we were pedantic, we would call this a *denotational*
+ semantics.
+@@ -231,39 +215,34 @@
+     stack-typ = List typ
+ 
+     data stack : stack-typ → Set where
+-      ε   : stack []
+-      _∙_ : ∀ {T σ} → sem T → stack σ → stack (T ∷ σ)
++      -- XXX: COMPLETE
+ 
++    postulate _∙_ : ⊤ → ⊤ → ⊤
+ 
+ In particular, a non-empty stack allows us to peek at the top element
+ and to take its tail::
+ 
+     top : ∀ {T σ} → stack (T ∷ σ) → sem T
+-    top (t ∙ _) = t
++    top s = {!!}
+ 
+     tail : ∀ {T σ} → stack (T ∷ σ) → stack σ
+-    tail (_ ∙ s) = s
++    tail s = {!!}
+ 
+ Using an inductive family, we can once again garantee that
+ instructions are only applied onto well-formed and well-typed stacks::
+ 
+     data code : stack-typ → stack-typ → Set where
+-      skip : ∀ {σ} → code σ σ
+-      _#_  : ∀ {σ₁ σ₂ σ₃} → (c₁ : code σ₁ σ₂)(c₂ : code σ₂ σ₃) → code σ₁ σ₃
+-      PUSH : ∀ {T σ} → (v : sem T) → code σ (T ∷ σ)
+-      ADD  : ∀ {σ} → code (nat ∷ nat ∷ σ) (nat ∷ σ)
+-      IFTE : ∀ {σ₁ σ₂} → (c₁ c₂ : code σ₁ σ₂) → code (bool ∷ σ₁) σ₂
++      skip : code {!!} {!!}
++      _#_  : (c₁ : code {!!} {!!})(c₂ : code {!!} {!!}) → code {!!} {!!}
++      PUSH : (v : {!!}) → code {!!} {!!}
++      ADD  : code {!!} {!!}
++      IFTE : (c₁ : code {!!} {!!})(c₂ : code {!!} {!!}) → code {!!} {!!}
+ 
+ As a result, we can implement a (total) interpreter for our stack
+ machine::
+ 
+-    exec : ∀ {σ-i σ-f} → code σ-i σ-f → stack σ-i → stack σ-f
+-    exec skip s                   = s
+-    exec (c₁ # c₂) s              = exec c₂ (exec c₁ s)
+-    exec (PUSH v) s               = v ∙ s
+-    exec ADD (x₁ ∙ x₂ ∙ s)        = x₁ + x₂ ∙ s
+-    exec (IFTE c₁ c₂) (true ∙ s)  = exec c₁ s
+-    exec (IFTE c₁ c₂) (false ∙ s) = exec c₂ s
++    exec : code {!!} {!!} → stack {!!} → stack {!!}
++    exec c s = {!!}
+ 
+ **Exercise (difficulty: 1)** Implement a simply-typed version of
+ ``code`` and update ``exec`` to work (partially) from list of tagged
+@@ -277,10 +256,8 @@
+ straightforward, the types making sure that we cannot generate
+ non-sensical opcodes::
+ 
+-    compile : ∀ {T σ} → exp T → code σ (T ∷ σ)
+-    compile (val v)        = PUSH v
+-    compile (plus e₁ e₂)   = compile e₂ # compile e₁ # ADD
+-    compile (ifte c e₁ e₂) = compile c # IFTE (compile e₁) (compile e₂)
++    compile : exp {!!} → code {!!} {!!}
++    compile t = {!!}
+ 
+ **Exercise (difficulty: 1)** Implement the (same) compiler on the
+ simply-typed representation of expressions ``exp'``.
+@@ -318,16 +295,8 @@
+ and output machine codes, we can focus on proving only the meaningful
+ cases::
+ 
+-    correctness : forall {T σ} → (e : exp T)(s : stack σ) → exec (compile e) s ≡ eval e ∙ s
+-    correctness (val v) s = refl
+-    correctness (plus e₁ e₂) s
+-      rewrite correctness e₂ s
+-              | correctness e₁ (eval e₂ ∙ s) = refl
+-    correctness (ifte c e₁ e₂) s
+-      rewrite correctness c s
+-      with eval c
+-    ... | true rewrite correctness e₁ s = refl
+-    ... | false rewrite correctness e₂ s = refl
++    correctness : forall {T σ} → (e : exp T)(s : stack σ) → {!!}
++    correctness x = {!!}
+ 
+ 
+ **Exercise (difficulty: 2)** Prove the same theorem one the
+@@ -499,19 +468,16 @@
+ to typed embeddings::
+ 
+     data _⊇_ : context → context → Set where
+-      id    : ∀ {Γ} → Γ ⊇ Γ
+-      weak1 : ∀ {Γ Δ A} → (wk : Δ ⊇ Γ) → Δ ▹ A ⊇ Γ
+-      weak2 : ∀ {Γ Δ A} → (wk : Δ ⊇ Γ) → Δ ▹ A ⊇ Γ ▹ A
++      -- XXX: COMPLETE
++
++    postulate id : ∀ {Γ} → Γ ⊇ Γ
+ 
+     shift : ∀ {Γ Δ T} → Γ ⊇ Δ → T ∈ Δ → T ∈ Γ
+-    shift id v                 = v
+-    shift (weak1 wk) v         = there (shift wk v)
+-    shift (weak2 wk) here      = here
+-    shift (weak2 wk) (there v) = there (shift wk v)
++    shift wk v = {!!}
+ 
+     rename : ∀ {Γ Δ T} → Γ ⊇ Δ → Δ ⊢ T → Γ ⊢ T
+-    rename wk (lam t)    = lam (rename (weak2 wk) t)
+-    rename wk (var v)    = var (shift wk v)
++    rename wk (lam t)    = lam {!!}
++    rename wk (var v)    = var {!!}
+     rename wk (f ! s)    = rename wk f ! rename wk s
+     rename wk tt         = tt
+     rename wk (pair a b) = pair (rename wk a) (rename wk b)
+@@ -519,9 +485,8 @@
+     rename wk (snd p)    = snd (rename wk p)
+ 
+     sub : ∀ {Γ Δ T} → Γ ⊢ T → (∀ {S} → S ∈ Γ →  Δ ⊢ S) → Δ ⊢ T
+-    sub (lam t) ρ    = lam (sub t (λ { here      → var here ;
+-                                       (there v) → rename (weak1 id) (ρ v) }))
+-    sub (var v) ρ    = ρ v
++    sub (lam t) ρ    = lam {!!}
++    sub (var v) ρ    = {!!}
+     sub (f ! s) ρ    = sub f ρ ! sub s ρ
+     sub tt ρ         = tt
+     sub (pair a b) ρ = pair (sub a ρ) (sub b ρ)
+@@ -529,7 +494,7 @@
+     sub (snd p) ρ    = snd (sub p ρ)
+ 
+     sub1 : ∀ {Γ S T} → Γ ▹ S ⊢ T → Γ ⊢ S → Γ ⊢ T
+-    sub1 t s = sub t (λ { here → s ; (there v) → var v })
++    sub1 t s = sub t {!!}
+ 
+ A formal treatment of this construction can be found in `Formalized
+ metatheory with terms represented by an indexed family of types`_, for
+@@ -576,7 +541,7 @@
+       rule-η-fun : ∀{Γ S T}{f : Γ ⊢ S ⇒ T} →
+ 
+         ------------------------------------------------------
+-        Γ ⊢ S ⇒ T ∋ f ↝βη lam (rename (weak1 id) f ! var here)
++        Γ ⊢ S ⇒ T ∋ f ↝βη lam ({!f!} ! var here)
+ 
+       rule-η-pair : ∀{Γ A B}{p : Γ ⊢ A * B} →
+ 
+@@ -666,20 +631,16 @@
+        snd  : (p : term) → term
+ 
+     ⟦_⟧Type : type → Set
+-    ⟦ unit ⟧Type  = term
+-    ⟦ S ⇒ T ⟧Type = ⟦ S ⟧Type → ⟦ T ⟧Type
+-    ⟦ S * T ⟧Type = ⟦ S ⟧Type × ⟦ T ⟧Type
++    ⟦ T ⟧Type  = {!!}
+ 
+     ⟦_⟧context : context → Set
+-    ⟦ ε ⟧context     = ⊤
+-    ⟦ Γ ▹ T ⟧context = ⟦ Γ ⟧context × ⟦ T ⟧Type
++    ⟦ Γ ⟧context     = {!!}
+ 
+     _⊩_ : context → type → Set
+     Γ ⊩ T = ⟦ Γ ⟧context → ⟦ T ⟧Type
+ 
+     lookup : ∀{Γ T} → T ∈ Γ → Γ ⊩ T
+-    lookup here (_ , x)      = x
+-    lookup (there h) (γ , _) = lookup h γ
++    lookup v ρ = {!!}
+ 
+     eval : ∀{Γ T} → Γ ⊢ T → Γ ⊩ T
+     eval (var v) ρ    = lookup v ρ
+@@ -718,14 +679,8 @@
+       reify : ∀{T} → ⟦ T ⟧Type → term
+       reflect : (T : type) → term → ⟦ T ⟧Type
+ 
+-      reify {unit} nf       = nf
+-      reify {A * B} (x , y) = pair (reify x) (reify y)
+-      reify {S ⇒ T} f       = let s = gensym tt in
+-                              lam s (reify (f (reflect S (var s))))
+-
+-      reflect unit nf     = nf
+-      reflect (A * B) nf  = reflect A (fst nf) , reflect B (snd nf)
+-      reflect (S ⇒ T) neu = λ s → reflect T (neu ! reify s)
++      reify {T} t = {!!}
++      reflect T t = {!!}
+ 
+ Given a λ-term, we can thus compute its normal form::
+ 
+@@ -822,11 +777,13 @@
+ 
+ We then simply translate the previous code to a monadic style, a
+ computer could do it automatically::
+-
+-      reify : ∀{T} → ⟦ T ⟧Type → Fresh term
+-      reflect : (T : type) → term → Fresh ⟦ T ⟧Type
+-
+-      reify {unit} nf       = return nf
++      
++      postulate 
++        reify   : ∀{T} → ⟦ T ⟧Type → Fresh term
++        reflect : (T : type) → term → Fresh ⟦ T ⟧Type
++      
++      {-
++      reify {T} nf          = return nf
+       reify {A * B} (a , b) = reify a >>= λ a →
+                               reify b >>= λ b →
+                               return (pair a b)
+@@ -835,12 +792,13 @@
+                               reify (f t) >>= λ b →
+                               return (lam s b)
+ 
++        
+       reflect unit nf     = return nf
+       reflect (A * B) nf  = reflect A (fst nf) >>= λ a →
+                             reflect B (snd nf) >>= λ b →
+                             return (a , b)
+-      reflect (S ⇒ T) neu = return (λ s → {!!})
+-      -- XXX: cannot conclude with `reflect T (neu ! reify s)`
++      reflect (S ⇒ T) neu = ?
++      -}
+ 
+ Excepted that, try as we might, we cannot reflect a function.
+ 
+@@ -991,12 +949,12 @@
+     rename-Nf : ∀{Γ Δ T} → Γ ⊇ Δ → Δ ⊢Nf T → Γ ⊢Nf T
+     rename-Ne : ∀{Γ Δ T} → Γ ⊇ Δ → Δ ⊢Ne T → Γ ⊢Ne T
+ 
+-    rename-Nf wk (lam b)       = lam (rename-Nf (weak2 wk) b)
++    rename-Nf wk (lam b)       = lam {!!}
+     rename-Nf wk (ground grnd) = ground (rename-Ne wk grnd)
+     rename-Nf wk (pair a b)    = pair (rename-Nf wk a) (rename-Nf wk b)
+     rename-Nf wk tt            = tt
+ 
+-    rename-Ne wk (var v)       = var (shift wk v)
++    rename-Ne wk (var v)       = {!!}
+     rename-Ne wk (f ! s)       = (rename-Ne wk f) ! (rename-Nf wk s)
+     rename-Ne wk (fst p)       = fst (rename-Ne wk p)
+     rename-Ne wk (snd p)       = snd (rename-Ne wk p)
+@@ -1192,13 +1150,13 @@
+     lookup (there x) (γ , _) = lookup x γ
+ 
+     eval : ∀{Γ T} → Γ ⊢ T → Γ ⊩ T
+-    eval {Γ} (lam {S}{T} b)    = ⟦lam⟧ {⟦ Γ ⟧C}{⟦ S ⟧}{⟦ T ⟧} (eval b)
+-    eval (var v)               = lookup v
+-    eval {Γ}{T} (_!_ {S} f s)  = ⟦app⟧ {⟦ Γ ⟧C}{⟦ S ⟧}{⟦ T ⟧} (eval f) (eval s)
+-    eval {Γ} tt                = ⟦tt⟧ {⟦ Γ ⟧C}
+-    eval {Γ} (pair {A}{B} a b) = ⟦pair⟧ {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval a) (eval b)
+-    eval {Γ} (fst {A}{B} p)    = ⟦fst⟧ {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval p)
+-    eval {Γ} (snd {A}{B} p)    = ⟦snd⟧ {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval p)
++    eval {Γ} (lam {S}{T} b)    = ?
++    eval (var v)               = ?
++    eval {Γ}{T} (_!_ {S} f s)  = ?
++    eval {Γ} tt                = ?
++    eval {Γ} (pair {A}{B} a b) = ?
++    eval {Γ} (fst {A}{B} p)    = ?
++    eval {Γ} (snd {A}{B} p)    = ?
+ 
+ Reify and reflect are defined at a given syntactic context, we
+ therefore introduce suitable notations::
+@@ -1218,17 +1176,17 @@
+     reify : ∀ {T Γ} → [ Γ ]⊩ T  → Γ ⊢Nf T
+     reflect : ∀ {Γ} → (T : type) → Γ ⊢Ne T → [ Γ ]⊩ T
+ 
+-    reify {unit} v        = v
+-    reify {A * B} (a , b) = pair (reify a) (reify b)
+-    reify {S ⇒ T} f       = lam (reify (app {S}{T} (ren (weak1 id) f) (reflect S (var here))))
++    reify {unit} v        = {!!}
++    reify {A * B} (a , b) = {!!}
++    reify {S ⇒ T} f       = {!!}
+       where open Sem ⟦ S ⇒ T ⟧
+ 
+             app : ∀{S T Γ} → [ Γ ]⊩ (S ⇒ T) → [ Γ ]⊩ S → [ Γ ]⊩ T
+             app f s = f id s
+ 
+-    reflect unit v    = ground v
+-    reflect (A * B) v = reflect A (fst v) , reflect B (snd v)
+-    reflect (S ⇒ T) v = λ w s → reflect T (ren w v ! reify s)
++    reflect unit v    = {!!}
++    reflect (A * B) v = {!!}
++    reflect (S ⇒ T) v = {!!}
+       where open Sem (Nê (S ⇒ T))
+ 
+ 
+@@ -1242,7 +1200,7 @@
+ 
+             idC : ∀ Γ → [ Γ ]⊩C Γ
+             idC ε       = tt
+-            idC (Γ ▹ T) = ren ⟦ Γ ⟧C (weak1 id) (idC Γ) , reflect T (var here)
++            idC (Γ ▹ T) = {!!} , reflect T (var here)
+ 
+ 
+     norm : ∀{Γ T} → Γ ⊢ T → Γ ⊢Nf T
+@@ -1254,7 +1212,7 @@
+ implementation::
+ 
+     remark-reify-fun : ∀ {Γ S T} → (f : [ Γ ]⊩ (S ⇒ T)) →
+-        reify {S ⇒ T} f ≡ lam (reify (f (weak1 id) (reflect S (var here))))
++        reify {S ⇒ T} f ≡ lam (reify (f ({! weak1 id !}) (reflect S (var here))))
+     remark-reify-fun f = refl
+ 
+ 
