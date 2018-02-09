@@ -967,8 +967,8 @@ The Rising Sea
     infix 30 _⊢Nf_
     infix 30 _⊢Ne_
     infix 40 _⟶_
-    infix 45 _⇒̂_
-    infix 50 _×̂_
+    infix 45 _⟦⇒⟧_
+    infix 50 _⟦×⟧_
     infix 30 _⊩_
 
 
@@ -1104,7 +1104,7 @@ interface::
 
     Nf̂ : type → Sem
     Nf̂ T = record { _⊢ = λ Γ → Γ ⊢Nf T
-                  ; ren = rename-Nf }
+                    ; ren = rename-Nf }
 
     Nê : type → Sem
     Nê T = record { _⊢ = λ Γ → Γ ⊢Ne T
@@ -1113,36 +1113,36 @@ interface::
 Following our earlier model, we will interpret the ``unit`` type as
 the normal forms of type unit::
 
-    ⊤̂ : Sem
-    ⊤̂ =  Nf̂ unit
+    ⟦unit⟧ : Sem
+    ⟦unit⟧ =  Nf̂ unit
 
-    TT : ∀ {P} → P ⟶ ⊤̂
-    TT ρ = tt
+    ⟦tt⟧ : ∀ {P} → P ⟶ ⟦unit⟧
+    ⟦tt⟧ ρ = tt
 
 Similarly, we will interpret the ``_*_`` type as a product in
 ``Sem``, defined in a pointwise manner::
 
-    _×̂_ : Sem → Sem → Sem
-    P ×̂ Q = record { _⊢ = λ Γ → Γ ⊢P × Γ ⊢Q
+    _⟦×⟧_ : Sem → Sem → Sem
+    P ⟦×⟧ Q = record { _⊢ = λ Γ → Γ ⊢P × Γ ⊢Q
                    ; ren = λ { wk (x , y) → ( ren-P wk x , ren-Q wk y ) } }
       where open Sem P renaming (_⊢ to _⊢P ; ren to ren-P)
             open Sem Q renaming (_⊢ to _⊢Q ; ren to ren-Q)
 
-    PAIR : ∀ {P Q R} → P ⟶ Q → P ⟶ R → P ⟶ Q ×̂ R
-    PAIR a b ρ = a ρ , b ρ
+    ⟦pair⟧ : ∀ {P Q R} → P ⟶ Q → P ⟶ R → P ⟶ Q ⟦×⟧ R
+    ⟦pair⟧ a b ρ = a ρ , b ρ
 
-    FST : ∀ {P Q R} → P ⟶ Q ×̂ R → P ⟶ Q
-    FST p ρ = proj₁ (p ρ)
+    ⟦fst⟧ : ∀ {P Q R} → P ⟶ Q ⟦×⟧ R → P ⟶ Q
+    ⟦fst⟧ p ρ = proj₁ (p ρ)
 
-    SND : ∀ {P Q R} → P ⟶ Q ×̂ R → P ⟶ R
-    SND p ρ = proj₂ (p ρ)
+    ⟦snd⟧ : ∀ {P Q R} → P ⟶ Q ⟦×⟧ R → P ⟶ R
+    ⟦snd⟧ p ρ = proj₂ (p ρ)
 
 We may be tempted to define the exponential in a pointwise manner too:
 
 .. code-block:: guess
 
-    _⇒̂_ : Sem → Sem → Sem
-    P ⇒̂ Q = record { _⊢ = λ Γ → Γ ⊢P → Γ ⊢Q
+    _⟦⇒⟧_ : Sem → Sem → Sem
+    P ⟦⇒⟧ Q = record { _⊢ = λ Γ → Γ ⊢P → Γ ⊢Q
                    ; ren = ?! }
       where open Sem P renaming (_⊢ to _⊢P)
             open Sem Q renaming (_⊢ to _⊢Q)
@@ -1224,65 +1224,65 @@ Back to the Sea
 -------------------------------------
 
 
-Let us assume that the exponential ``P ⇒̂ Q : Sem`` exists. This means,
+Let us assume that the exponential ``P ⟦⇒⟧ Q : Sem`` exists. This means,
 in particular, that it satisfies the following isomorphism for all ``R
 : Sem``:
 
 .. code-block:: guess
 
-    R ⟶ P ⇒̂ Q ≡ R ×̂ P ⟶ Q
+    R ⟶ P ⟦⇒⟧ Q ≡ R ⟦×⟧ P ⟶ Q
 
-We denote ``_⊢P⇒̂Q`` its action on contexts. Let ``Γ : context``. We
+We denote ``_⊢P⟦⇒⟧Q`` its action on contexts. Let ``Γ : context``. We
 have the following isomorphisms:
 
 .. code-block:: guess
 
-    Γ ⊢P⇒̂Q ≡ ∀ {Δ} → Δ ⊇ Γ → Δ ⊢P⇒̂Q              -- by ψ
-           ≡ ⊇[ Γ ] ⟶ P⇒̂Q                        -- by the alternative definition ψ'
-           ≡ ⊇[ Γ ] ×̂ P ⟶ Q                      -- by definition of an exponential
-           ≡ ∀ {Δ} → Δ ⊇ Γ → Δ ⊢P → Δ ⊢Q         -- by unfolding definition of ×̂, ⟶ and currying
+    Γ ⊢P⟦⇒⟧Q ≡ ∀ {Δ} → Δ ⊇ Γ → Δ ⊢P⟦⇒⟧Q              -- by ψ
+           ≡ ⊇[ Γ ] ⟶ P⟦⇒⟧Q                        -- by the alternative definition ψ'
+           ≡ ⊇[ Γ ] ⟦×⟧ P ⟶ Q                      -- by definition of an exponential
+           ≡ ∀ {Δ} → Δ ⊇ Γ → Δ ⊢P → Δ ⊢Q         -- by unfolding definition of ⟦×⟧, ⟶ and currying
 
 As in the definition of ``Y``, it is easy to see that this last member
 can easily be equipped with a renaming: we therefore take it as the
 **definition** of the exponential::
 
-    _⇒̂_ : Sem → Sem → Sem
-    P ⇒̂ Q = record { _⊢ = λ Γ → ∀ {Δ} → Δ ⊇ Γ → Δ ⊢P → Δ ⊢Q
+    _⟦⇒⟧_ : Sem → Sem → Sem
+    P ⟦⇒⟧ Q = record { _⊢ = λ Γ → ∀ {Δ} → Δ ⊇ Γ → Δ ⊢P → Δ ⊢Q
                    ; ren = λ wk₁ k wk₂ → k (wk₁ ∘wk wk₂) }
       where open Sem P renaming (_⊢ to _⊢P)
             open Sem Q renaming (_⊢ to _⊢Q)
 
-    LAM : ∀ {P Q R} → P ×̂ Q ⟶ R → P ⟶ Q ⇒̂ R
-    LAM {P} η p = λ wk q → η (ren-P wk p , q)
+    ⟦lam⟧ : ∀ {P Q R} → P ⟦×⟧ Q ⟶ R → P ⟶ Q ⟦⇒⟧ R
+    ⟦lam⟧ {P} η p = λ wk q → η (ren-P wk p , q)
       where open Sem P renaming (ren to ren-P)
 
-    APP : ∀ {P Q R} → P ⟶ Q ⇒̂ R → P ⟶ Q → P ⟶ R
-    APP η μ = λ px → η px id (μ px)
+    ⟦app⟧ : ∀ {P Q R} → P ⟶ Q ⟦⇒⟧ R → P ⟶ Q → P ⟶ R
+    ⟦app⟧ η μ = λ px → η px id (μ px)
 
 
 **Remark:** The above construction of the exponential is taken from
 MacLane & Moerdijk's `Sheaves in Geometry and Logic`_ (p.46).
 
 .. BEGIN HIDE
-.. TODO renaming ⊤̂, ⇒̂, ×̂
+.. TODO renaming ⊤̂, ⟦⇒⟧, ⟦×⟧
 .. END HIDE
 
 At this stage, we have enough structure to interpret the types::
 
     ⟦_⟧ : type → Sem
-    ⟦ unit ⟧  = ⊤̂
-    ⟦ S ⇒ T ⟧ = ⟦ S ⟧ ⇒̂ ⟦ T ⟧
-    ⟦ A * B ⟧ = ⟦ A ⟧ ×̂ ⟦ B ⟧
+    ⟦ unit ⟧  = ⟦unit⟧
+    ⟦ S ⇒ T ⟧ = ⟦ S ⟧ ⟦⇒⟧ ⟦ T ⟧
+    ⟦ A * B ⟧ = ⟦ A ⟧ ⟦×⟧ ⟦ B ⟧
 
 To interpret contexts, we need a terminal object::
 
-    ε̂ : Sem
-    ε̂ = record { _⊢ = λ _ → ⊤
+    ⊤̂ : Sem
+    ⊤̂ = record { _⊢ = λ _ → ⊤
                ; ren = λ _ _ → tt }
 
     ⟦_⟧C : (Γ : context) → Sem
-    ⟦ ε ⟧C     = ε̂
-    ⟦ Γ ▹ T ⟧C = ⟦ Γ ⟧C ×̂ ⟦ T ⟧
+    ⟦ ε ⟧C     = ⊤̂
+    ⟦ Γ ▹ T ⟧C = ⟦ Γ ⟧C ⟦×⟧ ⟦ T ⟧
 
 As usual, a type in context will be interpreted as a morphism between
 their respective interpretations. The interpreter then takes the
@@ -1296,13 +1296,13 @@ syntactic object to its semantical counterpart::
     lookup (there x) (γ , _) = lookup x γ
 
     eval : ∀{Γ T} → Γ ⊢ T → Γ ⊩ T
-    eval {Γ} (lam {S}{T} b)    = LAM {⟦ Γ ⟧C}{⟦ S ⟧}{⟦ T ⟧} (eval b)
+    eval {Γ} (lam {S}{T} b)    = ⟦lam⟧ {⟦ Γ ⟧C}{⟦ S ⟧}{⟦ T ⟧} (eval b)
     eval (var v)               = lookup v
-    eval {Γ}{T} (_!_ {S} f s)  = APP {⟦ Γ ⟧C}{⟦ S ⟧}{⟦ T ⟧} (eval f) (eval s)
-    eval {Γ} tt                = TT {⟦ Γ ⟧C}
-    eval {Γ} (pair {A}{B} a b) = PAIR {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval a) (eval b)
-    eval {Γ} (fst {A}{B} p)    = FST {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval p)
-    eval {Γ} (snd {A}{B} p)    = SND {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval p)
+    eval {Γ}{T} (_!_ {S} f s)  = ⟦app⟧ {⟦ Γ ⟧C}{⟦ S ⟧}{⟦ T ⟧} (eval f) (eval s)
+    eval {Γ} tt                = ⟦tt⟧ {⟦ Γ ⟧C}
+    eval {Γ} (pair {A}{B} a b) = ⟦pair⟧ {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval a) (eval b)
+    eval {Γ} (fst {A}{B} p)    = ⟦fst⟧ {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval p)
+    eval {Γ} (snd {A}{B} p)    = ⟦snd⟧ {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval p)
 
 Reify and reflect are defined at a given syntactic context, we
 therefore introduce suitable notations::
@@ -1354,7 +1354,7 @@ function::
 
 **Remark:** For pedagogical reasons, we have defined ``reify {S ⇒ T}
 f`` using function application and weakening, without explicitly using
-the structure of ``f : [ Γ ]⊩ S ⇒̂ T``. However, there is also a direct
+the structure of ``f : [ Γ ]⊩ S ⟦⇒⟧ T``. However, there is also a direct
 implementation::
 
     remark-reify-fun : ∀ {Γ S T} → (f : [ Γ ]⊩ (S ⇒ T)) →
