@@ -1079,6 +1079,10 @@ with renaming operation::
         _⊢ : context → Set
         ren : ∀ {Γ Δ} → Γ ⊇ Δ → Δ ⊢ → Γ ⊢
 
+.. BEGIN HIDE
+.. TODO change symbol ⟶ for something less ambiguous
+.. END HIDE
+
 An implication in ``Sem`` is a family of implications for each context::
 
     _⟶_ : (P Q : Sem) → Set

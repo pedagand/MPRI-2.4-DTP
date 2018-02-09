@@ -529,6 +529,10 @@ underlying composition of substitutions::
 Structurally: most-general unifier
 --------------------------------------
 
+.. BEGIN HIDE
+.. TODO reveal the recursive structure in the definition
+.. END HIDE
+
 The implementation of the most-general unifier is exactly the same,
 excepted that termination has become self-evident: when performing the
 substitution (case ``amgu {suc k} _ _ (m , (σ ∷[ r / z ]))``), the
