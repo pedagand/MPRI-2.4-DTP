@@ -62,6 +62,10 @@ The vision: `Total Functional Programming`_
   - zealously pursued with dependent types by `Conor McBride <http://strictlypositive.org/>`_
   - at the origin of *all* of today's examples
 
+.. BEGIN HIDE
+.. TODO Add more exercises in 2nd and 3rd part
+.. END HIDE
+
 ************************************************
 First-order Unification
 ************************************************
