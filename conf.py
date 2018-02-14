@@ -163,6 +163,8 @@ latex_documents = [
      u'Pierre-Évariste Dagand', 'manual'),
     ("03-total/Recursion", 'Recursion.tex', u'Total Programming',
      u'Pierre-Évariste Dagand', 'manual'),
+    ("04-generic/Desc", 'Desc.tex', u'Generic Programming',
+     u'Pierre-Évariste Dagand', 'manual'),
 
 ]
 
