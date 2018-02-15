@@ -52,7 +52,10 @@ Takeaways:
 Typing ``sprintf``
 ************************************************
 
+.. BEGIN HIDE
 .. TODO: type-system for formats?
+.. sprintf : ∀ {T} → String T → T → String
+.. END HIDE
 
 ..
   ::
