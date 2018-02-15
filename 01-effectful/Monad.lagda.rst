@@ -23,11 +23,18 @@ Today, we shall:
   - present a general framework for modelling *algebraic* effects
   - meet a few monads (reader, writer, non-determinism, random, CPS, etc.)
 
-`Notions of computations determine monads`_:
+Vision: `Notions of computations determine monads`_
   1. syntax of effectful operations
   2. equational theory of effectful operations
   3. denotational semantics = quotiented syntax
   4. interpreter / monad!
+
+Takeaways:
+  - you will be *able* to define a monad (``return``, ``bind``) and its supporting operations
+  - you will be *able* to use the following monads: exceptions, reader, writer, state, non-determinism
+  - you will be *able* to relate an equational theory with a monadic presentation (normalization-by-evaluation)
+  - you will be *familiar* with algebraic effects
+  - you will be *familiar* with the most commonly used monads
 
 
 ************************************************

@@ -45,6 +45,13 @@ Vision: `Generic programming is just programming <https://doi.org/10.1145/186354
   - Program with structure, one way (extensional) or another (intensional)
   - Reflect the programming language in itself, one way (type-classes) or another (universe)
 
+Takeaways:
+  - you will be *able* to spot the following structures: Monoid, Functor, Applicative, Monad, Foldable, Traversable
+  - you will be *able* to generalize a program to exploit any of the above structures
+  - you will be *able* to program in/with a universe of descriptions
+  - you will be *familiar* with Naperian functors
+  - you will be *familiar* with the notion of universe
+  - you will be *familiar* with "instance arguments"/"type classes"
 
 ************************************************
 Extensional Generic Programming

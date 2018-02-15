@@ -34,6 +34,13 @@ Today, we shall:
 
 The vision: `The Proof Assistant as an Integrated Development Environment`_
 
+Takeaways:
+  - you will be *able* to use inductive families to encode structural invariants
+  - you will be *able* to write dependently-typed programs over inductive families
+  - you will be *able* to construct denotational models in type theory
+  - you will be *familiar* with the Yoneda lemma
+  - you will be *familiar* with the notion of functor and presheaf
+  - you will be *familiar* with normalization-by-evaluation for the simply-typed calculus
 
 ..
   ::
@@ -1382,15 +1389,18 @@ implementation::
 
 .. END HIDE
 
-By defining a richly-structured model, we have seen how we could
-implement a typed model of the λ-calculus and manipulate binders in
-the model.
+************************************************
+Conclusion
+************************************************
 
-Takeaways:
-  * You are *familiar* with the construction of denotational models in type theory
-  * You are *able* to define an inductive family that captures exactly some structural invariant
-  * You are *able* to write a dependently-typed program
-  * You are *familiar* with normalization-by-evaluation proofs for the simply-typed calculus
+In the first and second part, we have seen how inductive types and
+families can be used to build initial models, supporting the
+definition of various interpretations in Agda itself.
+
+In the third part, we have seen how, by defining a richly-structured
+model, we could implement a typed model of the λ-calculus and
+manipulate binders in the model.
+
 
 **Exercises (difficulty: open ended):**
 
@@ -1408,9 +1418,10 @@ Takeaways:
      categorical semantics (described in the next section) provides
      the blueprint of the necessary proofs.
 
--------------------------------------
+
+************************************************
 Optional: Categorical spotting
--------------------------------------
+************************************************
 
 ..
   ::
