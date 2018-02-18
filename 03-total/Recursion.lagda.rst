@@ -810,6 +810,11 @@ context/list::
       open Solution-context public
 .. END HIDE
 
+.. BEGIN HIDE
+.. TODO: is ``search`` buggy? while explore a subcontext, it drops the
+..       current bucket altogether.
+.. END HIDE
+
 With a bit of refactoring, we can integrate indices as well as absorb
 the zipper traversal, making the structural recursion slightly more
 obvious (to us, not to Agda)::
@@ -856,16 +861,21 @@ obvious (to us, not to Agda)::
 
     open DjinnStructural ℕ Data.Nat._≟_
 
-    A B ∐ : ∀ {n} → Formula n
+    A B C D ∐ : ∀ {n} → Formula n
     A = Atom 0
     B = Atom 1
     ∐ = Atom 2
+    C = Atom 3
+    D = Atom 4
 
     test₁ : ⊢ (A ⊃ B ⊃ A) ≡ true
     test₁ = refl
 
     test₂ : ⊢ (A ⊃ B) ≡ false
     test₂ = refl
+
+    test₃ : ⊢ (A ⊃ B) ⊃ ((C ⊃ D) ⊃ (((A ⊃ B) ⊃ C) ⊃ D)) ≡ true
+    test₃ = refl
 
     CPS : ∀ {n} → Formula n → Formula (2 + n)
     CPS A = (A ⊃ ∐) ⊃ ∐
@@ -899,17 +909,17 @@ definitions on ``Formulas``::
       {-# TERMINATING #-}
       search : ∀ {n} → Context n → A → Bool
       search {zero} tt α = false
-      search {suc n} ((l , B) , Γ) α =
+      search {suc m} ((l , B) , Γ) α =
         let try = map (λ { (P , B) → B / Γ [ P ]⊢ α }) 
                       (pick1 B)
         in
         any try ∨ search Γ α
-          where _/_[_]⊢_ : Vec (Formula n) (pred l) → Context n → Formula n → A → Bool
+          where _/_[_]⊢_ : Vec (Formula m) (pred l) → Context m → Formula m → A → Bool
                 B / Γ [ Atom α ]⊢ β = ⌊ α ≟ β ⌋
                 B / Γ [ _⊃_ {n} P Q  ]⊢ β = B / Γ [ Q ]⊢ β ∧ B / Γ ⊢ P
                   where  _/_⊢_ : Vec (Formula (suc n)) (pred l) → Context (suc n) → Formula n → Bool
                          B / Γ ⊢ Atom α = search ((, B) , Γ) α
-                         B / B₂ , Γ ⊢ P ⊃ Q  = B / B₂ , Γ ▹C P  ⊢ Q
+                         B / B' , Γ ⊢ P ⊃ Q  = B / B' , Γ ▹C P  ⊢ Q
 
       _⊢_ : ∀ {n} → Context n → Formula n → Bool
       Γ ⊢ Atom α = search Γ α
@@ -978,10 +988,11 @@ With `The View from the Left`_ came the idea that one could get the
 benefits of pattern-matching *syntax* while actually appealing to
 induction principles to back them up *semantically*. 
 
-Assuming that we had this machinery (which we have not), it becomes
-interesting to study and develop the algebra of induction
-principles. Let us dissect the induction principle for natural
-numbers.
+Assuming that we had this machinery (which we have not in Agda but is
+available in Coq thanks to `Equations
+<http://mattam82.github.io/Coq-Equations/>`_), it becomes interesting
+to study and develop the algebra of induction principles. Let us
+dissect the induction principle for natural numbers.
 
 The first ingredient of an induction principle is the *induction
 hypothesis*. We can generically define an induction hypothesis as a
