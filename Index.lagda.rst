@@ -12,10 +12,6 @@ MPRI 2.4 : Dependently-typed Functional Programming
   open import 02-dependent.Indexed
   open import 03-total.Recursion
   open import 04-generic.Desc
-
-.. BEGIN HIDE
-  ::
-
   open import 05-open.Problems
 
 This course is organized as follows:
@@ -29,6 +25,9 @@ This course is organized as follows:
    03-total/Recursion
    04-generic/Desc
    05-open/Problems
+
+.. BEGIN HIDE
+  ::
 
 ************************************************
 Build

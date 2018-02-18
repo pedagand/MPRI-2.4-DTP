@@ -1,6 +1,6 @@
 ..
   ::
-  {-# OPTIONS --allow-unsolved-metas --rewriting #-}
+  {-# OPTIONS --no-positivity-check --allow-unsolved-metas --rewriting #-}
 
   module 05-open.Problems where
 

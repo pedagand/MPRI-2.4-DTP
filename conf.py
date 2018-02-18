@@ -165,6 +165,8 @@ latex_documents = [
      u'Pierre-Évariste Dagand', 'manual'),
     ("04-generic/Desc", 'Desc.tex', u'Generic Programming',
      u'Pierre-Évariste Dagand', 'manual'),
+    ("05-open/Problems", 'Problems.tex', u'Open Problems',
+     u'Pierre-Évariste Dagand', 'manual'),
 
 ]
 
