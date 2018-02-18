@@ -674,6 +674,13 @@ We consider the purely negative fragment of propositional logic::
         Atom : (a : A) → Formula
         _⊃_ : (P Q : Formula) → Formula
 
+.. BEGIN HIDE
+.. François: Quand on cherche une hypothèse dans le contexte, c'est un
+.. "exists" sur une liste, et quand on cherche à habiter toutes les
+.. prémisses, c'est une "forall" sur une liste; pourrait-on employer
+.. deux fonctions d'ordre supérieur pour clarifier cela?
+.. END HIDE
+
 The decision procedure checks whether a Formula (in a context) is
 true. This amounts to implementing a traditional focusing presentation
 of the sequent calculus::
@@ -1315,10 +1322,17 @@ Let ``M : Set → Set`` be a monad. We have:
 
 .. code-block:: guess
 
-    Monad(RecMon X, M X)
-        ≅ Set(Σ[ a ∈ A ] B a → X, M X)    -- by the free/forgetful adjunction
-        ≅ (a : A) → ∀ X → (B a → X) → M X -- by uncurry, etc.
-        ≅ (a : A) → M (B a)               -- by Yoneda lemma
+    Monad(RecMon, M)
+        ≅ Monad(Free(λ X → Σ[ a ∈ A ] B a → X), M)  -- by def. of RecMon
+        ≅ [Set,Set](λ X → Σ[ a ∈ A ] B a → X, U(M)) -- by the free/forgetful adjunction
+        ≅ ∀ X → (Σ[ a ∈ A ] B a → X) → M X          -- morphism of functors are natural trans.
+        ≅ (a : A) → ∀ X → (B a → X) → M X           -- by uncurry, etc.
+        ≅ (a : A) → M (B a)                         -- by Yoneda lemma
+
+.. BEGIN HIDE
+.. François: montrer que le morphisme de RecMon vers M, c'est en
+.. fait un codage de "let rec" à l'aide d'un effect handler.
+.. END HIDE
 
 Or, put otherwise, a monad morphism from RecMon is entirely specified
 by a mere function of type ``(a : A) → M (B a)``::
