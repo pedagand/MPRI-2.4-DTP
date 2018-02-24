@@ -167,8 +167,7 @@ manner:
                                (4 ∷ 9 ∷ 15 ∷ []) ∷ [])))
 
 Or "per column", using the *reranking* operator ```¹``, which amounts
-to pre- and post-compositing the desired operation with a
-transposition:
+to pre- and post-composing the desired operation with a transposition:
 
  .. code-block:: agda
 
@@ -259,6 +258,10 @@ Another (arbitrary) example of functor is the following::
       ListFunctor : Functor List
       _<$>_ {{ListFunctor}} f [] = []
       _<$>_ {{ListFunctor}} f (x ∷ xs) = f x ∷ (f <$> xs)
+.. END HIDE
+
+.. BEGIN HIDE
+.. TODO Add non-example of functor
 .. END HIDE
 
 --------------------------------
@@ -380,9 +383,17 @@ Lecture 1) is an applicative::
                                           let (x , s'') = xs s' in 
                                           f x , s''
 
+.. BEGIN HIDE
 .. TODO: write the instances above (<$>, pure and ⊛) using the monadic operations
+.. END HIDE
 
 **Exercise (difficulty: 1)** Write a program that takes a monad (specified with ``return`` and ``>>=``) and produces its underlying applicative.
+
+.. BEGIN HIDE
+.. TODO Add non-example of applicative
+.. TODO Add an example of an applicative which is not a monad
+.. END HIDE
+
 
 --------------------------------
 Naperian
@@ -403,10 +414,10 @@ n-elements vectors::
                  (4 ∷ 5 ∷ 6 ∷ []) ∷ []
   
 
-To implement transposition (and, therefore, reranking), we need to
-access to be able to *index* into a vector (say, "get the value on row
-``i`` and column ``j``") as well as to be able to *create* a vector as
-a function from its indices (say, "define the matrix of value ``f(i,
+To implement transposition (and, therefore, reranking), we need to be
+able to *index* into a vector (say, "get the value on row ``i`` and
+column ``j``") as well as to be able to *create* a vector as a
+function from its indices (say, "define the matrix of value ``f(i,
 j)`` at row ``i`` and column ``j``). The first corresponds to a lookup
 while the second corresponds to a tabulation::
 
@@ -459,6 +470,18 @@ An applicative functor such that there exists a set ``Log`` supporting
 
 .. TODO: add `comonad instance <https://stackoverflow.com/questions/12963733/writing-cojoin-or-cobind-for-n-dimensional-grid-type/13100857#13100857>`_
 
+.. BEGIN HIDE
+.. TODO Why ask for ``F`` to be an applicative, not just a functor?
+.. END HIDE
+
+
+.. BEGIN HIDE
+.. TODO add equational theory
+.. END HIDE
+
+.. BEGIN HIDE
+.. TODO add algebra of Log (Log 1, Log(a * b), Log(1 => b))
+.. END HIDE
 
 **Exercise (difficulty: 2)** State the Naperian laws and prove them
 for vectors.
@@ -471,6 +494,10 @@ Pairs are Naperian too::
       lookup {{PairNaperian}} (P x y) true = x
       lookup {{PairNaperian}} (P x y) false = y
       tabulate {{PairNaperian}} f = P (f true) (f false)
+
+.. BEGIN HIDE
+.. TODO Add non-example of Naperian
+.. END HIDE
 
 
 Given any pair of Naperian functors, transposition is expressed as
@@ -518,6 +545,10 @@ structure of a given set::
         _<>_ : A → A → A
   
     open Monoid ⦃...⦄
+
+.. BEGIN HIDE
+.. TODO add equational theory
+.. END HIDE
 
 .. BEGIN HIDE
 .. TODO: activate?
@@ -611,6 +642,10 @@ A functor offering such an iterator is said to be `foldable
       VecFoldable : ∀ {n} → Foldable (λ A → Vec A n)
       foldMap {{VecFoldable}} = foldMap-Vec
     
+.. BEGIN HIDE
+.. TODO add equational theory
+.. END HIDE
+
 Pairs are foldable too::
 
     instance
@@ -691,6 +726,10 @@ A functor offering such an iterator is said to be `traversable
       VectorTraversable : ∀ {n} → Traversable (λ A → Vec A n)
       traverse {{VectorTraversable}} f [] = pure []
       traverse {{VectorTraversable}} f (x ∷ v) = _∷_ <$> f x ⊛ traverse f v
+
+.. BEGIN HIDE
+.. TODO add equational theory
+.. END HIDE
 
 Surprise, pairs are traversable too::
 
@@ -849,7 +888,7 @@ defined by ``MDimension`` is equivalent to the following function::
     toNat (B l r)  = toNat l + toNat r
 
 
-Programming solely with the structured offered by dimensions, we can
+Programming solely with the structure offered by dimensions, we can
 implement a generic inner product and matrix product::
 
     inner-product : ∀ {F} → {{_ : Dimension F}} → 
@@ -979,7 +1018,7 @@ which is interpreted as-is in the monoid of endofunctor on ``Set``::
     Hyper [] A = Id A
     Hyper (F ∷ Fs) A = Seq F (Hyper Fs) A
 
-that is (but this would play nice with unification):
+that is (but this would not play nice with unification):
 
 .. code-block:: agda
 
