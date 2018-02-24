@@ -444,7 +444,7 @@ An applicative functor such that there exists a set ``Log`` supporting
         Log : Set
         lookup : ∀ {A} → F A → (Log → A)
         tabulate : ∀ {A} → (Log → A) → F A
-        overlap {{super}} : Applicative F
+        overlap {{super}} : Functor F
   
       positions : F Log
       positions = tabulate λ ix → ix
@@ -728,8 +728,10 @@ to be both traversable (ie. support effectful iteration) and naperian
 
     record Dimension (F : Set → Set) : Set₁ where
       field
-        overlap {{super₁}} : Traversable F
+        overlap {{super₁}} : Applicative F
         overlap {{super₂}} : Naperian F
+        overlap {{super₃}} : Traversable F
+
   
       size : ∀ {α} → F α → ℕ
       size as = length (toList as)
@@ -778,6 +780,9 @@ dimension::
       BVectorFoldable : ∀ {n} → Foldable (bvector n)
       BVectorFoldable = {!!}
   
+      BVectorApplicative : ∀ {n} → Applicative (bvector n)
+      BVectorApplicative = {!!}
+
       BVectorNaperian : ∀ {n} → Naperian (bvector n)
       BVectorNaperian = {!!}
   
@@ -823,6 +828,9 @@ dimension::
   
         MFoldable : ∀ {r c} → Foldable (λ A → M A r c)
         MFoldable = {!!}
+
+        MApplicative : ∀ {r c} → Applicative (λ A → M A r c)
+        MApplicative = {!!}
   
         MNaperian : ∀ {r c} → Naperian (λ A → M A r c)
         MNaperian = {!!}
@@ -1089,11 +1097,11 @@ As a result, a shapely list of functors is itself a dimension.
     
       HyperFunctor : ∀ {Fs} → Shapely Fs → Functor (Hyper Fs)
       HyperFunctor shapes = HyperProp shapes Functor
-                                      (Applicative.super ∘ Naperian.super ∘ Dimension.super₂)
+                                      (Applicative.super ∘ Dimension.super₁)
     
       HyperApplicative : ∀ {Fs} → Shapely Fs → Applicative (Hyper Fs)
       HyperApplicative shapes = HyperProp shapes Applicative 
-                                          (Naperian.super ∘ Dimension.super₂)
+                                          (Dimension.super₁)
       
       HyperNaperian : ∀ {Fs} → Shapely Fs → Naperian (Hyper Fs)
       HyperNaperian shapes = HyperProp shapes Naperian 
@@ -1101,11 +1109,11 @@ As a result, a shapely list of functors is itself a dimension.
       
       HyperFoldable : ∀ {Fs} → Shapely Fs → Foldable (Hyper Fs)
       HyperFoldable shapes = HyperProp shapes Foldable 
-                                       (Traversable.super ∘ Dimension.super₁)
+                                       (Traversable.super ∘ Dimension.super₃)
     
       HyperTraversable : ∀ {Fs} → Shapely Fs → Traversable (Hyper Fs)
       HyperTraversable shapes = HyperProp shapes Traversable 
-                                          Dimension.super₁
+                                          Dimension.super₃
 
       HyperDimension : ∀ {Fs} → Shapely Fs → Dimension (Hyper Fs)
       HyperDimension shapes = HyperProp shapes Dimension id
