@@ -1,14 +1,13 @@
 TARGETS=01-effectful/Monad.lagda.rst   \
         02-dependent/Indexed.lagda.rst \
-	03-total/Recursion.lagda.rst
+	03-total/Recursion.lagda.rst \
+	04-generic/Desc.lagda.rst \
+	05-open/Problems.lagda.rst
+
 SRC_DIR=../
 STUDENTIZE=python ../studentize.py
 DIFF=diff -u
 PATCH=patch
-
-#  ../../03-total/Recursion.lagda.rst
-# cp ../../03-total/Recursion.student.lagda.rst .
-# diff -u Recursion.student.lagda.rst Recursion.lagda.rst.orig > Recursion.lagda.rst.patch
 
 all: $(TARGETS)
 
