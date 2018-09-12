@@ -25,10 +25,10 @@ Module McCompiler.
 
 Inductive typ := Nat | Bool.
 
-Definition sem (T: typ): Type := 
+Definition sem (T: typ): Type :=
   match T with
-  | Nat => nat 
-  | Bool => bool 
+  | Nat => nat
+  | Bool => bool
   end.
 
 Inductive exp : typ -> Type :=
@@ -41,9 +41,9 @@ Inductive exp : typ -> Type :=
 
 Fixpoint eval {T} (e: exp T): sem T :=
   match e with
-  | val _ v => v
+  | val v => v
   | plus e1 e2 => (eval e1) + (eval e2)
-  | ifte _ b e1 e2 => if eval b then eval e1 else eval e2
+  | ifte b e1 e2 => if eval b then eval e1 else eval e2
   end.
 
 (** *** Stack machine *)
@@ -66,12 +66,12 @@ Inductive stack : stack_typ -> Type :=
 
 Definition top {T S}(s: stack (T :: S)): sem T :=
   match s with
-  | cns _ _ t _ => t
+  | cns t _ => t
   end.
 
 Definition tail {T S}(s: stack (T :: S)): stack S :=
   match s with
-  | cns _ _ _ s => s
+  | cns _ s => s
   end.
 
 
@@ -90,22 +90,20 @@ Inductive code : stack_typ -> stack_typ -> Type :=
 
 Fixpoint exec {S S'} (c: code S S'): stack S -> stack S' :=
   match c with
-  | skip _ => fun s => s
-  | seq _ _ _ c1 c2 => fun s => exec c2 (exec c1 s)
-  | PUSH _ _ v => fun s => cns v s
-  | ADD _ =>
-    fun s => 
-      match s with
-      | cns Nat _ a s' => 
-        match s' with
-        | cns Nat _ b s'' => @cns Nat _ (a + b) s''
-        end
-      end
-  | IFTE S1 S2 c1 c2 => 
-    fun s => 
-      (match s with
-       | cns Bool _ true s' => fun c1 c2 => exec c1 s'
-       | cns Bool _ false s' => fun c1 c2 => exec c2 s'
+  | skip => fun s => s
+  | seq c1 c2 => fun s => exec c2 (exec c1 s)
+  | PUSH v => fun s => cns v s
+  | ADD =>
+    fun s =>
+      let a := top s in
+      let b := top (tail s) in
+      let s' := tail (tail s) in
+      @cns Nat _ (a + b) s'
+  | IFTE c1 c2 =>
+    fun s =>
+      (match top s with
+       | true  => fun c1 c2 => exec c1 (tail s)
+       | false => fun c1 c2 => exec c2 (tail s)
        end) c1 c2
   end.
 
@@ -119,9 +117,9 @@ Fixpoint exec {S S'} (c: code S S'): stack S -> stack S' :=
 
 Fixpoint compile {T S} (e: exp T): code S (T :: S) :=
   match e with
-  | val _ v => PUSH v
+  | val v => PUSH v
   | plus e1 e2 => seq (compile e2) (seq (compile e1) ADD)
-  | ifte _ b e1 e2 => seq (compile b) (IFTE (compile e1) (compile e2))
+  | ifte b e1 e2 => seq (compile b) (IFTE (compile e1) (compile e2))
   end.
 
 (** *** Correctness *)
@@ -140,7 +138,7 @@ intros T S e; generalize S.
 induction e; simpl; intros; auto.
 - now rewrite <- IHe2, <- IHe1.
 - now
-    rewrite <- IHe1;
+    rewrite <- IHe1; simpl;
     destruct (eval e1);
     rewrite <- ? IHe2, <- ? IHe3.
 Qed.
@@ -175,11 +173,11 @@ Definition error {X} (tt: unit): failure X := None.
 (** Implement its associated operations: *)
 
 Definition ret {X} (x: X): failure X(* := YOUR CODE HERE *). Admitted.
-Definition bind {X Y}(mx: failure X)(k: X -> failure Y): failure Y 
+Definition bind {X Y}(mx: failure X)(k: X -> failure Y): failure Y
   (* := YOUR CODE HERE *). Admitted.
 
 
-Notation "'let!' x ':=' mx 'in' f" := 
+Notation "'let!' x ':=' mx 'in' f" :=
   (bind mx (fun x => f)) (at level 50).
 
 (** *** Expressions *)
@@ -187,7 +185,7 @@ Notation "'let!' x ':=' mx 'in' f" :=
 (** Intuitively, we are dealing with a _dynamically-typed_ expression
     language. Values must therefore be _tagged_ by their run-time type: *)
 
-Inductive value := 
+Inductive value :=
 | value_bool: bool -> value
 | value_nat: nat -> value.
 
@@ -202,15 +200,15 @@ Inductive exp : Type :=
 Fixpoint eval (e: exp): failure value :=
   match e with
   | val v => ret v
-  | plus e1 e2 => 
+  | plus e1 e2 =>
     let! x := eval e1 in
     let! y := eval e2 in
     match x, y with
-    | value_nat m, value_nat n => 
+    | value_nat m, value_nat n =>
       ret (value_nat (m + n))
     | _, _ => error tt
     end
-  | ifte b e1 e2 => 
+  | ifte b e1 e2 =>
     let! x := eval b in
     match x with
     | value_bool x =>
@@ -227,37 +225,37 @@ Fixpoint eval (e: exp): failure value :=
 Inductive typ := Nat | Bool.
 
 Inductive wt_value: value -> typ -> Prop :=
-| wt_val_bool: forall b, 
+| wt_val_bool: forall b,
 
  (* ---------------------------- *)
     wt_value (value_bool b) Bool
 
-| wt_val_nat: forall n, 
+| wt_val_nat: forall n,
 
  (* ---------------------------- *)
     wt_value (value_nat n) Nat.
 
 Inductive wt_exp: exp -> typ -> Prop :=
-| wt_val: forall v ty, 
+| wt_val: forall v ty,
 
-    wt_value v ty -> 
+    wt_value v ty ->
  (* ----------------- *)
     wt_exp (val v) ty
 
-| wt_plus: forall e1 e2, 
+| wt_plus: forall e1 e2,
 
-    wt_exp e1 Nat -> 
-    wt_exp e2 Nat -> 
+    wt_exp e1 Nat ->
+    wt_exp e2 Nat ->
  (* ----------------------- *)
     wt_exp (plus e1 e2) Nat
 
-| wt_ifte: forall b e1 e2 ty, 
+| wt_ifte: forall b e1 e2 ty,
 
-    wt_exp b Bool -> 
-    wt_exp e1 ty -> 
-    wt_exp e2 ty -> 
+    wt_exp b Bool ->
+    wt_exp e1 ty ->
+    wt_exp e2 ty ->
  (* -------------------------- *)
-    wt_exp (ifte b e1 e2) ty. 
+    wt_exp (ifte b e1 e2) ty.
 
 (** **** Exercise: Soundness of typing, 3 stars *)
 
@@ -265,10 +263,10 @@ Inductive wt_exp: exp -> typ -> Prop :=
     expression _must_ successfully evaluate to a value (_progress_) of
     the same type (_preservation_): *)
 
-Lemma wt_exp_sound: 
-  forall e ty, 
-    wt_exp e ty -> 
-    exists v, 
+Lemma wt_exp_sound:
+  forall e ty,
+    wt_exp e ty ->
+    exists v,
         eval e = ret v
       /\ wt_value v ty.
 Admitted.
@@ -289,7 +287,7 @@ Definition stack := list value.
 (** As before, the execution must now be partial. You should therefore
     implement *)
 
-Fixpoint exec (c: code)(s: stack): failure stack (* := (YOUR CODE HERE) *). 
+Fixpoint exec (c: code)(s: stack): failure stack (* := (YOUR CODE HERE) *).
 Admitted.
 
 
@@ -308,31 +306,27 @@ Inductive wt_code: code -> stack_typ -> stack_typ -> Prop := (* YOUR DEFINITION 
 Lemma wt_code_sound: (* YOUR SOUNDNESS STATEMENT *) False. Admitted.
 
 
-(** *** Compilation *)  
-      
+(** *** Compilation *)
+
 (** Ignoring types, the compilation function is exactly the same as
     before. In particular, it remains a total function. *)
 
-Fixpoint compile (e: exp): code :=
-  match e with
-  | val v => PUSH v
-  | plus e1 e2 => seq (compile e2) (seq (compile e1) ADD)
-  | ifte b e1 e2 => seq (compile b) (IFTE (compile e1) (compile e2))
-  end.
+Fixpoint compile (e: exp): code (* := (YOUR CODE HERE) *).
+Admitted.
 
 (** **** Exercise: Correctness, 5 stars *)
 
 (** Inspired by the earlier correctness statement, state and prove the
-correctness of this compiler. 
+correctness of this compiler.
 
 Hint: you will very likely need to prove the following technical lemma
 
 [[
-Lemma bind_split {X Y}: 
+Lemma bind_split {X Y}:
   forall (mx: failure X)(k: X -> failure Y) v,
-    let! x := mx in k x = ret v -> 
+    let! x := mx in k x = ret v ->
     exists vx,
-        mx = ret vx 
+        mx = ret vx
       /\ k vx = ret v.
 ]]
 *)
