@@ -98,7 +98,8 @@ Build the lecture notes
 ************************************************
 
 You will need 
-  * Agda (tested with version 2.5.3)
+  * Agda (tested with version 2.5.4.1)
+  * Agda standard library (tested with version 0.17-1)
   * Sphinx (tested with version 1.6.4)
 
 Type:

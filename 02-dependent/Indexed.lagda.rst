@@ -9,7 +9,7 @@
   open import Data.Nat hiding (_*_ ; _≤_)
   open import Data.Maybe
   open import Data.Product
-  open import Data.List hiding (_++_)
+  open import Data.List hiding (_++_ ; tail ; lookup)
   open import Data.String
 
   open import Function hiding (id ; const)

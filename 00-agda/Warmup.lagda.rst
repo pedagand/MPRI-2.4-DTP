@@ -9,7 +9,7 @@ Warming up
 
 Cheatsheets:
   - `Install Agda`_
-  - `Retrieve the Agda Standard Library <https://github.com/agda/agda-stdlib/archive/v0.14.tar.gz>`_
+  - `Retrieve the Agda Standard Library <https://github.com/agda/agda-stdlib/archive/v0.17.tar.gz>`_
   - `Setup the Standard Library`_
   - Get used to the `Emacs mode`_
   - RTF `Agda Manual`_ if necessary
@@ -69,10 +69,10 @@ to begin your exploration with a bird-eye view of the project.
 
 .. References:
 
-.. _`Install Agda`: http://agda.readthedocs.io/en/v2.5.3/getting-started/installation.html
-.. _`Setup the Standard Library`: http://agda.readthedocs.io/en/v2.5.2/tools/package-system.html#example-using-the-standard-library
-.. _`Emacs mode`: http://agda.readthedocs.io/en/latest/tools/emacs-mode.html
-.. _`Agda manual`: https://agda.readthedocs.io/en/v2.5.3/
+.. _`Install Agda`: https://agda.readthedocs.io/en/v2.5.4.1/getting-started/installation.html
+.. _`Setup the Standard Library`: https://agda.readthedocs.io/en/v2.5.4.1/tools/package-system.html#example-using-the-standard-library
+.. _`Emacs mode`: http://agda.readthedocs.io/en/v2.5.4.1/tools/emacs-mode.html
+.. _`Agda manual`: https://agda.readthedocs.io/en/v2.5.4.1/
 .. _`Evolution of a Typechecker`: https://github.com/pedagand/typechecker-evolution
 .. TODO: any other useful resources for setting things up?
 

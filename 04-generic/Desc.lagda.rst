@@ -67,7 +67,8 @@ Extensional Generic Programming
     open import Data.Product hiding (map)
     open import Data.Nat
     open import Data.Fin hiding (_+_)
-    open import Data.List hiding (map ; replicate ; zipWith ; foldr ; sum ; sequence)
+    open import Data.List
+      hiding (map ; replicate ; zipWith ; foldr ; sum ; lookup ; tabulate)
 
     open import Relation.Binary.PropositionalEquality
 
@@ -1343,7 +1344,7 @@ Intensional Generic Programming
     open import Data.Bool
     open import Data.Product hiding (map)
     open import Data.Sum hiding (map)
-    open import Data.Nat hiding (fold)
+    open import Data.Nat
     open import Data.Fin renaming (suc to sucF) hiding (fold)
     open import Data.Vec hiding (map)
 
@@ -1422,7 +1423,7 @@ of two functors to be a functor. Implement composition of descriptions::
 
       correctness-∘ : ∀ {X D₁ D₂} → ⟦ D₁ ∘D D₂ ⟧ X ≡ ⟦ D₁ ⟧ (⟦ D₂ ⟧ X)
       correctness-∘ = {!!}
-        where postulate ext : Extensionality 0ℓ 0ℓ
+        where postulate ext : Extensionality Level.zero Level.zero
 
 .. BEGIN HIDE
   ::
@@ -1442,13 +1443,13 @@ and (generically) prove the functor laws::
 
       proof-map-id : ∀ {X} → (D : Desc)(v : ⟦ D ⟧ X) → map D id v ≡ v
       proof-map-id = {!!}
-        where postulate ext : Extensionality 0ℓ 0ℓ
+        where postulate ext : Extensionality Level.zero Level.zero
 
       proof-map-compos : ∀ {X Y Z}{f : X → Y}{g : Y → Z} → 
                          (D : Desc)(v : ⟦ D ⟧ X) → 
                          map D (λ x → g (f x)) v ≡ map D g (map D f v)
       proof-map-compos = {!!}
-        where postulate ext : Extensionality 0ℓ 0ℓ
+        where postulate ext : Extensionality Level.zero Level.zero
 
 .. END BLOCK
 
@@ -1477,7 +1478,7 @@ and (generically) prove the functor laws::
     proof-map-id (`Σ S T) (a , b)
       rewrite proof-map-id (T a) b = refl
     proof-map-id (`Π S T) k = ext (λ a → proof-map-id (T a) (k a))
-      where postulate ext : Extensionality 0ℓ 0ℓ
+      where postulate ext : Extensionality Level.zero Level.zero
 
     proof-map-compos : ∀ {X Y Z}{f : X → Y}{g : Y → Z} → 
                        (D : Desc)(v : ⟦ D ⟧ X) → 
@@ -1494,7 +1495,7 @@ and (generically) prove the functor laws::
     proof-map-compos {f = f}{g} (`Σ S T) (a , b)
       rewrite proof-map-compos {f = f}{g} (T a) b = refl
     proof-map-compos (`Π S T) k = ext (λ a → proof-map-compos (T a) (k a))
-      where postulate ext : Extensionality 0ℓ 0ℓ
+      where postulate ext : Extensionality Level.zero Level.zero
 
 .. END HIDE
 

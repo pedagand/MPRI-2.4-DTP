@@ -87,7 +87,7 @@ Nowadays:
   open import Data.Unit hiding (setoid ; _≟_)
   open import Data.Nat renaming (_*_ to _*ℕ_)
   open import Data.Nat.DivMod
-  open import Data.Fin hiding (_+_ ; raise ; _-_)
+  open import Data.Fin hiding (_+_ ; raise ; _-_ ; _≟_)
   open import Data.Product
 
   open import Function
