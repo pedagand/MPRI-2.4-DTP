@@ -976,9 +976,9 @@ The Rising Sea
 
     infix 30 _⊢Nf_
     infix 30 _⊢Ne_
-    infix 40 _⟶_
+    infix 40 _⟦⊢⟧_
     infix 45 _⟦⇒⟧_
-    infix 50 _⟦×⟧_
+    infix 50 _⟦*⟧_
     infix 30 _⊩_
 
 
@@ -1089,14 +1089,10 @@ with renaming operation::
         _⊢ : context → Set
         ren : ∀ {Γ Δ} → Γ ⊇ Δ → Δ ⊢ → Γ ⊢
 
-.. BEGIN HIDE
-.. TODO change symbol ⟶ for something less ambiguous
-.. END HIDE
-
 An implication in ``Sem`` is a family of implications for each context::
 
-    _⟶_ : (P Q : Sem) → Set
-    P ⟶ Q = ∀ {Γ} → Γ ⊢P → Γ ⊢Q
+    _⟦⊢⟧_ : (P Q : Sem) → Set
+    P ⟦⊢⟧ Q = ∀ {Γ} → Γ ⊢P → Γ ⊢Q
       where open Sem P renaming (_⊢ to _⊢P)
             open Sem Q renaming (_⊢ to _⊢Q)
 
@@ -1130,25 +1126,35 @@ the normal forms of type unit::
     ⟦unit⟧ : Sem
     ⟦unit⟧ =  Nf̂ unit
 
-    ⟦tt⟧ : ∀ {P} → P ⟶ ⟦unit⟧
+    ⟦tt⟧ : ∀ {P} → P ⟦⊢⟧ ⟦unit⟧
     ⟦tt⟧ ρ = tt
 
 Similarly, we will interpret the ``_*_`` type as a product in
 ``Sem``, defined in a pointwise manner::
 
-    _⟦×⟧_ : Sem → Sem → Sem
-    P ⟦×⟧ Q = record { _⊢ = λ Γ → Γ ⊢P × Γ ⊢Q
-                   ; ren = λ { wk (x , y) → ( ren-P wk x , ren-Q wk y ) } }
+    _⟦*⟧_ : Sem → Sem → Sem
+    P ⟦*⟧ Q = record { _⊢ = λ Γ → Γ ⊢P × Γ ⊢Q
+                     ; ren = λ { wk (x , y) → ( ren-P wk x , ren-Q wk y ) } }
       where open Sem P renaming (_⊢ to _⊢P ; ren to ren-P)
             open Sem Q renaming (_⊢ to _⊢Q ; ren to ren-Q)
 
-    ⟦pair⟧ : ∀ {P Q R} → P ⟶ Q → P ⟶ R → P ⟶ Q ⟦×⟧ R
+    ⟦pair⟧ : ∀ {P Q R} →
+                 P ⟦⊢⟧ Q →
+                 P ⟦⊢⟧ R →
+                 -------------
+                 P ⟦⊢⟧ Q ⟦*⟧ R
     ⟦pair⟧ a b ρ = a ρ , b ρ
 
-    ⟦fst⟧ : ∀ {P Q R} → P ⟶ Q ⟦×⟧ R → P ⟶ Q
+    ⟦fst⟧ : ∀ {P Q R} →
+                P ⟦⊢⟧ Q ⟦*⟧ R →
+                -------------
+                P ⟦⊢⟧ Q
     ⟦fst⟧ p ρ = proj₁ (p ρ)
 
-    ⟦snd⟧ : ∀ {P Q R} → P ⟶ Q ⟦×⟧ R → P ⟶ R
+    ⟦snd⟧ : ∀ {P Q R} →
+                P ⟦⊢⟧ Q ⟦*⟧ R →
+                -------------
+                P ⟦⊢⟧ R
     ⟦snd⟧ p ρ = proj₂ (p ρ)
 
 We may be tempted to define the exponential in a pointwise manner too:
@@ -1208,16 +1214,16 @@ A slightly more abstract way of presenting this isomorphism consists
 in noticing that any downward-closed set of context forms a valid
 semantics objects. ``φ`` and ``ψ`` can thus be read as establishing an
 isomorphism between the object ``Γ ⊢T`` and the morphisms in ``⊇[ Γ ]
-⟶ T``::
+⟦⊢⟧ T``::
 
       ⊇[_] : context → Sem
       ⊇[ Γ ] = record { _⊢ = λ Δ → Δ ⊇ Γ
                       ; ren = λ wk₁ wk₂ → wk₂ ∘wk wk₁ }
 
-      ψ' : Γ ⊢T → ⊇[ Γ ] ⟶ T
+      ψ' : Γ ⊢T → ⊇[ Γ ] ⟦⊢⟧ T
       ψ' t wk = ren-T wk t
 
-      φ' : ⊇[ Γ ] ⟶ T → Γ ⊢T
+      φ' : ⊇[ Γ ] ⟦⊢⟧ T → Γ ⊢T
       φ' k = k id
 
 
@@ -1244,7 +1250,7 @@ in particular, that it satisfies the following isomorphism for all ``R
 
 .. code-block:: guess
 
-    R ⟶ P ⟦⇒⟧ Q ≡ R ⟦×⟧ P ⟶ Q
+    R ⟦⊢⟧ P ⟦⇒⟧ Q ≡ R ⟦*⟧ P ⟦⊢⟧ Q
 
 We denote ``_⊢P⟦⇒⟧Q`` its action on contexts. Let ``Γ : context``. We
 have the following isomorphisms:
@@ -1252,9 +1258,9 @@ have the following isomorphisms:
 .. code-block:: guess
 
     Γ ⊢P⟦⇒⟧Q ≡ ∀ {Δ} → Δ ⊇ Γ → Δ ⊢P⟦⇒⟧Q              -- by ψ
-           ≡ ⊇[ Γ ] ⟶ P⟦⇒⟧Q                        -- by the alternative definition ψ'
-           ≡ ⊇[ Γ ] ⟦×⟧ P ⟶ Q                      -- by definition of an exponential
-           ≡ ∀ {Δ} → Δ ⊇ Γ → Δ ⊢P → Δ ⊢Q         -- by unfolding definition of ⟦×⟧, ⟶ and currying
+           ≡ ⊇[ Γ ] ⟦⊢⟧ P⟦⇒⟧Q                        -- by the alternative definition ψ'
+           ≡ ⊇[ Γ ] ⟦*⟧ P ⟦⊢⟧ Q                      -- by definition of an exponential
+           ≡ ∀ {Δ} → Δ ⊇ Γ → Δ ⊢P → Δ ⊢Q         -- by unfolding definition of ⟦*⟧, ⟦⊢⟧ and currying
 
 As in the definition of ``Y``, it is easy to see that this last member
 can easily be equipped with a renaming: we therefore take it as the
@@ -1266,44 +1272,47 @@ can easily be equipped with a renaming: we therefore take it as the
       where open Sem P renaming (_⊢ to _⊢P)
             open Sem Q renaming (_⊢ to _⊢Q)
 
-    ⟦lam⟧ : ∀ {P Q R} → P ⟦×⟧ Q ⟶ R → P ⟶ Q ⟦⇒⟧ R
+    ⟦lam⟧ : ∀ {P Q R} →
+                P ⟦*⟧ Q ⟦⊢⟧ R →
+                -------------
+                P ⟦⊢⟧ Q ⟦⇒⟧ R
     ⟦lam⟧ {P} η p = λ wk q → η (ren-P wk p , q)
       where open Sem P renaming (ren to ren-P)
 
-    ⟦app⟧ : ∀ {P Q R} → P ⟶ Q ⟦⇒⟧ R → P ⟶ Q → P ⟶ R
+    ⟦app⟧ : ∀ {P Q R} →
+                P ⟦⊢⟧ Q ⟦⇒⟧ R →
+                P ⟦⊢⟧ Q →
+                -------------
+                P ⟦⊢⟧ R
     ⟦app⟧ η μ = λ px → η px id (μ px)
 
 
 **Remark:** The above construction of the exponential is taken from
 MacLane & Moerdijk's `Sheaves in Geometry and Logic`_ (p.46).
 
-.. BEGIN HIDE
-.. TODO renaming ⊤̂, ⟦⇒⟧, ⟦×⟧
-.. END HIDE
-
 At this stage, we have enough structure to interpret the types::
 
     ⟦_⟧ : type → Sem
     ⟦ unit ⟧  = ⟦unit⟧
     ⟦ S ⇒ T ⟧ = ⟦ S ⟧ ⟦⇒⟧ ⟦ T ⟧
-    ⟦ A * B ⟧ = ⟦ A ⟧ ⟦×⟧ ⟦ B ⟧
+    ⟦ A * B ⟧ = ⟦ A ⟧ ⟦*⟧ ⟦ B ⟧
 
-To interpret contexts, we need a terminal object::
+To interpret contexts, we also need a terminal object::
 
-    ⊤̂ : Sem
-    ⊤̂ = record { _⊢ = λ _ → ⊤
-               ; ren = λ _ _ → tt }
+    ⟦⊤⟧ : Sem
+    ⟦⊤⟧ = record { _⊢ = λ _ → ⊤
+                 ; ren = λ _ _ → tt }
 
     ⟦_⟧C : (Γ : context) → Sem
-    ⟦ ε ⟧C     = ⊤̂
-    ⟦ Γ ▹ T ⟧C = ⟦ Γ ⟧C ⟦×⟧ ⟦ T ⟧
+    ⟦ ε ⟧C     = ⟦⊤⟧
+    ⟦ Γ ▹ T ⟧C = ⟦ Γ ⟧C ⟦*⟧ ⟦ T ⟧
 
 As usual, a type in context will be interpreted as a morphism between
 their respective interpretations. The interpreter then takes the
 syntactic object to its semantical counterpart::
 
     _⊩_ : context → type → Set
-    Γ ⊩ T = ⟦ Γ ⟧C ⟶ ⟦ T ⟧
+    Γ ⊩ T = ⟦ Γ ⟧C ⟦⊢⟧ ⟦ T ⟧
 
     lookup : ∀ {Γ T} → T ∈ Γ → Γ ⊩ T
     lookup here (_ , v)      = v
