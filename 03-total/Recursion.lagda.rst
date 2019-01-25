@@ -2,7 +2,7 @@
   ::
   {-# OPTIONS --allow-unsolved-metas --rewriting #-}
 
-  open import Level renaming (zero to 0ℓ ; suc to sucℓ) 
+  open import Level renaming (zero to 0ℓ ; suc to sucℓ)
 
   open import Data.Empty
   open import Data.Unit hiding (_≤_ ; _≤?_)
@@ -25,7 +25,7 @@
   open import Category.Monad
 
   module 03-total.Recursion where
-    
+
 
   {-# BUILTIN REWRITE _≡_ #-}
   -- being lazy in the implementation of `pick1`
@@ -155,7 +155,7 @@ renamed ``j`` otherwise::
     zero  Δ zero  = ∅
     zero  Δ suc y = return y
     suc x Δ zero  = return zero
-    suc x Δ suc y = x Δ y >>= λ y' → 
+    suc x Δ suc y = x Δ y >>= λ y' →
                     return (suc y')
 
 The occur-check consists then simply in applying ``Δ`` to every
@@ -166,7 +166,7 @@ it will raise::
     check i (var j)    = i Δ j >>= λ z →
                          return (var z)
     check i leaf       = return leaf
-    check i (fork f s) = check i f >>= λ r1 → 
+    check i (fork f s) = check i f >>= λ r1 →
                          check i s >>= λ r2 →
                          return (fork r1 r2)
 
@@ -209,7 +209,7 @@ function composition::
     ⟦ id ⟧ = var
     ⟦ ρ ∷[ t / i ] ⟧ = ⟦ ρ ⟧ ∘K (t for i)
 
-    
+
 
 -----------------------------------
 Specification: most-general unifier
@@ -232,16 +232,16 @@ solve a flex-flex problem or a flex-rigid problem::
     amgu (fork _ _) leaf _             = ∅
     -- Matches:
     amgu leaf leaf acc                 = return acc
-    amgu (fork s₁ t₁) (fork s₂ t₂) acc = amgu s₁ s₂ acc >>= λ acc → 
+    amgu (fork s₁ t₁) (fork s₂ t₂) acc = amgu s₁ s₂ acc >>= λ acc →
                                          amgu t₁ t₂ acc
-    -- Variables flex-flex: 
+    -- Variables flex-flex:
     amgu (var x) (var y) id            = return (flex-flex x y)
     -- Variables flex-rigid:
     amgu (var x) t id                  = flex-rigid x t
     amgu t (var x) id                  = flex-rigid x t
     -- Terms under substitution:
     amgu s t (σ ∷[ r / z ])            = amgu (sub (r for z) s)
-                                              (sub (r for z) t) σ >>= λ σ → 
+                                              (sub (r for z) t) σ >>= λ σ →
                                          return (σ ∷[ r / z ])
 
     flex-flex x y with x Δ y
@@ -250,7 +250,7 @@ solve a flex-flex problem or a flex-rigid problem::
 
     flex-rigid x t = check x t >>= λ t' →
                      return (id ∷[ t' / x ])
-   
+
     mgu : (s t : Term) → Maybe Subst
     mgu s t = amgu s t id
 
@@ -308,7 +308,7 @@ Part of the problem stands in the fact that, whilst we have the
 intuition that the numbers of variables occuring in terms keeps
 decreasing as unification proceeds, this intuition is not documented
 in the code. Let us try again, using indexing as a machine-checked
-mode of documentation. 
+mode of documentation.
 
 We now stratify the set of variables, ie. ``Var n`` contains ``n``
 distinct variables::
@@ -388,7 +388,7 @@ class of variables::
     zero Δ suc y                = return y
     _Δ_ {zero} (suc ())
     _Δ_ {suc _} (suc x) zero    = return zero
-    _Δ_ {suc _} (suc x) (suc y) = x Δ y >>= λ y' → 
+    _Δ_ {suc _} (suc x) (suc y) = x Δ y >>= λ y' →
                                   return (suc y')
 
 ..
@@ -416,7 +416,7 @@ Prove the following lemmas, the last being one way to state that
       lemma-inj3 : ∀ {n} x y → x ≢ y → ∃ λ y' → inj[_] {n} x y' ≡ y
       lemma-inj3 = {!!}
 
-      lemma-inj-Δ : ∀ {n}(x y : Var (suc n))(r : Maybe (Var n)) → 
+      lemma-inj-Δ : ∀ {n}(x y : Var (suc n))(r : Maybe (Var n)) →
         x Δ y ≡ r → ((y ≡ x × r ≡ nothing) ⊎ (∃ λ y' → y ≡ inj[ x ] y' × r ≡ just y'))
       lemma-inj-Δ = {!!}
 
@@ -440,19 +440,19 @@ Structurally: occur-check
 
 Following ``Δ``, the occur-check reflects the fact that, in case of
 success, the resulting term did not use one variable::
-    
+
     check : ∀ {n} → (i : Var (suc n))(t : Term (suc n)) → Maybe (Term n)
-    check i (var j)    = i Δ j >>= λ k → 
+    check i (var j)    = i Δ j >>= λ k →
                          return (var k)
     check i leaf       = return leaf
-    check i (fork f s) = check i f >>= λ r1 → 
+    check i (fork f s) = check i f >>= λ r1 →
                          check i s >>= λ r2 →
                          return (fork r1 r2)
 
 ..
   ::
     module Exercise-check where
- 
+
 If we were able to extrude ``x`` from ``t`` into ``t'``, this means
 that injecting ``x`` into ``t'`` amounts to the exact same term
 ``t``::
@@ -485,7 +485,7 @@ The composition of ``_for_`` and ``inj[_]`` amounts to an identity::
       lemma-for-inj : ∀ {n} (t : Term n) x → ((t for x) ∘ (inj[ x ])) ≐ var
       lemma-for-inj = {!!}
 
-      lemma-check-inj : ∀ {n} x t t' → check {n} x t ≡ just t' → 
+      lemma-check-inj : ∀ {n} x t t' → check {n} x t ≡ just t' →
         sub (t' for x) t  ≡ sub (t' for x) (var x)
       lemma-check-inj = {!!}
 
@@ -541,10 +541,6 @@ underlying composition of substitutions::
 Structurally: most-general unifier
 --------------------------------------
 
-.. BEGIN HIDE
-.. TODO reveal the recursive structure in the definition
-.. END HIDE
-
 The implementation of the most-general unifier is exactly the same,
 excepted that termination has become self-evident: when performing the
 substitution (case ``amgu {suc k} _ _ (m , (σ ∷[ r / z ]))``), the
@@ -561,17 +557,18 @@ is able to spot it::
     amgu (fork _ _) leaf _ = ∅
     -- Matches:
     amgu leaf leaf acc = return acc
-    amgu (fork s₁ t₁) (fork s₂ t₂) acc = amgu s₁ s₂ acc >>= λ acc → 
-                                         amgu t₁ t₂ acc
-    -- Variables flex-flex: 
+    amgu {k} (fork s₁ t₁) (fork s₂ t₂) acc =
+      amgu {k} s₁ s₂ acc >>= λ acc →
+      amgu {k} t₁ t₂ acc
+    -- Variables flex-flex:
     amgu (var x) (var y) (m , id) = return (flex-flex x y)
     -- Variables flex-rigid:
     amgu (var x) t (m , id) = flex-rigid x t
     amgu t (var x) (m , id) = flex-rigid x t
     -- Terms under substitution:
-    amgu {suc k} s t (m , (σ ∷[ r / z ])) = 
+    amgu {suc k} s t (m , (σ ∷[ r / z ])) =
       amgu {k} (sub (r for z) s)
-               (sub (r for z) t) (m , σ) >>= λ { (n , σ) → 
+               (sub (r for z) t) (m , σ) >>= λ { (n , σ) →
       return ((n , σ ∷[ r / z ])) }
 
     flex-flex {zero} ()
@@ -582,7 +579,7 @@ is able to spot it::
     flex-rigid {0} ()
     flex-rigid {suc _} x t = check x t >>= λ t' →
                              return (-, id ∷[ t' / x ])
-   
+
 
     mgu : ∀ {m} → (s t : Term m) → Maybe (∃ (Subst m))
     mgu s t = amgu s t (-, id)
@@ -621,7 +618,7 @@ is able to spot it::
 The key idea was thus to reify the (decreasing) *measure* as an
 indexing discipline. Our implementation was then naturally defined
 structurally over this index, thus yielding a structurally acceptable
-definition. 
+definition.
 
 **Exercise (difficulty: 3)** Prove the *soundness* of your
 implementation: the substitution thus computed is indeed a valid
@@ -829,7 +826,7 @@ obvious (to us, not to Agda)::
 
       pick1 : ∀ {X : Set}{n} → Vec X n → Vec (X × Vec X (pred n)) n
       pick1 {X} xs = help [] xs []
-        where help : ∀ {k l} → Vec X k → Vec X l 
+        where help : ∀ {k l} → Vec X k → Vec X l
                              → Vec (X × Vec X (pred (k + l))) k
                              → Vec (X × Vec X (pred (k + l))) (k + l)
               help Δ []  acc = acc
@@ -851,10 +848,10 @@ obvious (to us, not to Agda)::
 
       B / Γ [ Atom α ]⊢ β      = ⌊ α ≟ β ⌋
       B / Γ [ P ⊃ Q  ]⊢ β      = B / Γ [ Q ]⊢ β ∧ B / Γ ⊢ P
-      
+
       search {zero} tt α = false
       search {suc n} ((l , B) , Γ) α =
-        let try = map (λ { (P , B) → B / Γ [ P ]⊢ α }) 
+        let try = map (λ { (P , B) → B / Γ [ P ]⊢ α })
                       (pick1 B)
         in
         any try ∨ search Γ α
@@ -918,7 +915,7 @@ definitions on ``Formulas``::
       search : ∀ {n} → Context n → A → Bool
       search {zero} tt α = false
       search {suc m} ((l , B) , Γ) α =
-        let try = map (λ { (P , B) → B / Γ [ P ]⊢ α }) 
+        let try = map (λ { (P , B) → B / Γ [ P ]⊢ α })
                       (pick1 B)
         in
         any try ∨ search Γ α
@@ -979,7 +976,7 @@ Interlude: induction / memoisation
   ::
 
   module DjinnMonotonic (A : Set)(_≟_ : Decidable {A = A} _≡_) where
-      
+
       open DjinnStructural A _≟_ hiding (search ; ⊢_ ; _/_[_]⊢_ ; _/_⊢_) public
 
 The Coq layman tends to see induction principles as a reassuring
@@ -994,7 +991,7 @@ fine.
 
 With `The View from the Left`_ came the idea that one could get the
 benefits of pattern-matching *syntax* while actually appealing to
-induction principles to back them up *semantically*. 
+induction principles to back them up *semantically*.
 
 Assuming that we had this machinery (which we have not in Agda but is
 available in Coq thanks to `Equations
@@ -1052,11 +1049,11 @@ effect, this is what we do when manipulating ``Bucket``, asking only
 for the size of the underlying vector to decrease::
 
       Σ1-Rec : ∀ {A : Set}{B : A → Set} →
-              RecStruct A → 
+              RecStruct A →
               RecStruct (Σ A B)
       Σ1-Rec RecA P (x , y) =
         RecA (λ x' → ∀ y' → P (x' , y')) x
-     
+
       Rec-Bucket : ∀ {X} → RecStruct (Bucket X)
       Rec-Bucket  = Σ1-Rec Rec-ℕ
 
@@ -1101,7 +1098,7 @@ recursion structure, lexicographic recursion::
             p₂ : ∀ x → RecA (λ x' → ∀ y' → P (x' , y')) x
             p₂ = recA (λ x → ∀ y → P (x , y))
                       (λ x x-rec y → f (x , y) (p₁ x y x-rec , x-rec))
-      
+
             p₂x = p₂ x
 
 We thus have:
@@ -1147,7 +1144,7 @@ the way::
 
       ⟨search[_]⟩ : {n : ℕ} (Γ : Context n) → Set
       ⟨search[ Γ ]⟩ = A → Bool
-      
+
       mutual
         search-step : ∀ {n} → (Γ : Context n) → Rec-Context n ⟨search[_]⟩ Γ → ⟨search[ Γ ]⟩
         search-step {zero} tt tt α = false
@@ -1186,7 +1183,7 @@ the way::
     A = Atom 0
     B = Atom 1
     ∐ = Atom 2
-    
+
     test₁ : ⊢ (A ⊃ B ⊃ A) ≡ true
     test₁ = refl
 
@@ -1238,7 +1235,7 @@ free monad of the signature ``call : (a : A) → B a``::
 And its a monad::
 
     monad : RawMonad RecMon
-    monad = record { return = return 
+    monad = record { return = return
                     ; _>>=_ = _>>=_ }
            where  _>>=_ : ∀{X Y : Set} → RecMon X → (X → RecMon Y) → RecMon Y
                   return x >>= f = f x
@@ -1258,7 +1255,7 @@ We introduce some syntactic sugar to Pi-type the programs written in
 this syntax::
 
   infix 2 Π-syntax
-  
+
   Π-syntax  : (A : Set)(B : A → Set) → Set
   Π-syntax A B = (a : A) → RecMon (B a)
     where open RecMonad A B
@@ -1295,8 +1292,8 @@ structure. For example, we can write the naïve Fibonacci function::
     fib : Π[ m ∈ ℕ ] ℕ
     fib zero = return 0
     fib (suc zero) = return 1
-    fib (suc (suc n)) = call⟨ suc n ⟩ >>= λ r₁ → 
-                        call⟨ n ⟩ >>= λ r₂ → 
+    fib (suc (suc n)) = call⟨ suc n ⟩ >>= λ r₁ →
+                        call⟨ n ⟩ >>= λ r₂ →
                         return (r₁ + r₂)
 
 ..
@@ -1308,7 +1305,7 @@ structure. For example, we can write the naïve Fibonacci function::
 Monad morphism
 --------------------------------
 
-.. 
+..
   ::
   module Morphism (M : Set → Set)(M-Struct : RawMonad M)
                   (A : Set)(B : A → Set) where
@@ -1331,14 +1328,14 @@ Let ``M : Set → Set`` be a monad. We have:
         ≅ (a : A) → M (B a)                         -- by Yoneda lemma
 
 .. BEGIN HIDE
-.. François: montrer que le morphisme de RecMon vers M, c'est en
-.. fait un codage de "let rec" à l'aide d'un effect handler.
+.. TODO (François): show that the morphism from RecMon to M is in fact
+.. an encoding of 'let rec' using an effect handler.
 .. END HIDE
 
-Or, put otherwise, a monad morphism from RecMon is entirely specified
-by a mere function of type ``(a : A) → M (B a)``::
+Or, put otherwise, a monad morphism from ``RecMon`` is entirely
+specified by a mere function of type ``(a : A) → M (B a)``::
 
-    morph : ((a : A) → M (B a)) → 
+    morph : ((a : A) → M (B a)) →
             ∀ {X} → RecMon X → M X
     morph h (call a rec) = h a >>=-M λ b → morph h (rec b)
     morph h (return x)   = return-M x
@@ -1364,7 +1361,7 @@ interpretation into ``RecMon``::
 Interpretation: immediate values
 --------------------------------
 
-.. 
+..
   ::
   module Fuel (A : Set)(B : A → Set) where
     open RecMonad A B
@@ -1379,7 +1376,7 @@ We may blankly refuse to iterate::
 --------------------------------
 Interpretation: step-indexing
 --------------------------------
-    
+
 Iterating immediate interpretations, followed by the immediate one, we
 get a "step-indexed" interpretation::
 
@@ -1402,7 +1399,7 @@ This interpretation allows us to (maybe) run some programs::
 
     test₂ : petrol fib 5 6 ≡ just 8
     test₂ = refl
-  
+
 
 -----------------------------------------------
 Interlude: Universe of (collapsible) predicates
@@ -1490,7 +1487,7 @@ the call-graph of the recursive program.
 
 As it turns out, this call-graph is always a collapsible predicate: to
 "prove" this, we simply describe it with a collapsible description::
-    
+
     dom : ∀{a} → RecMon (B a) → CDesc A
     dom (return z) = `1
     dom (call a rec) = `X a `× `Π (B a) λ b → dom (rec b)
@@ -1510,7 +1507,7 @@ call-graph (and, therefore, not over its arguments)::
     run a (con domS) = run1 (f a) (mapRun {p = f a} domS)
 
     mapRun {p = return x} tt = tt
-    mapRun {p = call a rec} (domA , domRec) = 
+    mapRun {p = call a rec} (domA , domRec) =
       run a domA , λ b → mapRun {p = rec b} (domRec b)
 
     run1 (return b) tt = b
@@ -1525,7 +1522,7 @@ computationally-relevant: being collapsible, there is nothing in ``μ
 Dom`` to compute with! At run-time, `Inductive Families Need Not Store
 Their Indices`_ and it can be entirely removed.
 
-.. 
+..
   ::
   open Gcd
   open import Induction
@@ -1553,17 +1550,17 @@ simply have to prove that ``DomGCD`` is inhabited for any input
 numbers m and n (the proof is not really important)::
 
   gcd-wf : (m n : ℕ) → DomGCD (m , n)
-  gcd-wf m n = build ([_⊗_] IndNat.<-recBuilder IndNat.<-recBuilder) 
-                   (λ { (m , n) → DomGCD (m , n) }) 
+  gcd-wf m n = build ([_⊗_] IndNat.<-recBuilder IndNat.<-recBuilder)
+                   (λ { (m , n) → DomGCD (m , n) })
                    (λ { (m , n) rec → con (ih m n rec) })
                    (m , n)
          where ih : ∀ x y → (IndNat.<-Rec ⊗ IndNat.<-Rec) DomGCD (x , y) → ⟦ BC.dom gcd (gcd (x , y)) ⟧ DomGCD
                ih zero y rec = tt
                ih (suc x) zero rec = tt
-               ih (suc x) (suc y) rec with x ≤? y 
-               ih (suc x) (suc y) (rec-x , rec-y) 
+               ih (suc x) (suc y) rec with x ≤? y
+               ih (suc x) (suc y) (rec-x , rec-y)
                  | yes p = rec-x (y ∸ x) (s≤s (n∸m≤n x y)) , λ _ → tt
-               ih (suc x) (suc y) (rec-x , rec-y) 
+               ih (suc x) (suc y) (rec-x , rec-y)
                  | no ¬p = rec-y ((x ∸ y)) (s≤s (n∸m≤n y x)) (suc y) , λ _ → tt
 
 And we get the desired gcd function::
@@ -1577,13 +1574,13 @@ And we get the desired gcd function::
   module TestGcd where
     test0 : gcd' 0 5 ≡ 5
     test0 = refl
-  
+
     test0' : gcd' 4 0 ≡ 4
     test0' = refl
 
     test1 : gcd' 4 5 ≡ 1
     test1 = refl
-  
+
     test2 : gcd' 30 35 ≡ 5
     test2 = refl
 
@@ -1604,7 +1601,7 @@ Conor McBride, and James McKinna describe a *run-time* optimisation
 called "collapsing" (Section 6):
 
 An inductive family ``D : I → Set`` is *collapsible* if
-  for every index ``i``,  
+  for every index ``i``,
       if ``a, b : D i``, then ``a ≡ b`` (extensionally)
 
 That is, the index ``i`` determines entirely the content of the
@@ -1637,7 +1634,7 @@ that fixpoints of CDesc are indeed collapsible::
 
   CDesc-collapse : ∀{I i}{R} → (xs ys : μ R i) → xs ≡ ys
   CDesc-collapse {I}{R = R} (con xs) (con ys) = cong con (help (CFunc.func R _) xs ys)
-    where postulate 
+    where postulate
             extensionality : {A : Set}{B : A → Set}{f g : (a : A) → B a} →
                              ((x : A) → (f x ≡ g x)) → f ≡ g
 
