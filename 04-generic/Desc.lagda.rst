@@ -64,6 +64,7 @@ Extensional Generic Programming
 
     open import Data.Unit
     open import Data.Bool
+    open import Data.Sum hiding (map)
     open import Data.Product hiding (map)
     open import Data.Nat
     open import Data.Fin hiding (_+_)
@@ -261,8 +262,45 @@ Another (arbitrary) example of functor is the following::
       _<$>_ {{ListFunctor}} f (x ∷ xs) = f x ∷ (f <$> xs)
 .. END HIDE
 
+**Exercise (difficulty: 1)** We define::
+
+    record Arrow (A : Set)(B : Set) : Set where
+      constructor ar
+      field
+        apply : A → B
+
+Let ``A : Set``. Is ``Arrow A : Set → Set`` an endofunctor on ``Set``?
+
 .. BEGIN HIDE
-.. TODO Add non-example of functor
+  :: 
+    ArrowFunctor : ∀ {A} → Functor (Arrow A)
+    _<$>_ {{ArrowFunctor}} f (ar g) = ar (f ∘ g)
+.. END HIDE
+
+
+**Exercise (difficulty: 1)** We define::
+
+    record CoArrow (B : Set)(A : Set) : Set where
+      constructor co
+      field
+        apply : A → B
+
+Let ``B : Set``. Is ``CoArrow B : Set → Set`` an endofunctor on
+``Set``?
+
+**Exercise (difficulty: 3)** Constructively prove your above answer.
+
+.. BEGIN HIDE
+  ::
+    open import Data.Empty
+
+    pf-CoArrow-not-Functor : Functor (CoArrow ⊥) → ⊥
+    pf-CoArrow-not-Functor F = CoArrow.apply (f <$>F x) tt
+        where open Functor F renaming (_<$>_ to _<$>F_)
+              f : ⊥ → ⊤
+              f _ = tt
+              x : CoArrow ⊥ ⊥
+              x = co λ falso → falso
 .. END HIDE
 
 --------------------------------
@@ -390,9 +428,45 @@ Lecture 1) is an applicative::
 
 **Exercise (difficulty: 1)** Write a program that takes a monad (specified with ``return`` and ``>>=``) and produces its underlying applicative.
 
+**Exercise (difficulty: 1)** We define::
+
+    record PPair (A : Set)(B : Set) : Set where
+      constructor ⟨_,_⟩
+      field
+        fst : A
+        snd : B
+
+Let ``A : Set``. Is ``PPair A : Set → Set`` an endofunctor on ``Set``? Is it an applicative?
+
 .. BEGIN HIDE
-.. TODO Add non-example of applicative
-.. TODO Add an example of an applicative which is not a monad
+  ::
+
+    PPairFunctor : ∀ {A} → Functor (PPair A)
+    _<$>_ {{PPairFunctor}} f ⟨ x , y ⟩ = ⟨ x , f y ⟩
+
+    pf-PPair-not-Applicative : Applicative (PPair ⊥) → ⊥
+    pf-PPair-not-Applicative A = PPair.fst x
+      where open Applicative A renaming (pure to pure-A)
+            x : PPair ⊥ ⊤
+            x = pure-A tt
+.. END HIDE
+
+**Exercise (difficulty: 2)** We define::
+
+    open import Data.Char hiding (toNat)
+    open import Data.Maybe hiding (zipWith)
+
+    record Regexp (A : Set) : Set where
+       constructor re
+       field
+         match : List Char → Maybe A
+
+Show that ``Regexp`` can be equipped with an ``Applicative`` structure
+enabling us to parse context-free grammars (ie. regular
+expressions). Is it (necessarily) a monad?
+
+.. BEGIN HIDE
+.. TODO Provide solution
 .. END HIDE
 
 
@@ -447,9 +521,9 @@ while the second corresponds to a tabulation::
                  (3 ∷ 6 ∷ []) ∷ []
       test = refl
 
-An applicative functor such that there exists a set ``Log`` supporting
-``lookup`` and ``tabulate`` is called a Naperian functor or a
-`representable functor`_::
+A functor such that there exists a set ``Log`` supporting ``lookup``
+and ``tabulate`` is called a Naperian functor or a `representable
+functor`_::
 
     record Naperian (F : Set → Set) : Set₁ where
       field
@@ -471,21 +545,86 @@ An applicative functor such that there exists a set ``Log`` supporting
 
 .. TODO: add `comonad instance <https://stackoverflow.com/questions/12963733/writing-cojoin-or-cobind-for-n-dimensional-grid-type/13100857#13100857>`_
 
-.. BEGIN HIDE
-.. TODO Why ask for ``F`` to be an applicative, not just a functor?
-.. END HIDE
-
-
-.. BEGIN HIDE
-.. TODO add equational theory
-.. END HIDE
-
-.. BEGIN HIDE
-.. TODO add algebra of Log (Log 1, Log(a * b), Log(1 => b))
-.. END HIDE
 
 **Exercise (difficulty: 2)** State the Naperian laws and prove them
 for vectors.
+
+.. BEGIN HIDE
+  ::
+    record IsNaperian (F : Set → Set){{F-Naperian : Naperian F}} : Set₁ where
+      field
+        tabulate-lookup : ∀ {A} (v : F A) → 
+                            tabulate (lookup v)  ≡ v
+        lookup-tabulate : ∀ {A} (f : Log {{F-Naperian}} → A)(l : Log {{F-Naperian}}) → 
+                            lookup {{F-Naperian}} (tabulate f) l  ≡ f l
+
+    VectorIsNaperian : ∀{n} → IsNaperian (vec n)
+    VectorIsNaperian = record { tabulate-lookup = tabulate-lookup
+                              ; lookup-tabulate = lookup-tabulate }
+      where tabulate-lookup : ∀ {n A} (v : vec n A) → 
+                            tabulate (lookup v)  ≡ v
+            tabulate-lookup [] = refl
+            tabulate-lookup (x ∷ v) rewrite tabulate-lookup v = refl
+
+            lookup-tabulate : ∀ {n A} (f : Fin n → A)(l : Fin n) → 
+                            lookup {{VecNaperian}} (tabulate f) l  ≡ f l
+            lookup-tabulate f zero = refl
+            lookup-tabulate f (suc l) rewrite lookup-tabulate (λ n → f (suc n)) l = refl
+.. END HIDE
+
+**Exercise (difficulty: 1)** Show that a Naperian functor is
+necessarily an Applicative functor.
+
+.. BEGIN HIDE
+  ::
+    Naperian→Applicative :  (F : Set → Set){{_ : Naperian F}} → Applicative F
+    pure {{Naperian→Applicative F}} a = tabulate (λ _ → a)
+    _⊛_ {{Naperian→Applicative F}} f a = tabulate (λ ix → (lookup f ix) (lookup a ix))
+.. END HIDE
+
+**Exercise (difficulty: 2)** Show that Naperian functors deserve their
+name: for ``f`` and ``g`` two Naperian functors, define ``Log (f ×
+g)`` and ``Log (f ∘ g)`` in terms of ``Log f`` and ``Log g``. Any
+other remarkable identities?
+
+.. BEGIN HIDE
+  ::
+
+    record Prod (F : Set → Set)(G : Set → Set)(X : Set) : Set where
+      constructor ⟨_,_⟩
+      field
+        fst : F X
+        snd : G X
+
+    ProdFunctor : (F : Set → Set)(G : Set → Set){{_ : Functor F}}{{_ : Functor G}} →
+                    Functor (Prod F G)
+    _<$>_ {{ProdFunctor F G}} f ⟨ x , y ⟩ = ⟨ f <$> x , f <$> y ⟩
+             
+    ProdNaperian : (F : Set → Set)(G : Set → Set)
+                    {{_ : Naperian F}}{{_ : Naperian G}} →
+                    Naperian (Prod F G)
+    Log {{ProdNaperian F G {{F-Naperian}} {{G-Naperian}}}} = Log {{F-Naperian}} ⊎ Log {{G-Naperian}}
+    lookup {{ProdNaperian F G}} ⟨ x , y ⟩ ( inj₁ ix) = lookup x ix  
+    lookup {{ProdNaperian F G}} ⟨ x , y ⟩ ( inj₂ jx) = lookup y jx  
+    tabulate {{ProdNaperian F G}} f = ⟨ tabulate (λ x → f (inj₁ x)) , tabulate (λ x → f (inj₂ x)) ⟩
+    super {{ProdNaperian F G}} = ProdFunctor F G
+
+    data Comp(F : Set → Set) (G : Set → Set)(X : Set) : Set where
+      C : F (G X) → Comp F G X
+
+    CompFunctor : (F : Set → Set)(G : Set → Set){{_ : Functor F}}{{_ : Functor G}} →
+                    Functor (Comp F G)
+    _<$>_ {{CompFunctor F G {{F-Functor}}{{G-Functor}}}} f (C x) = C ((_<$>_ f) <$> x)
+             
+    CompNaperian : (F : Set → Set)(G : Set → Set)
+                    {{_ : Naperian F}}{{_ : Naperian G}} →
+                    Naperian (Comp F G)
+    Log {{CompNaperian F G {{F-Naperian}} {{G-Naperian}}}} = Log {{F-Naperian}} × Log {{G-Naperian}}
+    lookup {{CompNaperian F G}} (C x) (ix , jx) = lookup (lookup x ix) jx
+    tabulate {{CompNaperian F G}} f = C (tabulate (λ ix → tabulate (λ jx → f (ix , jx))))
+    super {{CompNaperian F G}} = CompFunctor F G
+
+.. END HIDE
 
 Pairs are Naperian too::
   
@@ -496,8 +635,14 @@ Pairs are Naperian too::
       lookup {{PairNaperian}} (P x y) false = y
       tabulate {{PairNaperian}} f = P (f true) (f false)
 
+**Exercise (difficulty: 1)** Give an example of a Functor that is **not** Naperian.
+
 .. BEGIN HIDE
-.. TODO Add non-example of Naperian
+
+  Any structure that cannot be statically indexed (in a total manner)
+  will do the trick. For example, lists or any kind of data-structure
+  whose size is unknown at compile-time.
+
 .. END HIDE
 
 
@@ -547,9 +692,11 @@ structure of a given set::
   
     open Monoid ⦃...⦄
 
-.. BEGIN HIDE
-.. TODO add equational theory
-.. END HIDE
+    record IsMonoid (A : Set){{_ : Monoid A}} : Set₁ where
+      field
+        id-left : (a : A) → mempty <> a ≡ a
+        id-right : (a : A) → mempty <> a ≡ a
+        assoc : (a b c : A) → (a <> b) <> c ≡ a <> (b <> c)
 
 .. BEGIN HIDE
 .. TODO: activate?
@@ -1328,7 +1475,7 @@ example, we would like to able to sum a scalar to a matrix:
 However, this is also at this point that the extensional style starts
 to break. To feel that pain, try to translate Gibbons' ``Max``
 type-class. As we will see in the last lecture, manipulating an object
-of type ``List (Set → Set)`` is a red-herring, it is already quite
+of type ``List (Set → Set)`` was a red-herring, it is already quite
 surprising that we came this far.
 
 
