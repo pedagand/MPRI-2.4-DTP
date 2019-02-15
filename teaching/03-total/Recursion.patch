@@ -1,160 +1,39 @@
---- 03-total/Recursion.student	2018-02-09 19:28:02.889470237 +0100
-+++ 03-total/Recursion.lagda.rst.orig	2018-02-09 16:44:52.967851938 +0100
-@@ -104,9 +104,7 @@
- simultaneous substitution::
- 
-     sub : (Var → Term) → Term → Term
--    sub ρ (var i) = ρ i
--    sub ρ leaf = leaf
--    sub ρ (fork s t) = fork (sub ρ s) (sub ρ t)
-+    sub ρ t = {!!}
- 
-     _∘K_ : (Var → Term) → (Var → Term) → Var → Term
-     ρ₁ ∘K ρ₂ = λ k → sub ρ₁ (ρ₂ k)
-@@ -133,23 +131,14 @@
- renamed ``j`` otherwise::
- 
-     _Δ_ : Var → Var → Maybe Var
--    zero  Δ zero  = ∅
--    zero  Δ suc y = return y
--    suc x Δ zero  = return zero
--    suc x Δ suc y = x Δ y >>= λ y' → 
--                    return (suc y')
-+    m Δ n = {!!}
- 
- The occur-check consists then simply in applying ``Δ`` to every
- variable of the given term, unless ``i`` actually occurs in which case
- it will raise::
- 
-     check : Var →  Term → Maybe Term
--    check i (var j)    = i Δ j >>= λ z →
--                         return (var z)
--    check i leaf       = return leaf
--    check i (fork f s) = check i f >>= λ r1 → 
--                         check i s >>= λ r2 →
--                         return (fork r1 r2)
-+    check i t = {!!}
- 
- When ``check i t`` succeeds in producing a term ``t'``, we thus now
- that ``i`` did not occur in ``t`` and that all variables above ``i``
-@@ -170,8 +159,7 @@
+--- 03-total/Recursion.student	2019-02-15 10:56:04.825648220 +0100
++++ 03-total/Recursion.lagda.rst.orig	2019-02-15 10:55:45.418079151 +0100
+@@ -175,8 +175,6 @@
  consider::
  
      data Subst : Set where
 -      id : Subst
 -      _∷[_/_] : (σ : Subst)(t : Term)(i : Var) → Subst
-+
  
  In turn, we interpret this initial model in the target
  one. Substituting a single term ``t : Term`` for a variable ``i : Var``
-@@ -179,16 +167,13 @@
- remainder of ``j`` by ``i`` otherwise::
- 
-     _for_ : Term → Var → (Var → Term)
--    (t for i) j with i Δ j
--    ... | nothing = t
--    ... | just j' = var j'
-+    (t for i) = {!!}
- 
- The interpretation of a list of single substitutions is merely
- function composition::
- 
-     ⟦_⟧ : Subst → (Var → Term)
--    ⟦ id ⟧ = var
--    ⟦ ρ ∷[ t / i ] ⟧ = ⟦ ρ ⟧ ∘K (t for i)
-+    ⟦ ρ ⟧ = {!!}
- 
-     
- 
-@@ -201,12 +186,12 @@
- t₁) (fork s₂ t₂)``) and then discharging that substitution (case
- ``amgu s t (σ ∷[ r / z ])``). Variables are only considered under no
- substitution (cases ``amgu _ _ id``), in which case we must either
--solve a flex-flex problem or a flex-rigid problem::
-+solve a flex-flex problem or a flex-rigid problem:
- 
-     flex-flex : (x y : Var) → Subst
-     flex-rigid : (x : Var)(t : Term) → Maybe Subst
- 
--    {-# TERMINATING #-}
-+    -- {-# TERMINATING #-}
-     amgu : (s t : Term)(acc : Subst) → Maybe Subst
-     -- Conflicts:
-     amgu leaf (fork _ _) _             = ∅
-@@ -246,7 +231,7 @@
-     v₃ = var 3
- 
- Assuming that the above definition is terminating, we can test it on a
--few examples::
-+few examples:
- 
-     test₁ : mgu (fork v₀ leaf) (fork (fork leaf leaf) v₁)
-           ≡ just (id ∷[ leaf / 0 ] ∷[ (fork leaf leaf) / 0 ])
-@@ -300,9 +285,9 @@
+@@ -302,9 +300,9 @@
  We can thus represent *terms with (at most) ``n`` variables*::
  
      data Term (n : ℕ) : Set where
 -      var : (i : Var n) → Term n
 -      leaf : Term n
 -      fork : (s t : Term n) → Term n
-+      var : (i : Var {!!}) → Term {!!}
-+      leaf : Term {!!}
-+      fork : (s t : Term {!!}) → Term {!!}
++      var : (i : Var ?) → Term ?
++      leaf : Term ?
++      fork : (s t : Term ?) → Term ?
  
- 
- 
-@@ -339,12 +324,7 @@
- class of variables::
- 
-     _Δ_ : ∀ {n} → Var (suc n) → Var (suc n) → Maybe (Var n)
--    zero Δ zero                 = ∅
--    zero Δ suc y                = return y
--    _Δ_ {zero} (suc ())
--    _Δ_ {suc _} (suc x) zero    = return zero
--    _Δ_ {suc _} (suc x) (suc y) = x Δ y >>= λ y' → 
--                                  return (suc y')
-+    m Δ n = {!!}
- 
- ..
-   ::
-@@ -397,8 +377,7 @@
- success, the resulting term did not use one variable::
-     
-     check : ∀ {n} → (i : Var (suc n))(t : Term (suc n)) → Maybe (Term n)
--    check i (var j)    = i Δ j >>= λ k → 
--                         return (var k)
-+    check i (var j)    = {!!}
-     check i leaf       = return leaf
-     check i (fork f s) = check i f >>= λ r1 → 
-                          check i s >>= λ r2 →
-@@ -427,9 +406,7 @@
- term with one less variable::
- 
-     _for_ : ∀ {n} → Term n → Var (suc n) → (Var (suc n) → Term n)
--    (t' for x) y with x Δ y
--    ... | just y' = var y'
--    ... | nothing = t'
-+    (t' for x) = {!!}
- 
- ..
-   ::
-@@ -455,12 +432,11 @@
+ **Exercise (difficulty: 1)** Once again, we can implement
+ substitution::
+@@ -451,8 +449,8 @@
  Iteratively, a substitution counts the upper-bound of variables::
  
      data Subst : ℕ → ℕ → Set where
 -      id : ∀ {n} → Subst n n
 -      _∷[_/_] : ∀ {m n} → (σ : Subst m n)(t' : Term m)(x : Var (suc m)) → Subst (suc m) n
-+      id : ∀ {m n} → Subst ? ?
++      id : ∀ {n} → Subst ? ?
 +      _∷[_/_] : ∀ {m n} → (σ : Subst ? ?)(t' : Term ?)(x : Var ?) → Subst ? ?
  
      ⟦_⟧ : ∀ {m n} → Subst m n → (Var m → Term n)
--    ⟦_⟧ id = var
--    ⟦_⟧ (ρ ∷[ t' / x ]) = ⟦ ρ ⟧ ∘K (t' for x)
-+    ⟦ ρ ⟧ = {!!}
- 
- 
- ..
-@@ -488,7 +464,7 @@
+     ⟦ ρ ⟧ = {!!}
+@@ -481,7 +479,7 @@
  substitution (case ``amgu {suc k} _ _ (m , (σ ∷[ r / z ]))``), the
  next call to ``amgu`` will be on terms with ``k < suc k``
  variables. It is therefore definable by structural recursion and Agda
@@ -163,229 +42,29 @@
  
      flex-flex : ∀ {m} → (x y : Var m) → ∃ (Subst m)
      flex-rigid : ∀ {m} → (x : Var m)(t : Term m) → Maybe (∃ (Subst m))
-@@ -664,8 +640,8 @@
- suitable indexing strategy::
- 
-       data Formula : ℕ → Set where
--        Atom : ∀ {n} → (a : A) → Formula n
--        _⊃_ : ∀ {n} → (P : Formula n)(Q : Formula (suc n)) → Formula (suc n)
-+        Atom : {- ∀ {n} → -} (a : A) → Formula {!!}
-+        _⊃_ : {- ∀ {n} → -} (P : Formula {!!})(Q : Formula {!!}) → Formula {!!}
- 
- The representation of context also needs to be stratified, so that
- formulis come up sorted along their respective order::
-@@ -703,32 +679,22 @@
-         where help : ∀ {k l} → Vec X k → Vec X l 
-                              → Vec (X × Vec X (pred (k + l))) k
-                              → Vec (X × Vec X (pred (k + l))) (k + l)
--              help Δ []  acc = acc
--              help Δ (P ∷ Γ) acc = help (Δ ▹ P) Γ ((P , Δ ++ Γ) ∷ acc)
-+              help Δ Γ acc = {!!}
- 
-       any : ∀ {n} → Vec Bool n → Bool
--      any [] = false
--      any (false ∷ xs) = any xs
--      any (true ∷ xs) = true
-+      any v = {!!}
- 
- 
--      {-# TERMINATING #-}
-+      -- {-# TERMINATING #-}
-       _/_⊢_ : ∀ {n l} → Vec (Formula (suc n)) l → Context (suc n) → Formula n → Bool
-       _/_[_]⊢_ : ∀ {n l} → Vec (Formula n) l → Context n → Formula n → A → Bool
-       search : ∀ {n} → Context n → A → Bool
- 
--      B / Γ      ⊢ Atom α      = search ((, B) , Γ) α
--      B / B₂ , Γ ⊢ P ⊃ Q       = B / B₂ , Γ ▹C P  ⊢ Q
-+      B / Γ ⊢ P = {!!}
- 
--      B / Γ [ Atom α ]⊢ β      = ⌊ α ≟ β ⌋
--      B / Γ [ P ⊃ Q  ]⊢ β      = B / Γ [ Q ]⊢ β ∧ B / Γ ⊢ P
-+      B / Γ [ P ]⊢ β = {!!}
-       
--      search {zero} tt α = false
--      search {suc n} ((l , B) , Γ) α =
--        let try = map (λ { (P , B) → B / Γ [ P ]⊢ α }) 
--                      (pick1 B)
--        in
--        any try ∨ search Γ α
-+      search {n} Γ α = {!!}
- 
-       ⊢_ : Formula 42 → Bool
-       ⊢_ P = [] / []C ⊢ P
-@@ -747,9 +713,9 @@
- 
- The previous implementation was needlessly mutually recursive. We
- inline (at the expense of clarity, sadly) the purely structural
--definitions on ``Formulas``::
-+definitions on ``Formulas``:
- 
--      {-# TERMINATING #-}
-+      -- {-# TERMINATING #-}
-       search : ∀ {n} → Context n → A → Bool
-       search {zero} tt α = false
-       search {suc n} ((l , B) , Γ) α =
-@@ -813,8 +779,7 @@
-       RecStruct A = (A → Set) → (A → Set)
- 
-       Rec-ℕ : RecStruct ℕ
--      Rec-ℕ P zero    = ⊤
--      Rec-ℕ P (suc n) = P n
-+      Rec-ℕ P n = {!!}
- 
- Assuming that we have established the *induction step*, we ought to be
- able to prove any induction hypothesis::
-@@ -823,8 +788,7 @@
-       RecursorBuilder Rec = ∀ P → (∀ a → Rec P a → P a) → ∀ a → Rec P a
- 
-       rec-ℕ-builder : RecursorBuilder Rec-ℕ
--      rec-ℕ-builder P f zero    = tt
--      rec-ℕ-builder P f (suc n) = f n (rec-ℕ-builder P f n)
-+      rec-ℕ-builder P f n = {!!}
- 
- Therefore, typing the knot, given an induction step, we ought to be
- able to establish the desired predicate::
-@@ -837,17 +801,17 @@
-       build builder P f x = f x (builder P f x)
- 
-       rec-ℕ : Recursor Rec-ℕ
--      rec-ℕ = build rec-ℕ-builder
-+      rec-ℕ = {!!}
- 
- These recursors have trivial "terminal" object, which amount to
- performing no induction at all (as well we shall see, it has its uses,
- like the unit type)::
- 
-       Rec-1 : ∀ {X : Set} → RecStruct X
--      Rec-1 P x = ⊤
-+      Rec-1 P x = {!!}
- 
-       rec-1-builder : ∀ {X} → RecursorBuilder (Rec-1 {X})
--      rec-1-builder P f x = tt
-+      rec-1-builder P f x = {!!}
- 
- More interestingly, we can define induction on pairs by (arbitrarily)
- deciding that the first element must be strictly decreasing. In
-@@ -861,7 +825,7 @@
-         RecA (λ x' → ∀ y' → P (x' , y')) x
-      
-       Rec-Bucket : ∀ {X} → RecStruct (Bucket X)
--      Rec-Bucket  = Σ1-Rec Rec-ℕ
-+      Rec-Bucket  = {!!}
- 
-       Σ1-rec-builder : ∀ {A : Set}{B : A → Set}{RecA : RecStruct A} →
-         RecursorBuilder RecA → RecursorBuilder (Σ1-Rec {A = A}{B = B} RecA)
-@@ -869,7 +833,7 @@
-         recA _ (λ a a-rec b → f (a , b) a-rec) x
- 
-       rec-Bucket-builder : ∀ {X} → RecursorBuilder (Rec-Bucket {X})
--      rec-Bucket-builder {X} = Σ1-rec-builder rec-ℕ-builder
-+      rec-Bucket-builder {X} = {!!}
- 
- In fact, this latter recursor is a special case of a powerful
- recursion structure, lexicographic recursion::
-@@ -922,12 +886,10 @@
- ::
- 
-       Rec-Context : (n : ℕ) → RecStruct (Context n)
--      Rec-Context zero = Rec-1
--      Rec-Context (suc n) = Σ-Rec Rec-Bucket λ _ → Rec-Context n
-+      Rec-Context n = {!!}
- 
-       rec-Context-builder : ∀ {n} → RecursorBuilder (Rec-Context n)
--      rec-Context-builder {zero} = λ P x x₁ → tt
--      rec-Context-builder {suc n} = Σ-rec-builder rec-Bucket-builder (λ _ → rec-Context-builder {n})
-+      rec-Context-builder {n} = {!!}
- 
- 
- **Remark:** These definition can be found (suitably generalized) in
-@@ -946,7 +908,7 @@
- 
- We are left with translating our earlier definition, merely
- substituting recursion for pattern-matching, the type guiding us along
--the way::
-+the way:
- 
-       ⟨search[_]⟩ : {n : ℕ} (Γ : Context n) → Set
-       ⟨search[ Γ ]⟩ = A → Bool
-@@ -1003,22 +965,22 @@
- free monad of the signature ``call : (a : A) → B a``::
- 
-     data RecMon (X : Set) : Set where
--      call : (a : A)(rec : B a → RecMon X) → RecMon X
-+      call : {!!} → RecMon X
-       return : (x : X) → RecMon X
- 
- And its a monad::
- 
-     monad : RawMonad RecMon
-     monad = record { return = return 
--                    ; _>>=_ = _>>=_ }
--           where  _>>=_ : ∀{X Y : Set} → RecMon X → (X → RecMon Y) → RecMon Y
--                  return x >>= f = f x
--                  call a rec >>= f = call a (λ b → (rec b) >>= f)
-+                    ; _>>=_ = {!!} }
-+       --    where  _>>=_ : ∀{X Y : Set} → RecMon X → (X → RecMon Y) → RecMon Y
-+       --           return x >>= f = f x
-+       --           call a rec >>= f = call a (λ b → (rec b) >>= f)
- 
- The operation `call` translates into the usual generic operation::
- 
-     call⟨_⟩ : (a : A) → RecMon (B a)
--    call⟨ a ⟩ = call a return
-+    call⟨ a ⟩ = {!!} -- call a return
- 
- Intuitively, the ``call⟨_⟩`` operation will be used as an oracle,
- providing a ``B a`` result to any ``A`` query. We thus write our
-@@ -1050,8 +1012,8 @@
+@@ -1034,8 +1032,8 @@
      gcd (0  , n)     = return n
      gcd (m , 0)      = return m
      gcd (suc m , suc n) with m ≤? n
 -    ... | yes _ = call⟨ suc m , n ∸ m ⟩
 -    ... | no  _ = call⟨ m ∸ n , suc n ⟩
-+    ... | yes _ = {!!}
-+    ... | no  _ = {!!}
++    ... | yes _ = ?
++    ... | no  _ = ?
  
  ..
    ::
-@@ -1100,7 +1062,7 @@
-         ≅ (a : A) → M (B a)               -- by Yoneda lemma
- 
- Or, put otherwise, a monad morphism from RecMon is entirely specified
--by a mere function of type ``(a : A) → M (B a)``::
-+by a mere function of type ``(a : A) → M (B a)``:
- 
-     morph : ((a : A) → M (B a)) → 
-             ∀ {X} → RecMon X → M X
-@@ -1122,7 +1084,7 @@
- interpretation into ``RecMon``::
- 
-     expand : Π[ a ∈ A ] B a → ∀ {X} → RecMon X → RecMon X
--    expand f = morph f
-+    expand f = {!!}
- 
- --------------------------------
- Interpretation: immediate values
-@@ -1138,7 +1100,7 @@
- We may blankly refuse to iterate::
- 
-     already : ∀ {X} → RecMon X → Maybe X
--    already = morph (λ _ → nothing)
-+    already = {!!}
- 
- --------------------------------
- Interpretation: step-indexing
-@@ -1242,8 +1204,7 @@
+@@ -1227,8 +1225,8 @@
  "prove" this, we simply describe it with a collapsible description::
-     
+ 
      dom : ∀{a} → RecMon (B a) → CDesc A
 -    dom (return z) = `1
 -    dom (call a rec) = `X a `× `Π (B a) λ b → dom (rec b)
-+    dom p = {!!}
++    dom (return z) = ?
++    dom (call a rec) = ?
  
      Dom : CFunc A
      Dom = CFunc.mk λ a → dom (f a)
-@@ -1251,7 +1212,7 @@
+@@ -1236,7 +1234,7 @@
  
  Then, following the Bove-Capretta technique, we can run the
  (potentially general-recursive) function ``f`` by recursion over its
@@ -394,12 +73,3 @@
  
      run : (a : A) → μ Dom a → B a
      run1 : ∀{a} → (p : RecMon (B a)) → ⟦ dom p ⟧ B → B a
-@@ -1295,7 +1256,7 @@
- their gcd::
- 
-   gcd-bove : (m n : ℕ) → DomGCD (m , n) → ℕ
--  gcd-bove m n xs = BC.run gcd (m , n) xs
-+  gcd-bove m n xs = {!!} -- BC.run gcd (m , n) xs
- 
- Now, we can get rid of that pesky ``DomGCD`` predicate by proving,
- post facto, that our gcd function is indeed terminating. For that, we
