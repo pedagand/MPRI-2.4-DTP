@@ -1181,15 +1181,15 @@ Interlude: Yoneda lemma
 
       open Sem T renaming (_⊢ to _⊢T ; ren to ren-T)
 
-Let ``_⊢T : context → Set`` be a semantics objects together with its
+Let ``_⊢T : context → Set`` be a semantics object together with its
 weakening operator ``ren-T : Γ ⊇ Δ → Δ ⊢T → Γ ⊢T``. By mere
 application of ``ren-T``, we can implement::
 
       ψ : Γ ⊢T → (∀ {Δ} → Δ ⊇ Γ → Δ ⊢T)
       ψ t wk = ren-T wk t
 
-were the ``∀ {Δ} →`` quantifier of the codomain type must be
-understood in polymorphic sense. Surprisingly (perhaps), we can go
+where the ``∀ {Δ} →`` quantifier of the codomain type must be
+understood in a polymorphic sense. Surprisingly (perhaps), we can go
 from the polymorphic function back to a single element, by providing
 the ``id`` continuation::
 
@@ -1212,7 +1212,7 @@ prove the isomorphism.
 
 A slightly more abstract way of presenting this isomorphism consists
 in noticing that any downward-closed set of context forms a valid
-semantics objects. ``φ`` and ``ψ`` can thus be read as establishing an
+semantics object. ``φ`` and ``ψ`` can thus be read as establishing an
 isomorphism between the object ``Γ ⊢T`` and the morphisms in ``⊇[ Γ ]
 ⟦⊢⟧ T``::
 
@@ -1258,9 +1258,9 @@ have the following isomorphisms:
 .. code-block:: guess
 
     Γ ⊢P⟦⇒⟧Q ≡ ∀ {Δ} → Δ ⊇ Γ → Δ ⊢P⟦⇒⟧Q              -- by ψ
-           ≡ ⊇[ Γ ] ⟦⊢⟧ P⟦⇒⟧Q                        -- by the alternative definition ψ'
-           ≡ ⊇[ Γ ] ⟦*⟧ P ⟦⊢⟧ Q                      -- by definition of an exponential
-           ≡ ∀ {Δ} → Δ ⊇ Γ → Δ ⊢P → Δ ⊢Q         -- by unfolding definition of ⟦*⟧, ⟦⊢⟧ and currying
+             ≡ ⊇[ Γ ] ⟦⊢⟧ P⟦⇒⟧Q                      -- by the alternative definition ψ'
+             ≡ ⊇[ Γ ] ⟦*⟧ P ⟦⊢⟧ Q                    -- by definition of an exponential
+             ≡ ∀ {Δ} → Δ ⊇ Γ → Δ ⊢P → Δ ⊢Q           -- by unfolding definition of ⟦*⟧, ⟦⊢⟧ and currying
 
 As in the definition of ``Y``, it is easy to see that this last member
 can easily be equipped with a renaming: we therefore take it as the
@@ -1268,7 +1268,7 @@ can easily be equipped with a renaming: we therefore take it as the
 
     _⟦⇒⟧_ : Sem → Sem → Sem
     P ⟦⇒⟧ Q = record { _⊢ = λ Γ → ∀ {Δ} → Δ ⊇ Γ → Δ ⊢P → Δ ⊢Q
-                   ; ren = λ wk₁ k wk₂ → k (wk₁ ∘wk wk₂) }
+                     ; ren = λ wk₁ k wk₂ → k (wk₁ ∘wk wk₂) }
       where open Sem P renaming (_⊢ to _⊢P)
             open Sem Q renaming (_⊢ to _⊢Q)
 
@@ -1327,7 +1327,7 @@ syntactic object to its semantical counterpart::
     eval {Γ} (fst {A}{B} p)    = ⟦fst⟧ {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval p)
     eval {Γ} (snd {A}{B} p)    = ⟦snd⟧ {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval p)
 
-Reify and reflect are defined at a given syntactic context, we
+Reify and reflect are defined for a given syntactic context, we
 therefore introduce suitable notations::
 
     [_]⊩_ : context → type → Set

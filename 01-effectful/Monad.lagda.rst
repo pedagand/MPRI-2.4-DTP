@@ -32,7 +32,7 @@ Vision: `Notions of computations determine monads`_
 Takeaways:
   - you will be *able* to define a monad (``return``, ``bind``) and its supporting operations
   - you will be *able* to use the following monads: exceptions, reader, writer, state, non-determinism
-  - you will be *able* to relate an equational theory with a monadic presentation (normalization-by-evaluation)
+S  - you will be *able* to relate an equational theory with a monadic presentation (normalization-by-evaluation)
   - you will be *familiar* with algebraic effects
   - you will be *familiar* with the most commonly used monads
 
@@ -467,7 +467,7 @@ the identity function. Monads can be understood as offering "enhanced"
 functions, presenting a suitable notion of composition and identity
 *as well as* effectful operations. For the programmer, this means that
 we have ``let x = e₁ in e₂ ≅ e₁ (λ x → e₂)`` for pure functions and
-``let! x = e₁ in e₂ ≅ e₁ >>= λ x → e₂ `` for effectful functions, both
+``let! x = e₁ in e₂ ≅ e₁ >>= λ x → e₂`` for effectful functions, both
 subject to (morally) the same laws of function composition.
 
 
