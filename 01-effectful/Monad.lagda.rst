@@ -32,7 +32,7 @@ Vision: `Notions of computations determine monads`_
 Takeaways:
   - you will be *able* to define a monad (``return``, ``bind``) and its supporting operations
   - you will be *able* to use the following monads: exceptions, reader, writer, state, non-determinism
-S  - you will be *able* to relate an equational theory with a monadic presentation (normalization-by-evaluation)
+  - you will be *able* to relate an equational theory with a monadic presentation (normalization-by-evaluation)
   - you will be *familiar* with algebraic effects
   - you will be *familiar* with the most commonly used monads
 
