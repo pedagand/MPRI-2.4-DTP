@@ -1,0 +1,608 @@
+--- 03-total/Recursion.lagda.rst	2019-02-15 10:21:51.696752460 +0100
++++ 03-total/Recursion.student.lagda.rst	2019-02-15 10:21:42.621038003 +0100
+@@ -70,10 +70,6 @@
+   - you will be *familiar* with the Bove-Capretta technique
+   - you will be *familiar* with the notion of monad morphism
+ 
+-.. BEGIN HIDE
+-.. TODO Add more exercises in 2nd and 3rd part
+-.. END HIDE
+-
+ ************************************************
+ First-order Unification
+ ************************************************
+@@ -116,20 +112,10 @@
+ simultaneous substitution::
+ 
+     sub : (Var → Term) → Term → Term
+-    sub ρ (var i) = ρ i
+-    sub ρ leaf = leaf
+-    sub ρ (fork s t) = fork (sub ρ s) (sub ρ t)
++    sub ρ t = {!!}
+ 
+     _∘K_ : (Var → Term) → (Var → Term) → Var → Term
+-    ρ₁ ∘K ρ₂ = λ k → sub ρ₁ (ρ₂ k)
+-
+-.. BEGIN HIDE
+-  ::
+-    ren : (Var → Var) → Term → Term
+-    ren σ (var i) = var (σ i)
+-    ren σ leaf = leaf
+-    ren σ (fork s t) = fork (ren σ s) (ren σ t)
+-.. END HIDE
++    ρ₁ ∘K ρ₂ = {!!}
+ 
+ In the first lecture, the function ``sub`` was called ``bind`` but it
+ is otherwise exactly the same thing.
+@@ -198,16 +184,13 @@
+ remainder of ``j`` by ``i`` otherwise::
+ 
+     _for_ : Term → Var → (Var → Term)
+-    (t for i) j with i Δ j
+-    ... | nothing = t
+-    ... | just j' = var j'
++    (t for i) j = {!!}
+ 
+ The interpretation of a list of single substitutions is merely
+ function composition::
+ 
+     ⟦_⟧ : Subst → (Var → Term)
+-    ⟦ id ⟧ = var
+-    ⟦ ρ ∷[ t / i ] ⟧ = ⟦ ρ ⟧ ∘K (t for i)
++    ⟦ ρ ⟧ = {!!}
+ 
+ 
+ 
+@@ -220,12 +203,12 @@
+ t₁) (fork s₂ t₂)``) and then discharging that substitution (case
+ ``amgu s t (σ ∷[ r / z ])``). Variables are only considered under no
+ substitution (cases ``amgu _ _ id``), in which case we must either
+-solve a flex-flex problem or a flex-rigid problem::
++solve a flex-flex problem or a flex-rigid problem:
+ 
+     flex-flex : (x y : Var) → Subst
+     flex-rigid : (x : Var)(t : Term) → Maybe Subst
+ 
+-    {-# TERMINATING #-}
++    -- {-# TERMINATING #-}
+     amgu : (s t : Term)(acc : Subst) → Maybe Subst
+     -- Conflicts:
+     amgu leaf (fork _ _) _             = ∅
+@@ -265,7 +248,7 @@
+     v₃ = var 3
+ 
+ Assuming that the above definition is terminating, we can test it on a
+-few examples::
++few examples:
+ 
+     test₁ : mgu (fork v₀ leaf) (fork (fork leaf leaf) v₁)
+           ≡ just (id ∷[ leaf / 0 ] ∷[ (fork leaf leaf) / 0 ])
+@@ -323,50 +306,20 @@
+       leaf : Term n
+       fork : (s t : Term n) → Term n
+ 
+-.. BEGIN HIDE
+-  ::
+-    module Exercise-sub where
+-.. END HIDE
+-
+-.. BEGIN BLOCK
+-
+ **Exercise (difficulty: 1)** Once again, we can implement
+ substitution::
+ 
+-      sub : ∀ {m n} → (Var m → Term n) → Term m → Term n
+-      sub ρ t = {!!}
++    sub : ∀ {m n} → (Var m → Term n) → Term m → Term n
++    sub ρ t = {!!}
+ 
+-      _∘K_ : ∀ {m n l} → (Var m → Term n) → (Var l → Term m) → Var l → Term n
+-      ρ₁ ∘K ρ₂ = {!!}
++    _∘K_ : ∀ {m n l} → (Var m → Term n) → (Var l → Term m) → Var l → Term n
++    ρ₁ ∘K ρ₂ = {!!}
+ 
+ **Exercise (difficulty: 1)** Implement the (obvious) renaming
+ operation::
+ 
+-      ren : ∀ {m n} → (Var m → Var n) → Term m → Term n
+-      ren σ t = {!!}
+-
+-.. END BLOCK
+-
+-.. BEGIN HIDE
+-  ::
+-    module Solution-sub where
+-
+-      sub : ∀ {m n} → (Var m → Term n) → Term m → Term n
+-      sub ρ (var i) = ρ i
+-      sub ρ leaf = leaf
+-      sub ρ (fork s t) = fork (sub ρ s) (sub ρ t)
+-
+-      _∘K_ : ∀ {m n l} → (Var m → Term n) → (Var l → Term m) → Var l → Term n
+-      ρ₁ ∘K ρ₂ = λ k → sub ρ₁ (ρ₂ k)
+-
+-      ren : ∀ {m n} → (Var m → Var n) → Term m → Term n
+-      ren σ (var i) = var (σ i)
+-      ren σ leaf = leaf
+-      ren σ (fork s t) = fork (ren σ s) (ren σ t)
+-
+-    open Solution-sub
+-
+-.. END HIDE
++    ren : ∀ {m n} → (Var m → Var n) → Term m → Term n
++    ren σ t = {!!}
+ 
+ **Remark:** Two substitutions are equal if they are equal pointwise::
+ 
+@@ -472,9 +425,7 @@
+ term with one less variable::
+ 
+     _for_ : ∀ {n} → Term n → Var (suc n) → (Var (suc n) → Term n)
+-    (t' for x) y with x Δ y
+-    ... | just y' = var y'
+-    ... | nothing = t'
++    (t' for x) y = {!!}
+ 
+ ..
+   ::
+@@ -504,8 +455,7 @@
+       _∷[_/_] : ∀ {m n} → (σ : Subst m n)(t' : Term m)(x : Var (suc m)) → Subst (suc m) n
+ 
+     ⟦_⟧ : ∀ {m n} → Subst m n → (Var m → Term n)
+-    ⟦_⟧ id = var
+-    ⟦_⟧ (ρ ∷[ t' / x ]) = ⟦ ρ ⟧ ∘K (t' for x)
++    ⟦ ρ ⟧ = {!!}
+ 
+ 
+ ..
+@@ -522,21 +472,6 @@
+       lemma-comp : ∀ {l m n} (ρ : Subst m n)(σ : Subst l m) → ⟦ ρ ∘A σ ⟧ ≡ ⟦ ρ ⟧ ∘K ⟦ σ ⟧
+       lemma-comp = {!!}
+ 
+-
+-.. BEGIN HIDE
+-  ::
+-    module Solution-Subst where
+-
+-      _∘A_ : ∀ {l m n} → Subst m n → Subst l m → Subst l n
+-      ρ ∘A id = ρ
+-      ρ ∘A (σ ∷[ t' / x ]) = (ρ ∘A σ) ∷[ t' / x ]
+-
+-      lemma-comp : ∀ {l m n} (ρ : Subst m n)(σ : Subst l m) → ⟦ ρ ∘A σ ⟧ ≡ ⟦ ρ ⟧ ∘K ⟦ σ ⟧
+-      lemma-comp = {!!}
+-
+-    open Solution-Subst
+-.. END HIDE
+-
+ --------------------------------------
+ Structurally: most-general unifier
+ --------------------------------------
+@@ -584,37 +519,6 @@
+     mgu : ∀ {m} → (s t : Term m) → Maybe (∃ (Subst m))
+     mgu s t = amgu s t (-, id)
+ 
+-.. BEGIN HIDE
+-  ::
+-
+-    v₀ v₁ v₂ v₃ : Term 4
+-    v₀ = var zero
+-    v₁ = var (suc zero)
+-    v₂ = var (suc (suc zero))
+-    v₃ = var (suc (suc (suc zero)))
+-
+-    test₁ : mgu (fork v₀ leaf) (fork (fork leaf leaf) v₁)
+-          ≡ just (-, ((id ∷[ leaf / zero ]) ∷[ (fork leaf leaf) / zero ]))
+-    test₁ = refl
+-
+-    test₂ : mgu (fork v₀ leaf) (fork (fork leaf leaf) v₃)
+-          ≡ just (-, ((id ∷[ leaf / (suc (suc zero)) ]) ∷[ (fork leaf leaf) / zero ]))
+-    test₂ = refl
+-
+-    test₃ : mgu v₀ (fork leaf v₀)
+-          ≡ nothing
+-    test₃ = refl
+-
+-    test₄ : mgu (fork v₀ leaf) (fork (fork leaf leaf) v₀)
+-          ≡ nothing
+-    test₄ = refl
+-
+-    test₅ : mgu (fork v₀ v₁) (fork (fork leaf v₁) (fork leaf leaf))
+-            ≡ just (-, id ∷[ fork leaf leaf / zero ] ∷[ fork leaf (var zero) / zero ])
+-    test₅ = refl
+-
+-.. END HIDE
+-
+ The key idea was thus to reify the (decreasing) *measure* as an
+ indexing discipline. Our implementation was then naturally defined
+ structurally over this index, thus yielding a structurally acceptable
+@@ -672,12 +576,6 @@
+         Atom : (a : A) → Formula
+         _⊃_ : (P Q : Formula) → Formula
+ 
+-.. BEGIN HIDE
+-.. François: Quand on cherche une hypothèse dans le contexte, c'est un
+-.. "exists" sur une liste, et quand on cherche à habiter toutes les
+-.. prémisses, c'est une "forall" sur une liste; pourrait-on employer
+-.. deux fonctions d'ordre supérieur pour clarifier cela?
+-.. END HIDE
+ 
+ The decision procedure checks whether a Formula (in a context) is
+ true. This amounts to implementing a traditional focusing presentation
+@@ -760,8 +658,8 @@
+ suitable indexing strategy::
+ 
+       data Formula : ℕ → Set where
+-        Atom : ∀ {n} → (a : A) → Formula n
+-        _⊃_ : ∀ {n} → (P : Formula n)(Q : Formula (suc n)) → Formula (suc n)
++        Atom : ∀ {n} → (a : A) → Formula {!!}
++        _⊃_ : ∀ {n} → (P : Formula {!!})(Q : Formula {!!}) → Formula {!!}
+ 
+ The representation of context also needs to be stratified, so that
+ formulis come up sorted along their respective order::
+@@ -773,52 +671,18 @@
+       Context 0 = ⊤
+       Context (suc n) = Bucket (Formula n) × Context n
+ 
+-.. BEGIN HIDE
+-  ::
+-      module Exercise-context where
+-.. END HIDE
+-
+-.. BEGIN BLOCK
+-
+ **Exercise (difficulty: 1)** Implement the usual operations of a
+ context/list::
+ 
+-        []C : ∀ {n} → Context n
+-        []C = {!!}
++      []C : ∀ {n} → Context n
++      []C = {!!}
+ 
+-        infixl 70 _▹C_
+-        _▹C_ : ∀ {n} → Context (suc n) → Formula n → Context (suc n)
+-        _▹C_ = {!!}
+-
+-        _++C_ : ∀ {n} → Context n → Context n → Context n
+-        _++C_ = {!!}
+-
+-.. END BLOCK
+-
+-.. BEGIN HIDE
+-  ::
+-      module Solution-context where
++      infixl 70 _▹C_
++      _▹C_ : ∀ {n} → Context (suc n) → Formula n → Context (suc n)
++      _▹C_ = {!!}
+ 
+-        infixl 70 _▹C_
+-
+-        []C : ∀ {n} → Context n
+-        []C {zero} = tt
+-        []C {suc n} = (-, []) , []C
+-
+-        _▹C_ : ∀ {n} → Context (suc n) → Formula n → Context (suc n)
+-        _▹C_ ((_ , B) , Γ) P = (-, B ▹ P) , Γ
+-
+-        _++C_ : ∀ {n} → Context n → Context n → Context n
+-        _++C_ {zero} tt tt = tt
+-        _++C_ {suc n} ((_ , B₁) , Γ₁) ((_ , B₂) , Γ₂) = (-, B₁ ++ B₂) , Γ₁ ++C Γ₂
+-
+-      open Solution-context public
+-.. END HIDE
+-
+-.. BEGIN HIDE
+-.. TODO: is ``search`` buggy? while explore a subcontext, it drops the
+-..       current bucket altogether.
+-.. END HIDE
++      _++C_ : ∀ {n} → Context n → Context n → Context n
++      _++C_ = {!!}
+ 
+ With a bit of refactoring, we can integrate indices as well as absorb
+ the zipper traversal, making the structural recursion slightly more
+@@ -859,43 +723,6 @@
+       ⊢_ : Formula 42 → Bool
+       ⊢_ P = [] / []C ⊢ P
+ 
+-.. BEGIN HIDE
+-  ::
+-
+-  module TestStructural where
+-
+-    open DjinnStructural ℕ Data.Nat._≟_
+-
+-    A B C D ∐ : ∀ {n} → Formula n
+-    A = Atom 0
+-    B = Atom 1
+-    ∐ = Atom 2
+-    C = Atom 3
+-    D = Atom 4
+-
+-    test₁ : ⊢ (A ⊃ B ⊃ A) ≡ true
+-    test₁ = refl
+-
+-    test₂ : ⊢ (A ⊃ B) ≡ false
+-    test₂ = refl
+-
+-    test₃ : ⊢ (A ⊃ B) ⊃ ((C ⊃ D) ⊃ (((A ⊃ B) ⊃ C) ⊃ D)) ≡ true
+-    test₃ = refl
+-
+-    CPS : ∀ {n} → Formula n → Formula (2 + n)
+-    CPS A = (A ⊃ ∐) ⊃ ∐
+-
+-    return : ⊢ (A ⊃ CPS A) ≡ true
+-    return =  refl
+-
+-    bind : ⊢ (CPS A ⊃ (A ⊃ CPS B) ⊃ CPS B) ≡ true
+-    bind = refl
+-
+-    call-cc : ⊢ (((A ⊃ CPS B) ⊃ CPS A) ⊃ CPS A) ≡ true
+-    call-cc = refl
+-
+-.. END HIDE
+-
+ --------------------------------------
+ Compact search
+ --------------------------------------
+@@ -909,9 +736,9 @@
+ 
+ The previous implementation was needlessly mutually recursive. We
+ inline (at the expense of clarity, sadly) the purely structural
+-definitions on ``Formulas``::
++definitions on ``Formulas``:
+ 
+-      {-# TERMINATING #-}
++      -- {-# TERMINATING #-}
+       search : ∀ {n} → Context n → A → Bool
+       search {zero} tt α = false
+       search {suc m} ((l , B) , Γ) α =
+@@ -936,38 +763,6 @@
+ Once again, termination becomes clearer for us but still out of Agda's
+ grasp.
+ 
+-.. BEGIN HIDE
+-  ::
+-
+-  module TestCompact where
+-
+-    open DjinnCompact ℕ Data.Nat._≟_
+-
+-    A B ∐ : ∀ {n} → Formula n
+-    A = Atom 0
+-    B = Atom 1
+-    ∐ = Atom 2
+-
+-    test₁ : ⊢ (A ⊃ B ⊃ A) ≡ true
+-    test₁ = refl
+-
+-    test₂ : ⊢ (A ⊃ B) ≡ false
+-    test₂ = refl
+-
+-    CPS : ∀ {n} → Formula n → Formula (2 + n)
+-    CPS A = (A ⊃ ∐) ⊃ ∐
+-
+-    return : ⊢ (A ⊃ CPS A) ≡ true
+-    return =  refl
+-
+-    bind : ⊢ (CPS A ⊃ (A ⊃ CPS B) ⊃ CPS B) ≡ true
+-    bind = refl
+-
+-    call-cc : ⊢ (((A ⊃ CPS B) ⊃ CPS A) ⊃ CPS A) ≡ true
+-    call-cc = refl
+-
+-.. END HIDE
+-
+ --------------------------------------
+ Interlude: induction / memoisation
+ --------------------------------------
+@@ -1007,8 +802,7 @@
+       RecStruct A = (A → Set) → (A → Set)
+ 
+       Rec-ℕ : RecStruct ℕ
+-      Rec-ℕ P zero    = ⊤
+-      Rec-ℕ P (suc n) = P n
++      Rec-ℕ P n = {!!}
+ 
+ Assuming that we have established the *induction step*, we ought to be
+ able to prove any induction hypothesis::
+@@ -1017,8 +811,7 @@
+       RecursorBuilder Rec = ∀ P → (∀ a → Rec P a → P a) → ∀ a → Rec P a
+ 
+       rec-ℕ-builder : RecursorBuilder Rec-ℕ
+-      rec-ℕ-builder P f zero    = tt
+-      rec-ℕ-builder P f (suc n) = f n (rec-ℕ-builder P f n)
++      rec-ℕ-builder P f n = {!!}
+ 
+ Therefore, typing the knot, given an induction step, we ought to be
+ able to establish the desired predicate::
+@@ -1031,17 +824,17 @@
+       build builder P f x = f x (builder P f x)
+ 
+       rec-ℕ : Recursor Rec-ℕ
+-      rec-ℕ = build rec-ℕ-builder
++      rec-ℕ = {!!}
+ 
+ These recursors have trivial "terminal" object, which amount to
+ performing no induction at all (as well we shall see, it has its uses,
+ like the unit type)::
+ 
+       Rec-1 : ∀ {X : Set} → RecStruct X
+-      Rec-1 P x = ⊤
++      Rec-1 P x = {!!}
+ 
+       rec-1-builder : ∀ {X} → RecursorBuilder (Rec-1 {X})
+-      rec-1-builder P f x = tt
++      rec-1-builder P f x = {!!}
+ 
+ More interestingly, we can define induction on pairs by (arbitrarily)
+ deciding that the first element must be strictly decreasing. In
+@@ -1055,7 +848,7 @@
+         RecA (λ x' → ∀ y' → P (x' , y')) x
+ 
+       Rec-Bucket : ∀ {X} → RecStruct (Bucket X)
+-      Rec-Bucket  = Σ1-Rec Rec-ℕ
++      Rec-Bucket  = {!!}
+ 
+       Σ1-rec-builder : ∀ {A : Set}{B : A → Set}{RecA : RecStruct A} →
+         RecursorBuilder RecA → RecursorBuilder (Σ1-Rec {A = A}{B = B} RecA)
+@@ -1063,7 +856,7 @@
+         recA _ (λ a a-rec b → f (a , b) a-rec) x
+ 
+       rec-Bucket-builder : ∀ {X} → RecursorBuilder (Rec-Bucket {X})
+-      rec-Bucket-builder {X} = Σ1-rec-builder rec-ℕ-builder
++      rec-Bucket-builder {X} = {!!}
+ 
+ In fact, this latter recursor is a special case of a powerful
+ recursion structure, lexicographic recursion::
+@@ -1116,12 +909,10 @@
+ ::
+ 
+       Rec-Context : (n : ℕ) → RecStruct (Context n)
+-      Rec-Context zero = Rec-1
+-      Rec-Context (suc n) = Σ-Rec Rec-Bucket λ _ → Rec-Context n
++      Rec-Context n = {!!}
+ 
+       rec-Context-builder : ∀ {n} → RecursorBuilder (Rec-Context n)
+-      rec-Context-builder {zero} = λ P x x₁ → tt
+-      rec-Context-builder {suc n} = Σ-rec-builder rec-Bucket-builder (λ _ → rec-Context-builder {n})
++      rec-Context-builder {n} = {!!}
+ 
+ 
+ **Remark:** These definition can be found (suitably generalized) in
+@@ -1140,7 +931,7 @@
+ 
+ We are left with translating our earlier definition, merely
+ substituting recursion for pattern-matching, the type guiding us along
+-the way::
++the way:
+ 
+       ⟨search[_]⟩ : {n : ℕ} (Γ : Context n) → Set
+       ⟨search[ Γ ]⟩ = A → Bool
+@@ -1171,39 +962,6 @@
+       ⊢_ : Formula 42 → Bool
+       ⊢ P = []C ⊢ P
+ 
+-.. BEGIN HIDE
+-
+-::
+-
+-  module TestMonotonic where
+-
+-    open DjinnMonotonic ℕ Data.Nat._≟_
+-
+-    A B ∐ : ∀ {n} → Formula n
+-    A = Atom 0
+-    B = Atom 1
+-    ∐ = Atom 2
+-
+-    test₁ : ⊢ (A ⊃ B ⊃ A) ≡ true
+-    test₁ = refl
+-
+-    test₂ : ⊢ (A ⊃ B) ≡ false
+-    test₂ = refl
+-
+-    CPS : ∀ {n} → Formula n → Formula (2 + n)
+-    CPS A = (A ⊃ ∐) ⊃ ∐
+-
+-    return : ⊢ (A ⊃ CPS A) ≡ true
+-    return =  refl
+-
+-    bind : ⊢ (CPS A ⊃ (A ⊃ CPS B) ⊃ CPS B) ≡ true
+-    bind = refl
+-
+-    call-cc : ⊢ (((A ⊃ CPS B) ⊃ CPS A) ⊃ CPS A) ≡ true
+-    call-cc = refl
+-
+-.. END HIDE
+-
+ ************************************************
+ General recursion
+ ************************************************
+@@ -1327,11 +1085,6 @@
+         ≅ (a : A) → ∀ X → (B a → X) → M X           -- by uncurry, etc.
+         ≅ (a : A) → M (B a)                         -- by Yoneda lemma
+ 
+-.. BEGIN HIDE
+-.. TODO (François): show that the morphism from RecMon to M is in fact
+-.. an encoding of 'let rec' using an effect handler.
+-.. END HIDE
+-
+ Or, put otherwise, a monad morphism from ``RecMon`` is entirely
+ specified by a mere function of type ``(a : A) → M (B a)``::
+ 
+@@ -1355,7 +1108,7 @@
+ interpretation into ``RecMon``::
+ 
+     expand : Π[ a ∈ A ] B a → ∀ {X} → RecMon X → RecMon X
+-    expand f = morph f
++    expand f = {!!}
+ 
+ --------------------------------
+ Interpretation: immediate values
+@@ -1371,7 +1124,7 @@
+ We may blankly refuse to iterate::
+ 
+     already : ∀ {X} → RecMon X → Maybe X
+-    already = morph (λ _ → nothing)
++    already = {!!}
+ 
+ --------------------------------
+ Interpretation: step-indexing
+@@ -1425,21 +1178,6 @@
+     _`×_ : (A B : CDesc I) → CDesc I
+     `Π : (S : Set)(T : S → CDesc I) → CDesc I
+ 
+-.. BEGIN HIDE
+-  ::
+-
+-  _>>=_ : ∀ {I J} → CDesc I → (I → CDesc J) → CDesc J
+-  `0 >>= f = `0
+-  `1 >>= f = `1
+-  `X i >>= f = f i
+-  (D₁ `× D₂) >>= f = (D₁ >>= f) `× (D₂ >>= f)
+-  `Π S T >>= f = `Π S λ s → T s >>= f
+-
+-  -- monad-Desc : RawMonad CDesc
+-  -- monad-Desc = record { return = `X ; _>>=_ = _>>=_ }
+-
+-.. END HIDE
+-
+ Followed by their *interpretation*, which builds functors from
+ ``Set/I`` to ``Set``::
+ 
+@@ -1542,7 +1280,7 @@
+ their gcd::
+ 
+   gcd-bove : (m n : ℕ) → DomGCD (m , n) → ℕ
+-  gcd-bove m n xs = BC.run gcd (m , n) xs
++  gcd-bove m n xs = {!!}
+ 
+ Now, we can get rid of that pesky ``DomGCD`` predicate by proving,
+ post facto, that our gcd function is indeed terminating. For that, we
+@@ -1568,27 +1306,6 @@
+   gcd' : (m n : ℕ) → ℕ
+   gcd' m n = gcd-bove m n (gcd-wf m n)
+ 
+-.. BEGIN HIDE
+-  ::
+-
+-  module TestGcd where
+-    test0 : gcd' 0 5 ≡ 5
+-    test0 = refl
+-
+-    test0' : gcd' 4 0 ≡ 4
+-    test0' = refl
+-
+-    test1 : gcd' 4 5 ≡ 1
+-    test1 = refl
+-
+-    test2 : gcd' 30 35 ≡ 5
+-    test2 = refl
+-
+-    test3 : gcd' 70 105 ≡ 35
+-    test3 = refl
+-
+-.. END HIDE
+-
+ -----------------------------------------------
+ Postlude: collapsible, formally
+ -----------------------------------------------
