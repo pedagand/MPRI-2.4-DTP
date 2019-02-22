@@ -596,12 +596,11 @@ other remarkable identities?
         fst : F X
         snd : G X
 
-    ProdFunctor : (F : Set → Set)(G : Set → Set){{_ : Functor F}}{{_ : Functor G}} →
+    ProdFunctor : ∀ F G {{_ : Functor F}}{{_ : Functor G}} →
                     Functor (Prod F G)
     _<$>_ {{ProdFunctor F G}} f ⟨ x , y ⟩ = ⟨ f <$> x , f <$> y ⟩
 
-    ProdNaperian : (F : Set → Set)(G : Set → Set)
-                    {{_ : Naperian F}}{{_ : Naperian G}} →
+    ProdNaperian : ∀ F G {{_ : Naperian F}}{{_ : Naperian G}} →
                     Naperian (Prod F G)
     Log {{ProdNaperian F G {{F-Naperian}} {{G-Naperian}}}} = Log {{F-Naperian}} ⊎ Log {{G-Naperian}}
     lookup {{ProdNaperian F G}} ⟨ x , y ⟩ ( inj₁ ix) = lookup x ix
@@ -609,16 +608,15 @@ other remarkable identities?
     tabulate {{ProdNaperian F G}} f = ⟨ tabulate (λ x → f (inj₁ x)) , tabulate (λ x → f (inj₂ x)) ⟩
     super {{ProdNaperian F G}} = ProdFunctor F G
 
-    data Comp(F : Set → Set) (G : Set → Set)(X : Set) : Set where
+    data Comp (F : Set → Set)(G : Set → Set)(X : Set) : Set where
       C : F (G X) → Comp F G X
 
-    CompFunctor : (F : Set → Set)(G : Set → Set){{_ : Functor F}}{{_ : Functor G}} →
-                    Functor (Comp F G)
+    CompFunctor : ∀ F G {{_ : Functor F}}{{_ : Functor G}} →
+                  Functor (Comp F G)
     _<$>_ {{CompFunctor F G {{F-Functor}}{{G-Functor}}}} f (C x) = C ((_<$>_ f) <$> x)
 
-    CompNaperian : (F : Set → Set)(G : Set → Set)
-                    {{_ : Naperian F}}{{_ : Naperian G}} →
-                    Naperian (Comp F G)
+    CompNaperian : ∀ F G {{_ : Naperian F}}{{_ : Naperian G}} →
+                   Naperian (Comp F G)
     Log {{CompNaperian F G {{F-Naperian}} {{G-Naperian}}}} = Log {{F-Naperian}} × Log {{G-Naperian}}
     lookup {{CompNaperian F G}} (C x) (ix , jx) = lookup (lookup x ix) jx
     tabulate {{CompNaperian F G}} f = C (tabulate (λ ix → tabulate (λ jx → f (ix , jx))))
@@ -863,10 +861,10 @@ A functor offering such an iterator is said to be `traversable
 
     record Traversable (T : Set → Set) : Set₁ where
       field
-        traverse : ∀ {F : Set → Set} {A B} {{_ : Applicative F}} → (A → F B) → T A → F (T B)
+        traverse : ∀ {F A B} {{_ : Applicative F}} → (A → F B) → T A → F (T B)
         overlap {{super}} : Foldable T
 
-      sequence :  ∀ {F : Set → Set} {A} {{_ : Applicative F}} → T (F A) -> F (T A)
+      sequence :  ∀ {F A} {{_ : Applicative F}} → T (F A) → F (T A)
       sequence = traverse id
 
     open Traversable ⦃...⦄
