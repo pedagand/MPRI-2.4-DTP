@@ -10,14 +10,14 @@ PATCH=patch
 all: $(SRCS)
 
 # Use ONLY to UPDATE a patch
-%.patch: ../%.lagda.rst %.student.lagda.rst
-	$(DIFF) $*.lagda.rst $*.student.lagda.rst > $@; true
+%.patch: %.lagda.rst.orig # ../%.lagda.rst
+	$(DIFF) ../$*.lagda.rst $*.lagda.rst.orig > $@; true
 
-%.lagda.rst: 
+%.lagda.rst: %.patch # ../%.lagda.rst
 	$(PATCH) ../$*.lagda.rst $*.patch -o $@
 
 clean:
-	rm -i $(TARGETS)
+	rm -i $(SRCS)
 
 force:
 	true
