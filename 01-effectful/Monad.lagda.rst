@@ -86,7 +86,7 @@ Nowadays:
 
   open import Data.Unit hiding (setoid ; _≟_)
   open import Data.Nat renaming (_*_ to _*ℕ_)
-  open import Data.Nat.DivMod
+  open import Data.Nat.DivMod renaming (_/_ to _/ℕ_)
   open import Data.Fin hiding (_+_ ; raise ; _-_ ; _≟_)
   open import Data.Product
 
@@ -96,7 +96,8 @@ Nowadays:
   open import Relation.Binary
   open import Relation.Binary.PropositionalEquality
     renaming (trans to trans≡ ; sym to sym≡ ; cong to cong≡ ; cong₂ to cong₂≡)
-    hiding (setoid ; isEquivalence)
+    hiding (setoid ; isEquivalence ; Extensionality)
+  open import Axiom.Extensionality.Propositional
 
 ************************************************
 Stateful operations
