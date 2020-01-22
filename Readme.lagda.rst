@@ -38,13 +38,14 @@ This course is organized as follows:
 Using the lecture notes
 ************************************************
 
-This course is organized in 5 lectures, meant to be presented in 2h30
-each. The first lecture includes an example-driven introduction to
-Agda, which culminates with the presentation of `The Evolution of a
-Typechecker <https://github.com/pedagand/typechecker-evolution>`_
-serving as a fast-paced transition from functional programming to
-idiomatic, dependently-typed programming. Each lecture consists in a
-literate Agda file, which exists in 4 forms:
+This course is organized in 5 lectures, meant to be presented in slots
+of 2h30 each. The first lecture includes an example-driven
+introduction to Agda, which culminates with the presentation of `The
+Evolution of a Typechecker
+<https://github.com/pedagand/typechecker-evolution>`_ serving as a
+fast-paced transition from functional programming to idiomatic,
+dependently-typed programming. Each lecture consists in a literate
+Agda file, which exists in 4 forms:
 
   teacher version:
     It contains a complete & type-checked program, including exercises
@@ -80,7 +81,7 @@ reliance on filenames for identifying modules, this file must be
 renamed ``Monad.lagda.rst`` (in an other directory) to be usable by
 Agda.
 
-The *teaching version* is obtained from the *teacher version* and a
+The *teacher version* is obtained from the *student version* and a
 corresponding patch. Teaching patches are stored in the ``./teaching``
 directory. To produce the teaching version of the lectures, type:
 
@@ -98,9 +99,9 @@ Build the lecture notes
 ************************************************
 
 You will need 
-  * Agda (tested with version 2.5.4.1)
-  * Agda standard library (tested with version 0.17-1)
-  * Sphinx (tested with version 1.6.4)
+  * Agda (tested with version 2.6.0.1)
+  * Agda standard library (tested with version 1.1)
+  * Sphinx (tested with version 1.8.5)
 
 Type:
 
