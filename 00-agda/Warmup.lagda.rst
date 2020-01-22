@@ -6,9 +6,9 @@
 Warming up
 ================================================================
 
-These lecture notes have been prepared with Agda 2.6.0.1 and the Agda
-standard library stdlib 1.1. These are readily available in Debian
-testing and Ubuntu eoan, for example.
+These lecture notes have been prepared with Agda (version 2.6.0.1) and
+the Agda standard library (version 1.1). These are readily available
+in Debian testing and Ubuntu eoan, for example.
 
 Cheatsheets:
   - `Install Agda`_
