@@ -2,3 +2,8 @@
 *.rej
 *.bak
 *.agdai
+*.student.lagda.rst
+build/
+students/
+eval/2018-2019
+eval/2019-2020
