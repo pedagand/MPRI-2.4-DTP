@@ -1684,6 +1684,37 @@ one should look into `Representing Monads`_ (if you enjoy reading the
 Classics) and `Kan Extensions for Program Optimisation`_ (if you enjoy
 spicing things up with string diagrams).
 
+************************************************
+About syntax
+************************************************
+
+..
+  ::
+  module DoNotation where
+
+  open import Data.Bool
+  open import Data.List hiding (filter)
+
+The ``return`` and bind operator ``_>>=_`` are so ubiquitous that
+`syntactic sugar`_ has been introduced to lighten the notational load
+of monadic programs. Haskell introduced the ``do`` notation, which has
+been adapted to Agda. One can for example write the following in the
+``List`` monad::
+
+  open import Category.Monad
+  import Data.List.Categorical
+  open RawMonad {0ℓ} Data.List.Categorical.monad
+
+  filter : {A : Set} → (A → Bool) → List A → List A
+  filter p xs = do
+    x    ← xs
+    true ← p x ∷ []
+      where false → []
+    x ∷ []
+
+Under the hood, Agda desugars this notation to sequences of ``_>>=``
+and ``return``: there is no additional magic.
+
 .. BEGIN HIDE
 
 .. ************************************************
@@ -1792,6 +1823,7 @@ proofs by reflection.
 .. _`free monad`: https://ncatlab.org/nlab/show/free+monad
 .. TODO: there must exist a better, more programmer-friendly reference for free monads!
 .. _`monad transformers`: http://book.realworldhaskell.org/read/monad-transformers.html
+.. _`syntactic sugar`: https://agda.readthedocs.io/en/latest/language/syntactic-sugar.html#do-notation
 
 .. Local Variables:
 .. mode: agda2
