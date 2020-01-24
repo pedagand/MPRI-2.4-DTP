@@ -2,10 +2,12 @@
 MPRI 2.4 : Dependently-typed Functional Programming
 ================================================================
 
-
+.. BEGIN HIDE
 
 **WARNING: This is the "Teacher" edition of MPRI24-DTP.**
 **If you're an MPRI student, you should not be here but** `there <https://gitlab.inria.fr/fpottier/mpri-2.4-public/blob/master/>`_.
+
+.. END HIDE
 
 -------------------------
 
@@ -19,6 +21,8 @@ MPRI 2.4 : Dependently-typed Functional Programming
   open import 04-generic.Desc
   open import 05-open.Problems
 
+.. BEGIN HIDE
+
 This course is organized as follows:
 
 .. toctree::
@@ -30,9 +34,6 @@ This course is organized as follows:
    03-total/Recursion
    04-generic/Desc
    05-open/Problems
-
-.. BEGIN HIDE
-  ::
 
 ************************************************
 Using the lecture notes
@@ -70,6 +71,8 @@ Agda file, which exists in 4 forms:
 
 The *student version* is obtained from the *teacher version* thanks to
 the (dependently-untyped) ``studentize.py`` script. For example,
+
+.. TODO: update instructions
 
 .. code-block:: shell
 
