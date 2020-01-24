@@ -1,4 +1,6 @@
-SRCS=01-effectful/Monad.lagda.rst   \
+SRCS=Index.lagda.rst\
+	00-agda/Warmup.lagda.rst   \
+	01-effectful/Monad.lagda.rst   \
         02-dependent/Indexed.lagda.rst \
 	03-total/Recursion.lagda.rst \
 	04-generic/Desc.lagda.rst \
@@ -6,15 +8,17 @@ SRCS=01-effectful/Monad.lagda.rst   \
 
 DIFF=diff -u
 PATCH=patch
+STUDENTIZE=python3 studentize.py
 
 all: $(SRCS)
 
-# Use ONLY to UPDATE a patch
-%.patch: %.lagda.rst.orig # ../%.lagda.rst
-	$(DIFF) ../$*.lagda.rst $*.lagda.rst.orig > $@; true
+Index.lagda.rst:
+	$(STUDENTIZE) ../Readme.lagda.rst
+	mv ../Readme.student.lagda.rst Index.lagda.rst
 
-%.lagda.rst: %.patch # ../%.lagda.rst
-	$(PATCH) ../$*.lagda.rst $*.patch -o $@
+%.lagda.rst: force
+	$(STUDENTIZE) ../$*.lagda.rst
+	mv ../$*.student.lagda.rst  $*.lagda.rst
 
 clean:
 	rm -i $(SRCS)
