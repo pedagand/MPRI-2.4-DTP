@@ -1,0 +1,560 @@
+\documentclass[usenames,dvipsnames,rgb]{beamer}
+
+\usepackage[utf8x]{inputenc}
+\usepackage{amssymb}
+\usepackage{ifthen}
+\usepackage{xintexpr}
+\usepackage{tikz-cd}
+\usepackage{mdframed}
+
+\usetheme{default}
+\usefonttheme[stillsansserifmath,stillsansserifsmall]{serif}
+
+\beamertemplatenavigationsymbolsempty
+
+\definecolor{frameblue}{RGB}{11,116,149}
+\definecolor{titleblue}{RGB}{11,116,149}
+\definecolor{framegray}{RGB}{204,204,204}
+
+\setbeamercolor{title}{fg=titleblue}
+\setbeamerfont{title}{size=\Large}
+
+\setbeamercolor{frametitle}{fg=frameblue}
+\setbeamercolor{page number in head/foot}{fg=white}
+\setbeamercolor{block title}{fg=black}
+\setbeamerfont{block title}{size=\large,family=\sffamily}
+
+\mdfdefinestyle{blockframe}{linecolor=framegray,
+                            skipabove=5pt, 
+                            skipbelow=5pt}
+
+\setbeamertemplate{block begin}
+{
+  \begin{mdframed}[style=blockframe]
+    {
+      \usebeamerfont{block title}
+      \usebeamercolor[fg]{block title}
+      \insertblocktitle
+      \vskip2pt
+    }
+}
+\setbeamertemplate{block end}{\end{mdframed}}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{itemize items}[circle]
+\setbeamercolor{itemize item}{fg=black}
+
+
+\newcommand{\sidenote}[1]{\hfill #1}
+\newcommand{\law}[1]{\textit{(#1)}}
+\newcommand{\Forall}[1]{\forall #1.\:}
+
+%% Categorical macros
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\theCategory}[1]{\mathbb{#1}}
+\newcommand{\aCategory}[1][0]{%
+  \ensuremath{%
+    \ifthenelse%
+        {\equal{#1}{0}}%
+        {\theCategory{C}}%
+        {\ifthenelse%
+          {\equal{#1}{1}}%
+          {\theCategory{D}}%
+          {\ifthenelse%
+            {\equal{#1}{2}}%
+            {\theCategory{E}}%
+            {\theCategory{C}_{\xinttheiexpr #1 - 3 \relax}}}}}}
+
+\newcommand{\CAT}{\theCategory{C}\theCategory{A}\theCategory{T}}
+\newcommand{\SET}{\theCategory{S}\theCategory{E}\theCategory{T}}
+
+\newcommand{\CatObj}[1]{\ensuremath{| #1 |}}
+\newcommand{\CatMorph}[3][]{%
+  \ensuremath{%
+    \ifthenelse{\equal{#1}{}}%
+               {#2 \to #3}%
+               {#1(#2, #3)}}}
+\newcommand{\CatId}[1][]{\mathsf{id}_{#1}}
+
+\begin{frame}
+\frametitle{Category%
+  \sidenote{$(\aCategory, \aCategory[1], \aCategory[2], \aCategory[3], \aCategory[4], \ldots \in \CAT)$}}
+
+\begin{itemize}
+\item A class of objects \CatObj{\aCategory}
+  \sidenote{$(C, D, E, \ldots \in \CatObj{\aCategory})$}
+\item A class of morphisms \CatMorph[\aCategory]{C}{D} from object C to object D\\
+  \sidenote{$(f, g, h, \ldots \in \CatMorph[\aCategory]{C}{D})$}\\
+  \sidenote{$(f, g, h, \ldots \in \CatMorph{C}{D})$}
+\end{itemize}
+with:
+\begin{itemize}
+\item an identity morphism $\CatId[C] \in \CatMorph[\aCategory]{C}{C}$
+\item a composition operation $- \mathop{\circ} - \in \CatMorph[\aCategory]{D}{E} \to \CatMorph[\aCategory]{C}{D} \to \CatMorph[\aCategory]{C}{E}$
+\end{itemize}
+such that:
+\begin{itemize}
+\item $\CatId[C] \circ f = f \circ \CatId[D] = f$ %
+  \sidenote{\law{unity, left \& right}}\\
+  for any $f \in \CatMorph[\aCategory]{C}{D}$
+\item $(f \circ g) \circ h = f \circ (g \circ h)$ %
+  \sidenote{\law{associativity}}\\
+  for any $h \in \CatMorph[\aCategory]{C}{D}$, 
+          $g \in \CatMorph[\aCategory]{D}{E}$ and 
+          $f \in \CatMorph[\aCategory]{E}{F}$ 
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\CatOp}[1]{{#1}^{\mathsf{op}}}
+
+\begin{frame}
+\frametitle{Opposite category}
+
+The opposite category $\CatOp{\aCategory}$ consists of:
+\begin{itemize}
+\item Objects $\CatObj{\CatOp{\aCategory}} = \CatObj{\aCategory}$
+\item Morphisms $\CatMorph[\CatOp{\aCategory}]{C}{D} = \CatMorph[\aCategory]{D}{C}$
+\end{itemize}
+
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\TermObj}{\top}
+\newcommand{\TermMorph}{\mathsf{tt}}
+
+\begin{frame}[fragile]
+  \frametitle{Terminal object}
+
+  \begin{itemize}
+  \item An object $\TermObj \in \CatObj{\aCategory}$
+  \end{itemize}
+  %
+  such that for every
+  %
+  \begin{itemize}
+  \item object $X \in  \CatObj{\aCategory}$
+  \end{itemize}
+  %
+  there exists a unique morphism $\TermMorph \in \CatMorph[\aCategory]{X}{\TermObj}$.
+
+  \begin{center}
+    \begin{tikzcd}[column sep=large, row sep=large]
+      X
+        \arrow[d, dashed, "\exists ! \TermMorph"]
+      \\
+      \TermObj
+    \end{tikzcd}
+  \end{center}
+
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\ProdObj}[2]{\ensuremath{#1 \times #2}}
+\newcommand{\ProdMorph}[2]{\ensuremath{[ #1 \mathop{,} #2 ]}}
+\newcommand{\ProdFst}{\pi_1}
+\newcommand{\ProdSnd}{\pi_2}
+
+\begin{frame}[fragile]
+  \frametitle{Cartesian product}
+
+  Let $C, D \in \CatObj{\aCategory}$.
+
+  \vfill
+
+  \begin{itemize}
+  \item An object $\ProdObj{C}{D} \in \CatObj{\aCategory}$
+  \item A morphism
+    $\ProdFst \in \CatMorph[\aCategory]{\ProdObj{C}{D}}{C}$
+  \item A morphism
+    $\ProdSnd \in \CatMorph[\aCategory]{\ProdObj{C}{D}}{D}$
+  \end{itemize}
+  %
+  such that for every
+  %
+  \begin{itemize}
+  \item $X \in \CatObj{\aCategory}$
+  \item $f \in \CatMorph[\aCategory]{X}{C}$
+  \item $g \in \CatMorph[\aCategory]{X}{D}$
+  \end{itemize}
+  %
+  there exists a unique morphism $\ProdMorph{f}{g} \in \CatMorph[\aCategory]{X}{\ProdObj{C}{D}}$ verifying
+  %
+  \begin{center}
+    \begin{tikzcd}[column sep=large, row sep=large]
+        &
+      X
+        \arrow[ddl, bend right, "\forall f"{above left}]
+        \arrow[ddr, bend left, "\forall g"]
+        \arrow[d, dashed, "\exists ! \ProdMorph{f}{g}"]
+        &
+        \\
+        &
+      \ProdObj{C}{D}
+        \arrow[dl, "\pi_1"]
+        \arrow[dr, "\pi_2"{below left}]
+        &
+        \\
+      C &             & D \\
+    \end{tikzcd}
+  \end{center}
+
+  \vfill
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\ExpObj}[2]{\ensuremath{{#1}^{#2}}}
+\newcommand{\ExpMorph}[1]{\ensuremath{\lambda\; #1}}
+\newcommand{\ExpApply}{\ensuremath{\mathsf{apply}}}
+
+\begin{frame}[fragile]
+  \frametitle{Exponential}
+
+  Let $C \in \CatObj{\aCategory}$.
+  Let $D \in \CatObj{\aCategory}$ with all Cartesian products.
+
+  \vfill
+
+  \begin{itemize}
+  \item An object $\ExpObj{C}{D} \in \CatObj{\aCategory}$
+  \item A morphism
+    $\ExpApply \in \CatMorph[\aCategory]{\ProdObj{\ExpObj{C}{D}}{D}}{C}$
+  \end{itemize}
+  %
+  such that for every
+  %
+  \begin{itemize}
+  \item $X \in \CatObj{\aCategory}$
+  \item $f \in \CatMorph[\aCategory]{\ProdObj{X}{D}}{C}$
+  \end{itemize}
+  %
+  there exists a unique morphism $\ExpMorph{f} \in \CatMorph[\aCategory]{X}{\ExpObj{C}{D}}$ verifying
+  %
+  \begin{center}
+    \begin{tikzcd}[column sep=large, row sep=large]
+      X
+        \arrow[d, dashed, "\exists ! \ExpMorph{f}"{left}]
+        &
+      \ProdObj{X}{D}
+        \arrow[dr, "\forall f"{above right}]
+        \arrow[d, dashed, "\ProdMorph{\ExpMorph{f}}{\CatId[D]}"{left}]
+        &
+        \\
+      \ExpObj{C}{D}
+        &
+      \ProdObj{\ExpObj{C}{D}}{D}
+        \arrow[r, "\ExpApply"{below}]
+        &
+      C
+    \end{tikzcd}
+  \end{center}
+
+  \vfill
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Cartesian-closed category}
+
+  A category \aCategory{} with
+  %
+  \begin{itemize}
+  \item A terminal object $\TermObj$
+  \item A Cartesian product $\ProdObj{C}{D}$ for any $C, D \in \CatObj{\aCategory}$
+  \item An exponential object $\ExpObj{C}{D}$ for any $C, D \in \CatObj{\aCategory}$
+  \end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\CatFunc}[2]{\ensuremath{#1 \Rightarrow #2}}
+
+\newcommand{\theFunctor}[1]{\mathcal{#1}}
+\newcommand{\aFunctor}[1][0]{%
+  \ensuremath{%
+    \ifthenelse%
+        {\equal{#1}{0}}%
+        {\theFunctor{F}}%
+        {\ifthenelse%
+          {\equal{#1}{1}}%
+          {\theFunctor{G}}%
+          {\theFunctor{F}_{\xinttheiexpr #1 - 2 \relax}}}}}
+
+\newcommand{\FuncObj}[1]{\CatObj{#1}}
+\newcommand{\FuncMorph}[1]{#1^{\to}}
+
+\begin{frame}
+\frametitle{Functor%
+  \sidenote{$(\aFunctor, \aFunctor[1], \aFunctor[2], \aFunctor[3], \ldots \in \CatFunc{\aCategory}{\aCategory[1]})$}}
+
+\begin{itemize}
+\item An action on objects $\FuncObj{\aFunctor} \in \CatObj{\aCategory} \to \CatObj{\aCategory[1]}$
+\item An action on morphisms $\FuncMorph{\aFunctor} \in \CatMorph[\aCategory]{C}{C'} \to \CatMorph[{\aCategory[1]}]{D}{D'}$
+\end{itemize}
+such that:
+\begin{itemize}
+\item $\FuncMorph{\aFunctor}\: \CatId[C] = \CatId[{\FuncObj{\aFunctor}\: C}]$
+\sidenote{\law{identity preservation}}
+\item $\FuncMorph{\aFunctor}\: (g \circ f) = (\FuncMorph{\aFunctor}\: g) \circ (\FuncMorph{\aFunctor}\: f)$
+\sidenote{\law{composition preservation}}
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Adjunction}
+
+  Let $\aFunctor \in \CatFunc{\aCategory[1]}{\aCategory}$.
+
+  \aFunctor{} is a left adjoint if for every
+  %
+  \begin{itemize}
+  \item Object $C \in \CatObj{\aCategory}$
+  \end{itemize}
+  %
+  there exists
+  %
+  \begin{itemize}
+  \item An object $\FuncObj{\aFunctor[1]} C \in \CatObj{\aCategory[1]}$
+  \item A morphism $\epsilon_C \in \CatMorph[\aCategory]{\FuncObj{\aFunctor}(\FuncObj{\aFunctor[1]}(C))}{C}$
+  \end{itemize}
+  %
+  such that for every
+  %
+  \begin{itemize}
+  \item object $D \in \CatObj{\aCategory[1]}$
+  \item morphism $f \in \CatMorph[\aCategory]{\FuncObj{\aFunctor}\: D}{C}$
+  \end{itemize}
+  %
+  there exists a unique morphism $g \in \CatMorph[{\aCategory[1]}]{D}{\FuncObj{\aFunctor[1]}\:C}$
+  %
+  with
+  %
+\begin{center}
+\begin{tikzcd}
+  D
+    \arrow[d, dashed, "\exists ! g"{left}]
+  &
+  \FuncObj{\aFunctor}\: D
+    \arrow[dr, "\forall f"]
+    \arrow[d, dashed, "\FuncMorph{\aFunctor}\: g"{left}]
+  &
+  \\
+  \FuncObj{\aFunctor[1]}(C)
+  &
+  \FuncObj{\aFunctor}(\FuncObj{\aFunctor[1]}(C))
+    \arrow[r, "\epsilon_C"{below}]
+  &
+  C
+\end{tikzcd}
+\end{center}
+
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\CatNatTrans}[2]{\ensuremath{#1 \stackrel{\cdot}{\Rightarrow} #2}}
+
+\newcommand{\aNatTrans}[1][0]{%
+  \ensuremath{%
+    \ifthenelse%
+        {\equal{#1}{0}}%
+        {\varphi}%
+        {\ifthenelse%
+          {\equal{#1}{1}}%
+          {\psi}%
+          {\varphi_{\xinttheiexpr #1 - 2 \relax}}}}}
+
+\begin{frame}[fragile]
+\frametitle{Natural transformation%
+  \sidenote{$(\aNatTrans, \aNatTrans[1], \aNatTrans[2], \aNatTrans[3], \ldots \in \CatNatTrans{\aFunctor}{\aFunctor[1]})$}}
+
+Let $\aFunctor, \aFunctor[1] \in \CatFunc{\aCategory}{\aCategory[1]}$.
+
+\vfill 
+
+\begin{itemize}
+\item A transformation %
+  $\aNatTrans \in \Forall{C}%
+       \CatMorph[{\aCategory[1]}]%
+                {\FuncObj{\aFunctor}\: C}%
+                {\FuncObj{\aFunctor[1]}\: C}$
+\end{itemize}
+such that for every
+\begin{itemize}
+\item $k \in \CatMorph[\aCategory]{C}{D}$
+\end{itemize}
+we have
+
+\begin{center}
+\begin{tikzcd}
+  \FuncObj{\aFunctor}\: C 
+    \arrow[r, "\aNatTrans_C"]
+    \arrow[d, "\FuncMorph{\aFunctor}\: k"{left}] 
+  &   \FuncObj{\aFunctor[1]}\: C
+      \arrow[d, "\FuncMorph{\aFunctor[1]}\: k"] 
+  \\
+  \FuncObj{\aFunctor}\: D
+    \arrow[r, "\aNatTrans_D"{below}]
+  & \FuncObj{\aFunctor[1]}\: D
+\end{tikzcd}
+\end{center}
+
+\vfill
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\Adj}{\mathop{\dashv}}
+
+\begin{frame}
+  \frametitle{Adjunction, take II}
+
+  Let $\aFunctor \in \CatFunc{\aCategory[1]}{\aCategory}$ and
+  $\aFunctor[1] \in \CatFunc{\aCategory}{\aCategory[1]}$.
+
+  \vfill
+
+  \aFunctor{} is left adjoint to \aFunctor[1] ($\aFunctor \Adj
+  \aFunctor[1]$) if there exists
+  %
+  \begin{itemize}
+  \item a natural isomorphism $\aNatTrans \in \CatMorph[\aCategory]{\FuncObj{\aFunctor}\: D}{C} \stackrel{\sim}{\to}
+                                              \CatMorph[{\aCategory[1]}]{D}{\FuncObj{\aFunctor[1]}\: C}$
+  \end{itemize}
+
+  \vfill
+
+  Conversely, \aFunctor[1] is right adjoint to \aFunctor{}.
+
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\aMonad}[1][]{{\theFunctor{M}}_{#1}}
+
+\begin{frame}[fragile]
+  \frametitle{Monad}
+
+  \begin{itemize}
+  \item A functor $\aMonad \in \CatFunc{\aCategory}{\aCategory}$
+  \item A natural transformation $\eta \in \Forall{C} \CatMorph{C}{\FuncObj{\aMonad}\: C}$
+  \item A natural transformation $\mu \in \Forall{C} \CatMorph{\FuncObj{\aMonad}(\FuncObj{\aMonad}\: C)}{\FuncObj{\aMonad}\: C}$
+  \end{itemize}
+  %
+  such that
+  %
+  \begin{columns}
+    \begin{column}{.5\textwidth}
+      \begin{tikzcd}[column sep=large, row sep=large]
+        \FuncObj{\aMonad}^3\: C
+        \arrow[d, "\mu_{\FuncObj{\aMonad}\: C}"{left}]
+        \arrow[r, "\FuncObj{\aMonad} \mu_{C}"]
+        &
+        \FuncObj{\aMonad}^2\: C
+        \arrow[d, "\mu_{C}"]
+        \\
+        \FuncObj{\aMonad}^2\: C
+        \arrow[r, "\mu_{C}"]
+        &
+        \FuncObj{\aMonad}\: C
+      \end{tikzcd}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \begin{tikzcd}[column sep=large, row sep=large]
+        \FuncObj{\aMonad}\: C
+          \arrow[d, "\eta_C"]
+          \arrow[r, "\eta_{\FuncObj{\aMonad}\: C}"]
+          \arrow[dr, equal]
+        &
+        \FuncObj{\aMonad}^2\: C
+          \arrow[d, "\mu_C"]
+        \\
+        \FuncObj{\aMonad}^2\: C
+          \arrow[r, "\mu_C"]
+        &
+        \FuncObj{\aMonad}\: C
+      \end{tikzcd}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\KleisliCat}[2]{\ensuremath{{#1}_{#2}}}
+
+\begin{frame}
+  \frametitle{Kleisli category}
+
+  Let $\aMonad$ be a monad over $\aCategory$.
+
+  \vfill
+
+  The Kleisli category \KleisliCat{\aCategory}{\aMonad} consists of:
+  \begin{itemize}
+  \item Objects: $\FuncObj{\aMonad}\: C$ for every $C \in \CatObj{\aCategory}$
+  \item Morphisms: $\CatMorph[\KleisliCat{\aCategory}{\aMonad}]{C}{C'} = \CatMorph[\aCategory]{C}{\FuncObj{\aMonad}\: C'}$
+  %% \item Identity: $\CatId[C] = \eta \in \CatMorph[\KleisliCat{\aCategory}{\aMonad}]{C}{C}$
+  %% \item Composition: $g \circ f = \mu \circ \FuncMorph{\aMonad}\: g \circ f$
+  \end{itemize}
+
+  \vfill
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\Presheaf}[1]{\hat{#1}}
+
+\begin{frame}
+  \frametitle{Presheaf}
+
+  A presheaf on a category \aCategory{} is a functor $\Presheaf{\aCategory} \in
+  \CatFunc{\aCategory}{\SET}$.
+
+  \bigskip
+  
+  In particular, it forms a functor category:
+  \begin{itemize}
+  \item Objects: presheaf functors
+  \item Morphisms: natural transformations
+  \end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+  \frametitle{Further reading}
+
+  \begin{itemize}
+  \item ``Conceptual Mathematics'', Schanuel \& Lawvere
+  \item ``An introduction to Category Theory'', Simmons
+  \item ``Categories for Types'', Crole
+  \item ``Categories for the Working Mathematician'', Mac Lane
+  \item ``Sheaves in Geometry and Logic'', Mac Lane \& Moerdijk
+  \end{itemize}
+\end{frame}
+
+\end{document}
