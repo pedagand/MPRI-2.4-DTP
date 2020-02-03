@@ -74,8 +74,6 @@ Extensional Generic Programming
     open import Relation.Binary.PropositionalEquality
 
     infixr 5 _∷_
-    infixl 4 _<*>-Vec_
-
 
 
 Following Gibbons' `APLicative Programming Naperian Functors`_, we are
@@ -190,12 +188,32 @@ To represent vectors, we need a notion of arrays of a given size::
     vec : ℕ → Set → Set
     vec n A = Vec A n
 
+.. BEGIN HIDE
+  ::
+    module Exercise-map-Vec where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 Applying an operation pointwise to every elements of a vector is
 exactly what ``map`` does::
 
-    map-Vec : ∀ {n}{A B : Set} → (A → B) → vec n A → vec n B
-    map-Vec f [] = []
-    map-Vec f (x ∷ xs) = f x ∷ map-Vec f xs
+      map-Vec : ∀ {n}{A B : Set} → (A → B) → vec n A → vec n B
+      map-Vec f xs = ?
+
+.. END BLOCK
+
+
+.. BEGIN HIDE
+  ::
+    module Solution-map-Vec where
+
+      map-Vec : ∀ {n}{A B : Set} → (A → B) → vec n A → vec n B
+      map-Vec f [] = []
+      map-Vec f (x ∷ xs) = f x ∷ map-Vec f xs
+
+    open Solution-map-Vec
+.. END HIDE
 
 This would allow us to lift the operation ``square`` on numbers to
 apply on vectors of numbers.
@@ -307,28 +325,61 @@ Let ``B : Set``. Is ``CoArrow B : Set → Set`` an endofunctor on
 Applicative
 --------------------------------
 
+.. BEGIN HIDE
+  ::
+    module Exercise-zipWith where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 To lift n-ary operation ``f`` over two vectors of same size, we merely
 need a (total!) ``zipWith``::
 
-    zipWith-Vec : ∀ {n} {A B C : Set} →
-              (A → B → C) → vec n A → vec n B → vec n C
-    zipWith-Vec f [] [] = []
-    zipWith-Vec f (x ∷ xs) (y ∷ ys) = f x y ∷ zipWith-Vec f xs ys
+      zipWith-Vec : ∀ {n} {A B C : Set} →
+                (A → B → C) → vec n A → vec n B → vec n C
+      zipWith-Vec f xs ys = ?
 
 However, ``zipWith`` can be obtained from two more primitive
 operations and the functoriality of vectors::
 
-    replicate-Vec : ∀ {n} {A : Set} → A → vec n A
-    replicate-Vec {n = zero}  x = []
-    replicate-Vec {n = suc n} x = x ∷ replicate-Vec x
+      replicate-Vec : ∀ {n} {A : Set} → A → vec n A
+      replicate-Vec {n} x = ?
 
-    _<*>-Vec_ : ∀ {n} {A B : Set} → vec n (A → B) → vec n A → vec n B
-    []       <*>-Vec []       = []
-    (f ∷ fs) <*>-Vec (x ∷ xs) = f x ∷ (fs <*>-Vec xs)
+      _<*>-Vec_ : ∀ {n} {A B : Set} → vec n (A → B) → vec n A → vec n B
+      fs <*>-Vec xs = ?
 
-    zipWith-Vec' : ∀ {n} {A B C : Set} →
-              (A → B → C) → vec n A → vec n B → vec n C
-    zipWith-Vec' f xs ys = f <$> xs <*>-Vec ys
+      zipWith-Vec' : ∀ {n} {A B C : Set} →
+                (A → B → C) → vec n A → vec n B → vec n C
+      zipWith-Vec' f xs ys = ?
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-zipWith where
+
+      infixl 4 _<*>-Vec_
+
+      zipWith-Vec : ∀ {n} {A B C : Set} →
+                (A → B → C) → vec n A → vec n B → vec n C
+      zipWith-Vec f [] [] = []
+      zipWith-Vec f (x ∷ xs) (y ∷ ys) = f x y ∷ zipWith-Vec f xs ys
+
+      replicate-Vec : ∀ {n} {A : Set} → A → vec n A
+      replicate-Vec {n = zero}  x = []
+      replicate-Vec {n = suc n} x = x ∷ replicate-Vec x
+
+      _<*>-Vec_ : ∀ {n} {A B : Set} → vec n (A → B) → vec n A → vec n B
+      []       <*>-Vec []       = []
+      (f ∷ fs) <*>-Vec (x ∷ xs) = f x ∷ (fs <*>-Vec xs)
+
+      zipWith-Vec' : ∀ {n} {A B C : Set} →
+                (A → B → C) → vec n A → vec n B → vec n C
+      zipWith-Vec' f xs ys = f <$> xs <*>-Vec ys
+
+    open Solution-zipWith
+
+.. END HIDE
 
 A functor equipped with these two operations is an `applicative
 functor <https://wiki.haskell.org/Typeclassopedia#Applicative>`_::
@@ -407,20 +458,43 @@ Pairs are also applicative::
     open import Category.Monad
     open import Category.Monad.State
 
+.. BEGIN HIDE
+  ::
+    module Exercise-StateFunctor where
+.. END HIDE
+
+.. BEGIN BLOCK
 
 **Remark:** Every monad is an applicative functor (but not
 conversely!). So, for example, the ``State`` monad (encountered in
 Lecture 1) is an applicative::
 
-    instance
-      StateFunctor : ∀ {A : Set} → Functor (State A)
-      _<$>_ {{StateFunctor}} f m s = let (x , s') = m s in
-                                     f x , s'
-      StateApplicative : ∀ {A : Set} → Applicative (State A)
-      pure {{StateApplicative}} x s = x , s
-      _⊛_  {{StateApplicative}} fs xs s = let (f , s') = fs s in
-                                          let (x , s'') = xs s' in
-                                          f x , s''
+      instance
+        StateFunctor : ∀ {A : Set} → Functor (State A)
+        _<$>_ {{StateFunctor}} f m s = ?
+        StateApplicative : ∀ {A : Set} → Applicative (State A)
+        pure {{StateApplicative}} x s = ?
+        _⊛_  {{StateApplicative}} fs xs s = ?
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-StateFunctor where
+
+      instance
+        StateFunctor : ∀ {A : Set} → Functor (State A)
+        _<$>_ {{StateFunctor}} f m s = let (x , s') = m s in
+                                       f x , s'
+        StateApplicative : ∀ {A : Set} → Applicative (State A)
+        pure {{StateApplicative}} x s = x , s
+        _⊛_  {{StateApplicative}} fs xs s = let (f , s') = fs s in
+                                            let (x , s'') = xs s' in
+                                            f x , s''
+
+    open Solution-StateFunctor public
+
+.. END HIDE
 
 .. BEGIN HIDE
 .. TODO: write the instances above (<$>, pure and ⊛) using the monadic operations
@@ -489,6 +563,13 @@ n-elements vectors::
                  (4 ∷ 5 ∷ 6 ∷ []) ∷ []
 
 
+.. BEGIN HIDE
+  ::
+    module Exercise-lookup-Vec where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 To implement transposition (and, therefore, reranking), we need to be
 able to *index* into a vector (say, "get the value on row ``i`` and
 column ``j``") as well as to be able to *create* a vector as a
@@ -496,19 +577,37 @@ function from its indices (say, "define the matrix of value ``f(i,
 j)`` at row ``i`` and column ``j``). The first corresponds to a lookup
 while the second corresponds to a tabulation::
 
-    lookup-Vec : ∀ {n} {A : Set} → vec n A → Fin n → A
-    lookup-Vec (x ∷ xs)  zero = x
-    lookup-Vec (x ∷ xs) (suc i) = lookup-Vec xs i
+      lookup-Vec : ∀ {n} {A : Set} → vec n A → Fin n → A
+      lookup-Vec xs n = ?
 
-    tabulate-Vec : ∀ {n} {A : Set} → (Fin n → A) → vec n A
-    tabulate-Vec {zero}  f = []
-    tabulate-Vec {suc n} f = f zero ∷ tabulate-Vec (f ∘ suc)
+      tabulate-Vec : ∀ {n} {A : Set} → (Fin n → A) → vec n A
+      tabulate-Vec {n}  f = ?
 
-    transpose-Matrix : ∀ {m n} {A : Set} → matrix m n A → matrix n m A
-    transpose-Matrix m = tabulate-Vec (λ i →
-                         tabulate-Vec (λ j →
-                         lookup-Vec (lookup-Vec m j) i))
+      transpose-Matrix : ∀ {m n} {A : Set} → matrix m n A → matrix n m A
+      transpose-Matrix m = ?
 
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-lookup-Vec where
+
+      lookup-Vec : ∀ {n} {A : Set} → vec n A → Fin n → A
+      lookup-Vec (x ∷ xs)  zero = x
+      lookup-Vec (x ∷ xs) (suc i) = lookup-Vec xs i
+
+      tabulate-Vec : ∀ {n} {A : Set} → (Fin n → A) → vec n A
+      tabulate-Vec {zero}  f = []
+      tabulate-Vec {suc n} f = f zero ∷ tabulate-Vec (f ∘ suc)
+
+      transpose-Matrix : ∀ {m n} {A : Set} → matrix m n A → matrix n m A
+      transpose-Matrix m = tabulate-Vec (λ i →
+                           tabulate-Vec (λ j →
+                           lookup-Vec (lookup-Vec m j) i))
+
+    open Solution-lookup-Vec
+
+.. END HIDE
 ..
   ::
     module Example-matrix-tranpose where
@@ -643,15 +742,35 @@ Pairs are Naperian too::
 
 .. END HIDE
 
+.. BEGIN HIDE
+  ::
+    module Exercise-transpose where
+.. END HIDE
+
+.. BEGIN BLOCK
 
 Given any pair of Naperian functors, transposition is expressed as
 swapping the composition of structures::
 
-    transpose : ∀ {F G : Set → Set}
-                  {{_ : Naperian F}}{{_ : Naperian G}} →
-                ∀ {A} → F (G A) → G (F A)
-    transpose fga = tabulate <$> (tabulate (λ gx fx → lookup (lookup fga fx) gx))
+      transpose : ∀ {F G : Set → Set}
+                    {{_ : Naperian F}}{{_ : Naperian G}} →
+                  ∀ {A} → F (G A) → G (F A)
+      transpose fga = ?
 
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-transpose where
+
+      transpose : ∀ {F G : Set → Set}
+                    {{_ : Naperian F}}{{_ : Naperian G}} →
+                  ∀ {A} → F (G A) → G (F A)
+      transpose fga = tabulate <$> (tabulate (λ gx fx → lookup (lookup fga fx) gx))
+
+    open Solution-transpose
+
+.. END HIDE
 ..
   ::
 
@@ -729,29 +848,58 @@ the above examples.
 Foldable
 --------------------------------
 
+.. BEGIN HIDE
+  ::
+    module Exercise-foldMap where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 To compute the running ``sum`` over a vector of numbers, we need a
 notion of iteration over vectors. In all generality, the left-to-right
 iteration over a vector can be implemented as the interpretation into
 a given monoid::
 
-    foldMap-Vec : ∀ {n}{A}{W : Set} {{MonW : Monoid W}} → (A → W) → vec n A → W
-    foldMap-Vec f [] = mempty
-    foldMap-Vec f (x ∷ xs) = f x <> foldMap-Vec f xs
+      foldMap-Vec : ∀ {n}{A}{W : Set} {{MonW : Monoid W}} → (A → W) → vec n A → W
+      foldMap-Vec f xs = ?
 
-    sumAll-Vec : ∀ {n} → vec n ℕ → ℕ
-    sumAll-Vec = foldMap-Vec id
+      sumAll-Vec : ∀ {n} → vec n ℕ → ℕ
+      sumAll-Vec = ?
 
 Note that we recover the 70's embodiment of iteration, the ``foldr``,
 by exploiting the fact that endomorphisms form a monoid::
 
-    foldr-Vec : ∀ {n}{A B : Set} → (A → B → B) → B → vec n A → B
-    foldr-Vec su ze fs = foldMap-Vec su fs ze
+      foldr-Vec : ∀ {n}{A B : Set} → (A → B → B) → B → vec n A → B
+      foldr-Vec su ze fs = ?
 
 Conversely, we can interpret it into the initial model of foldability,
 namely lists::
 
-    toList-Vec : ∀ {n A} → vec n A → List A
-    toList-Vec = foldMap-Vec (λ a → a ∷ [])
+      toList-Vec : ∀ {n A} → vec n A → List A
+      toList-Vec = ?
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-foldMap where
+
+      foldMap-Vec : ∀ {n}{A}{W : Set} {{MonW : Monoid W}} → (A → W) → vec n A → W
+      foldMap-Vec f [] = mempty
+      foldMap-Vec f (x ∷ xs) = f x <> foldMap-Vec f xs
+
+      sumAll-Vec : ∀ {n} → vec n ℕ → ℕ
+      sumAll-Vec = foldMap-Vec id
+
+      foldr-Vec : ∀ {n}{A B : Set} → (A → B → B) → B → vec n A → B
+      foldr-Vec su ze fs = foldMap-Vec su fs ze
+
+      toList-Vec : ∀ {n A} → vec n A → List A
+      toList-Vec = foldMap-Vec (λ a → a ∷ [])
+
+    open Solution-foldMap
+
+.. END HIDE
 
 ..
   ::
@@ -825,19 +973,44 @@ the above examples.
 Traversable
 --------------------------------
 
+.. BEGIN HIDE
+  ::
+    module Exercise-traverse-Vec where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 Being foldable enables us to write pure iterators. To compute the
 running sum of a vector, we need to perform a stateful
 iteration::
 
-    traverse-Vec : ∀ {n F A B} {{_ : Applicative F}} → (A → F B) → vec n A → F (vec n B)
-    traverse-Vec f [] = pure []
-    traverse-Vec f (x ∷ v) = _∷_ <$> f x ⊛ traverse-Vec f v
+      traverse-Vec : ∀ {n F A B} {{_ : Applicative F}} → (A → F B) → vec n A → F (vec n B)
+      traverse-Vec f xs = ?
 
-    increase : ℕ → State ℕ ℕ
-    increase n = λ m → let n' = m + n in n' , n'
+      increase : ℕ → State ℕ ℕ
+      increase n = λ m → let n' = m + n in n' , n'
 
-    sumsAll-Vec : ∀ {n} → vec n ℕ → vec n ℕ
-    sumsAll-Vec xs = proj₁ (traverse-Vec increase xs 0)
+      sumsAll-Vec : ∀ {n} → vec n ℕ → vec n ℕ
+      sumsAll-Vec xs = ?
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-traverse-Vec where
+
+      traverse-Vec : ∀ {n F A B} {{_ : Applicative F}} → (A → F B) → vec n A → F (vec n B)
+      traverse-Vec f [] = pure []
+      traverse-Vec f (x ∷ v) = _∷_ <$> f x ⊛ traverse-Vec f v
+
+      increase : ℕ → State ℕ ℕ
+      increase n = λ m → let n' = m + n in n' , n'
+
+      sumsAll-Vec : ∀ {n} → vec n ℕ → vec n ℕ
+      sumsAll-Vec xs = proj₁ (traverse-Vec increase xs 0)
+
+    open Solution-traverse-Vec
+.. END HIDE
 
 ..
   ::
@@ -1034,18 +1207,43 @@ defined by ``MDimension`` is equivalent to the following function::
     toNat (B l r)  = toNat l + toNat r
 
 
+.. BEGIN HIDE
+  ::
+    module Exercise-inner-product where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 Programming solely with the structure offered by dimensions, we can
 implement a generic inner product and matrix product::
 
-    inner-product : ∀ {F} → {{_ : Dimension F}} →
-                    F ℕ → F ℕ → ℕ
-    inner-product xs ys = sumAll (zipWith _*_ xs ys)
+      inner-product : ∀ {F} → {{_ : Dimension F}} →
+                      F ℕ → F ℕ → ℕ
+      inner-product xs ys = ?
 
-    matrix-product : ∀ {F G H} →
-                     {{_ : Dimension F}}{{_ : Dimension G}}{{_ : Dimension H}} →
-                     F (G ℕ) → G (H ℕ) → F (H ℕ)
-    matrix-product {F}{G}{H} {{dimF}} xss yss =
-        zipWith (zipWith inner-product) (replicate <$> xss) (replicate (transpose yss))
+      matrix-product : ∀ {F G H} →
+                       {{_ : Dimension F}}{{_ : Dimension G}}{{_ : Dimension H}} →
+                       F (G ℕ) → G (H ℕ) → F (H ℕ)
+      matrix-product {F}{G}{H} {{dimF}} xss yss = ?
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-inner-product where
+
+      inner-product : ∀ {F} → {{_ : Dimension F}} →
+                      F ℕ → F ℕ → ℕ
+      inner-product xs ys = sumAll (zipWith _*_ xs ys)
+
+      matrix-product : ∀ {F G H} →
+                       {{_ : Dimension F}}{{_ : Dimension G}}{{_ : Dimension H}} →
+                       F (G ℕ) → G (H ℕ) → F (H ℕ)
+      matrix-product {F}{G}{H} {{dimF}} xss yss =
+          zipWith (zipWith inner-product) (replicate <$> xss) (replicate (transpose yss))
+
+    open Solution-inner-product
+.. END HIDE
 
 ..
   ::
@@ -1501,8 +1699,9 @@ Intensional Generic Programming
       hiding (subst ; Extensionality)
     open import Axiom.Extensionality.Propositional
 
-    infixr 50 _`×_ _`×'_
-    infixr 30 _`+_ _`+'_
+    infixr 50 _`×_
+    infixr 30 _`+_
+
 
 In this second part, we apply a type-theoretic concept, a *universe*,
 to manipulate some structure of interest. Here, we shall look at
@@ -1650,19 +1849,46 @@ and (generically) prove the functor laws::
 Fixpoint
 --------------------------------
 
+.. BEGIN HIDE
+  ::
+    module Exercise-μ where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 The functors captured by our grammar have also the property of being
 "strictly-positive". We are therefore allowed to take their fixpoint::
 
-    data μ (D : Desc) : Set where
-      ⟨_⟩ : ⟦ D ⟧ (μ D) → μ D
+      data μ (D : Desc) : Set where
+        ⟨_⟩ : ? → μ D
 
 Over this (standard) inductive type, we can implement the traditional
 ``fold`` operator::
 
-    {-# TERMINATING #-}
-    fold : (D : Desc){T : Set} →
-           (⟦ D ⟧ T → T) → μ D → T
-    fold D α ⟨ x ⟩ = α (map D (fold D α) x)
+      {-# TERMINATING #-}
+      fold : (D : Desc){T : Set} →
+             (⟦ D ⟧ T → T) → μ D → T
+      fold D α ⟨ x ⟩ = ?
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-μ where
+
+      data μ (D : Desc) : Set where
+        ⟨_⟩ : ⟦ D ⟧ (μ D) → μ D
+
+      {-# TERMINATING #-}
+      fold : (D : Desc){T : Set} →
+             (⟦ D ⟧ T → T) → μ D → T
+      fold D α ⟨ x ⟩ = α (map D (fold D α) x)
+
+    open Solution-μ
+
+.. END HIDE
+
+
 
 **Exercise (difficulty: 3)** Convince the termination checker that
 ``fold`` is indeed terminating. Hint: manually specialize the
@@ -1749,32 +1975,58 @@ Using the ``fold``, we can implement addition over these numbers::
 Induction
 --------------------------------
 
+.. BEGIN HIDE
+  ::
+    module Exercise-All where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 Introducing a ``fold`` to enable recursion over ``μ D`` is
 simple(-type)-minded. Being in type theory, we actually want a
 recursion principle. We obtain it by instantiating the usual framework
 for induction::
 
+      All : ∀{X} → (D : Desc)(P : X → Set) → ⟦ D ⟧ X → Set
+      All D P xs = ?
 
-    All : ∀{X} → (D : Desc)(P : X → Set) → ⟦ D ⟧ X → Set
-    All `X         P x         = P x
-    All (`K Z)     P x         = ⊤
-    All (D₁ `× D₂) P (d₁ , d₂) = All D₁ P d₁ × All D₂ P d₂
-    All (D₁ `+ D₂) P (inj₁ d₁) = All D₁ P d₁
-    All (D₁ `+ D₂) P (inj₂ d₂) = All D₂ P d₂
-    All (`Σ S T)   P (s , xs)  = All (T s) P xs
-    All (`Π S T)   P k         = ∀ s → All (T s) P (k s)
+      Rec-μ : ∀ D → RecStruct (μ D) _ _
+      Rec-μ D P ⟨ xs ⟩ = All D P xs
 
-    Rec-μ : ∀ D → RecStruct (μ D) _ _
-    Rec-μ D P ⟨ xs ⟩ = All D P xs
+      all : ∀ {X P} → (D : Desc) → (rec : (x : X) → P x)(x : ⟦ D ⟧ X) → All D P x
+      all D rec xs = ?
 
-    all : ∀ {X P} → (D : Desc) → (rec : (x : X) → P x)(x : ⟦ D ⟧ X) → All D P x
-    all `X rec x = rec x
-    all (`K S) rec z = tt
-    all (D₁ `× D₂) rec (d₁ , d₂) = all D₁ rec d₁ , all D₂ rec d₂
-    all (D₁ `+ D₂) rec (inj₁ d₁) = all D₁ rec d₁
-    all (D₁ `+ D₂) rec (inj₂ d₂) = all D₂ rec d₂
-    all (`Σ S T) rec (s , xs) = all (T s) rec xs
-    all (`Π S T) rec k = λ s → all (T s) rec (k s)
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-All where
+
+      All : ∀{X} → (D : Desc)(P : X → Set) → ⟦ D ⟧ X → Set
+      All `X         P x         = P x
+      All (`K Z)     P x         = ⊤
+      All (D₁ `× D₂) P (d₁ , d₂) = All D₁ P d₁ × All D₂ P d₂
+      All (D₁ `+ D₂) P (inj₁ d₁) = All D₁ P d₁
+      All (D₁ `+ D₂) P (inj₂ d₂) = All D₂ P d₂
+      All (`Σ S T)   P (s , xs)  = All (T s) P xs
+      All (`Π S T)   P k         = ∀ s → All (T s) P (k s)
+
+      Rec-μ : ∀ D → RecStruct (μ D) _ _
+      Rec-μ D P ⟨ xs ⟩ = All D P xs
+
+      all : ∀ {X P} → (D : Desc) → (rec : (x : X) → P x)(x : ⟦ D ⟧ X) → All D P x
+      all `X rec x = rec x
+      all (`K S) rec z = tt
+      all (D₁ `× D₂) rec (d₁ , d₂) = all D₁ rec d₁ , all D₂ rec d₂
+      all (D₁ `+ D₂) rec (inj₁ d₁) = all D₁ rec d₁
+      all (D₁ `+ D₂) rec (inj₂ d₂) = all D₂ rec d₂
+      all (`Σ S T) rec (s , xs) = all (T s) rec xs
+      all (`Π S T) rec k = λ s → all (T s) rec (k s)
+
+    open Solution-All
+
+.. END HIDE
+  ::
 
     {-# TERMINATING #-}
     rec-μ-builder : ∀{D} → RecursorBuilder (Rec-μ D)
@@ -1849,44 +2101,91 @@ encoding, again). This means that we can craft new datatypes from
 existing datatypes. We exercise this possibility by implementing a
 generic free monad construction.
 
+.. BEGIN HIDE
+  ::
+    module Exercise-FreeMonad where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 In its most brutal form, the free monad construction consists in
 grafting an extra constructor containing a value of a provided type,
 the elements of the earlier signature being integrated as operations
 ``op``::
 
-    _*D_ : Desc → Set → Desc
-    D *D X = `Σ Bool λ { true → `K X ; false → D }
+      _*D_ : Desc → Set → Desc
+      D *D X = ?
 
-    Free : Desc → Set → Set
-    Free D X = μ (D *D X)
+      Free : Desc → Set → Set
+      Free D X = μ (D *D X)
 
-    return : ∀ {D X} → X → Free D X
-    return x = ⟨ true , x ⟩
+      return : ∀ {D X} → X → Free D X
+      return x = ?
 
-    op : ∀ {D X} → ⟦ D ⟧ (Free D X) → Free D X
-    op xs = ⟨ false , xs ⟩
+      op : ∀ {D X} → ⟦ D ⟧ (Free D X) → Free D X
+      op xs = ?
 
 Doing so, the resulting description has a monadic structure, which we
 can realize generically::
 
-    subst[_∶_∶_] : ∀ {X Y} → (D : Desc) → Free D X → (X → Free D Y) → Set
-    subst[_∶_∶_] {X}{Y} D _ _ = Free D Y
 
-    subst : ∀ {X Y} → (D : Desc) →
-            Free D X → (X → Free D Y) → Free D Y
-    subst {X}{Y} D mx k =
-      induction (D *D X) (λ mx₁ → subst[ D ∶ mx ∶ k ])
-        (λ { (true , x) tt → k x
-           ; (false , xs) as → ⟨ false , help D xs as ⟩ })
-        mx
-      where help : ∀ {X Y} D → (ds : ⟦ D ⟧ X) → All D (λ _ → Y) ds → ⟦ D ⟧ Y
-            help `X ds as = as
-            help (`K x) ds as = ds
-            help (D₁ `× D₂) (ds₁ , ds₂) (as₁ , as₂) = help D₁ ds₁ as₁ , help D₂ ds₂ as₂
-            help (D₁ `+ D₂) (inj₁ ds₁) as₁ = inj₁ (help D₁ ds₁ as₁)
-            help (D₁ `+ D₂) (inj₂ ds₂) as₂ = inj₂ (help D₂ ds₂ as₂)
-            help (`Σ S D₁) (s , ds) as = s , help (D₁ s) ds as
-            help (`Π S D₁) ds as = λ s → help (D₁ s) (ds s) (as s)
+      subst[_∶_∶_] : ∀ {X Y} → (D : Desc) → Free D X → (X → Free D Y) → Set
+      subst[_∶_∶_] {X}{Y} D _ _ = Free D Y
+
+      subst : ∀ {X Y} → (D : Desc) →
+              Free D X → (X → Free D Y) → Free D Y
+      subst {X}{Y} D mx k = {!
+        induction (D *D X) (λ mx₁ → subst[ D ∶ mx ∶ k ]) 
+          (λ { xs as → ? })
+          mx !}
+        where help : ∀ {X Y} D → (ds : ⟦ D ⟧ X) → All D (λ _ → Y) ds → ⟦ D ⟧ Y
+              help `X ds as = as
+              help (`K x) ds as = ds
+              help (D₁ `× D₂) (ds₁ , ds₂) (as₁ , as₂) = help D₁ ds₁ as₁ , help D₂ ds₂ as₂
+              help (D₁ `+ D₂) (inj₁ ds₁) as₁ = inj₁ (help D₁ ds₁ as₁)
+              help (D₁ `+ D₂) (inj₂ ds₂) as₂ = inj₂ (help D₂ ds₂ as₂)
+              help (`Σ S D₁) (s , ds) as = s , help (D₁ s) ds as
+              help (`Π S D₁) ds as = λ s → help (D₁ s) (ds s) (as s)
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-FreeMonad where
+
+      _*D_ : Desc → Set → Desc
+      D *D X = `Σ Bool λ { true → `K X ; false → D }
+
+      Free : Desc → Set → Set
+      Free D X = μ (D *D X)
+
+      return : ∀ {D X} → X → Free D X
+      return x = ⟨ true , x ⟩
+
+      op : ∀ {D X} → ⟦ D ⟧ (Free D X) → Free D X
+      op xs = ⟨ false , xs ⟩
+
+      subst[_∶_∶_] : ∀ {X Y} → (D : Desc) → Free D X → (X → Free D Y) → Set
+      subst[_∶_∶_] {X}{Y} D _ _ = Free D Y
+
+      subst : ∀ {X Y} → (D : Desc) →
+              Free D X → (X → Free D Y) → Free D Y
+      subst {X}{Y} D mx k =
+        induction (D *D X) (λ mx₁ → subst[ D ∶ mx ∶ k ])
+          (λ { (true , x) tt → k x
+             ; (false , xs) as → ⟨ false , help D xs as ⟩ })
+          mx
+        where help : ∀ {X Y} D → (ds : ⟦ D ⟧ X) → All D (λ _ → Y) ds → ⟦ D ⟧ Y
+              help `X ds as = as
+              help (`K x) ds as = ds
+              help (D₁ `× D₂) (ds₁ , ds₂) (as₁ , as₂) = help D₁ ds₁ as₁ , help D₂ ds₂ as₂
+              help (D₁ `+ D₂) (inj₁ ds₁) as₁ = inj₁ (help D₁ ds₁ as₁)
+              help (D₁ `+ D₂) (inj₂ ds₂) as₂ = inj₂ (help D₂ ds₂ as₂)
+              help (`Σ S D₁) (s , ds) as = s , help (D₁ s) ds as
+              help (`Π S D₁) ds as = λ s → help (D₁ s) (ds s) (as s)
+
+    open Solution-FreeMonad
+.. END HIDE
 
 ..
   ::
@@ -1929,6 +2228,13 @@ language, this would mean having two "programming languages" in the
 programming language, one for generic programming and the other for
 programming.
 
+.. BEGIN HIDE
+  ::
+    module Exercise-DescD where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 There may be two solutions to this problem: either we (pragmatically)
 make the generic programming language to borrow as much as possible
 from the programming language, or we (brutally) collapse the
@@ -1937,34 +2243,71 @@ obvious reasons (having to do with full employment), we chose the
 latter. The key idea consists in noticing that ``Desc`` itself is an
 inductive type. As such, it can be described::
 
-    DescD : Desc
-    DescD =  `K ⊤
-          `+ `K Set
-          `+ (`X `× `X)
-          `+ (`X `× `X)
-          `+ (`Σ Set λ S → `Π S (λ _ → `X))
-          `+ (`Σ Set λ S → `Π S (λ _ → `X))
+      DescD : Desc
+      DescD =  ?
 
-    Desc' : Set₁
-    Desc' = μ DescD
+      Desc' : Set₁
+      Desc' = μ DescD
 
-    `X' : Desc'
-    `X' = ⟨ inj₁ tt ⟩
+      `X' : Desc'
+      `X' = ?
 
-    `K' : Set → Desc'
-    `K' S = ⟨ inj₂ (inj₁ S) ⟩
+      `K' : Set → Desc'
+      `K' S = ?
 
-    _`×'_ : Desc' → Desc' → Desc'
-    D₁ `×' D₂ = ⟨ inj₂ (inj₂ (inj₁ (D₁ , D₂) )) ⟩
+      _`×'_ : Desc' → Desc' → Desc'
+      D₁ `×' D₂ = ?
 
-    _`+'_ : Desc' → Desc' → Desc'
-    D₁ `+' D₂ = ⟨ inj₂ (inj₂ (inj₂ (inj₁ (D₁ , D₂) ))) ⟩
+      _`+'_ : Desc' → Desc' → Desc'
+      D₁ `+' D₂ = ?
 
-    `Σ' : (S : Set)(T : S → Desc') → Desc'
-    `Σ' S T = ⟨ inj₂ (inj₂ (inj₂ (inj₂ (inj₁ (S , T))))) ⟩
+      `Σ' : (S : Set)(T : S → Desc') → Desc'
+      `Σ' S T = ?
 
-    `Π' : (S : Set)(T : S → Desc') → Desc'
-    `Π' S T = ⟨ inj₂ (inj₂ (inj₂ (inj₂ (inj₂ (S , T))))) ⟩
+      `Π' : (S : Set)(T : S → Desc') → Desc'
+      `Π' S T = ?
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-DescD where
+
+      infixr 50 _`×'_
+      infixr 30 _`+'_
+
+      DescD : Desc
+      DescD =  `K ⊤
+            `+ `K Set
+            `+ (`X `× `X)
+            `+ (`X `× `X)
+            `+ (`Σ Set λ S → `Π S (λ _ → `X))
+            `+ (`Σ Set λ S → `Π S (λ _ → `X))
+
+      Desc' : Set₁
+      Desc' = μ DescD
+
+      `X' : Desc'
+      `X' = ⟨ inj₁ tt ⟩
+
+      `K' : Set → Desc'
+      `K' S = ⟨ inj₂ (inj₁ S) ⟩
+
+      _`×'_ : Desc' → Desc' → Desc'
+      D₁ `×' D₂ = ⟨ inj₂ (inj₂ (inj₁ (D₁ , D₂) )) ⟩
+
+      _`+'_ : Desc' → Desc' → Desc'
+      D₁ `+' D₂ = ⟨ inj₂ (inj₂ (inj₂ (inj₁ (D₁ , D₂) ))) ⟩
+
+      `Σ' : (S : Set)(T : S → Desc') → Desc'
+      `Σ' S T = ⟨ inj₂ (inj₂ (inj₂ (inj₂ (inj₁ (S , T))))) ⟩
+
+      `Π' : (S : Set)(T : S → Desc') → Desc'
+      `Π' S T = ⟨ inj₂ (inj₂ (inj₂ (inj₂ (inj₂ (S , T))))) ⟩
+
+    open Solution-DescD
+.. END HIDE
+
 
 Note that, aside from the constructor ``⟨_⟩`` of ``μ``, the
 constructor of ``Desc'`` only depend on constructors pre-existing in
