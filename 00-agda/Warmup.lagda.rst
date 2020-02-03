@@ -132,6 +132,17 @@ of ``(a : A) × B``. Again, a sequence of Σ-types is written ``(a₁ :
 A₁)(a₂ : A₂)...(aₙ : Aₙ) × B``, dispensing with the intermediate
 products.
 
+Since computation can occur at the type-level, we have to consider
+types up to conversion:
+
+.. code-block:: none
+
+   Γ ⊢ t ∈ S
+   S ≡ T        
+   ---------
+   Γ ⊢ t ∈ T
+
+
 ************************************************
 Motivating example: evolution of a type-checker
 ************************************************
