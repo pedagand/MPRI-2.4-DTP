@@ -14,8 +14,7 @@
 
   open import Function hiding (id ; const)
 
-  open import Relation.Binary.PropositionalEquality hiding (naturality ; Extensionality)
-  open import Axiom.Extensionality.Propositional
+  open import Relation.Binary.PropositionalEquality hiding (naturality)
 
   module 02-dependent.Indexed where
 
