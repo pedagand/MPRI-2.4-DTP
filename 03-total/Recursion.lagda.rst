@@ -6,8 +6,8 @@
 
   open import Data.Empty
   open import Data.Unit hiding (_≤_ ; _≤?_)
-  open import Data.Bool hiding (_≤?_)
-  open import Data.Maybe hiding (map ; _>>=_)
+  open import Data.Bool
+  open import Data.Maybe hiding (map)
   import Data.Maybe.Categorical
   open import Data.Product hiding (map)
   open import Data.Sum hiding (map)
@@ -82,7 +82,7 @@ First-order Unification
   ::
   module UnifNaive where
 
-    open import Data.Maybe hiding (_>>=_)
+    open import Data.Maybe
     open import Category.Monad
     open RawMonadZero {Level.zero} Data.Maybe.Categorical.monadZero
 

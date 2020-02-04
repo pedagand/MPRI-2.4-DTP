@@ -1466,40 +1466,40 @@ As a result, a shapely list of functors is itself a dimension.
   ::
     module Solution-instances where
 
-      HyperThing : ∀ {Fs} → Shapely Fs → (Thing : (Set → Set) → Set₁) →
-                    {{ _ : Thing Id}} →
-                    {{ _ : ∀ {F G} → {{_ : Thing F}}{{ _ : Thing G}} → Thing (Seq F G)}} →
-                    (∀ {F} → Dimension F → Thing F) → Thing (Hyper Fs)
-      HyperThing {[]} tt Thing {{pscalar}} pdim = pscalar
-      HyperThing {F ∷ Fs} (dimF , shapeFs) Thing {{pscalar}}{{pcomp}} pdim =
-                let instance recP : Thing (Hyper Fs)
-                             recP = HyperThing {Fs} shapeFs Thing {{pscalar}} {{pcomp}} pdim
-                             f : Thing F
+      HyperProp : ∀ {Fs} → Shapely Fs → (Prop : (Set → Set) → Set₁) →
+                    {{ _ : Prop Id}} →
+                    {{ _ : ∀ {F G} → {{_ : Prop F}}{{ _ : Prop G}} → Prop (Seq F G)}} →
+                    (∀ {F} → Dimension F → Prop F) → Prop (Hyper Fs)
+      HyperProp {[]} tt Prop {{pscalar}} pdim = pscalar
+      HyperProp {F ∷ Fs} (dimF , shapeFs) Prop {{pscalar}}{{pcomp}} pdim =
+                let instance recP : Prop (Hyper Fs)
+                             recP = HyperProp {Fs} shapeFs Prop {{pscalar}} {{pcomp}} pdim
+                             f : Prop F
                              f = pdim dimF
                 in pcomp
 
       HyperFunctor : ∀ {Fs} → Shapely Fs → Functor (Hyper Fs)
-      HyperFunctor shapes = HyperThing shapes Functor
+      HyperFunctor shapes = HyperProp shapes Functor
                                       (Applicative.super ∘ Dimension.super₁)
 
       HyperApplicative : ∀ {Fs} → Shapely Fs → Applicative (Hyper Fs)
-      HyperApplicative shapes = HyperThing shapes Applicative
+      HyperApplicative shapes = HyperProp shapes Applicative
                                           (Dimension.super₁)
 
       HyperNaperian : ∀ {Fs} → Shapely Fs → Naperian (Hyper Fs)
-      HyperNaperian shapes = HyperThing shapes Naperian
+      HyperNaperian shapes = HyperProp shapes Naperian
                                        Dimension.super₂
 
       HyperFoldable : ∀ {Fs} → Shapely Fs → Foldable (Hyper Fs)
-      HyperFoldable shapes = HyperThing shapes Foldable
+      HyperFoldable shapes = HyperProp shapes Foldable
                                        (Traversable.super ∘ Dimension.super₃)
 
       HyperTraversable : ∀ {Fs} → Shapely Fs → Traversable (Hyper Fs)
-      HyperTraversable shapes = HyperThing shapes Traversable
+      HyperTraversable shapes = HyperProp shapes Traversable
                                           Dimension.super₃
 
       HyperDimension : ∀ {Fs} → Shapely Fs → Dimension (Hyper Fs)
-      HyperDimension shapes = HyperThing shapes Dimension id
+      HyperDimension shapes = HyperProp shapes Dimension id
 
     open Solution-instances
 
@@ -1695,9 +1695,7 @@ Intensional Generic Programming
 
     open import Level renaming (zero to 0ℓ) hiding (suc)
 
-    open import Relation.Binary.PropositionalEquality 
-      hiding (subst ; Extensionality)
-    open import Axiom.Extensionality.Propositional
+    open import Relation.Binary.PropositionalEquality hiding (subst)
 
     infixr 50 _`×_
     infixr 30 _`+_
