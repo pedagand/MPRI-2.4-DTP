@@ -546,9 +546,9 @@ embedded language. We want::
               (set s >>= (λ _ → get tt >>= k)) ↝ (set s >>= λ _ → k s)
 
 In English, this amounts to the following rules:
-  * rule ``get_get``: getting the current state twice is equivalent to getting it
+  * rule ``get-get``: getting the current state twice is equivalent to getting it
       only once
-  * rule ``set_set``: setting the state twice is equivalent to performing only the
+  * rule ``set-set``: setting the state twice is equivalent to performing only the
       last 'set'
   * rule ``get-set``: getting the current state and setting it back in is equivalent to
      doing nothing
