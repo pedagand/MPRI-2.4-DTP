@@ -117,11 +117,31 @@ Such stateful programs are built from two state-manipulating operations:
   * ``get``, which returns the current state
   * ``set``, which updates the current state
 
+.. BEGIN HIDE
+  ::
+    module Exercise-ΣState where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 We formalize this intuition with the following signature::
 
-    data ΣState (X : Set) : Set where
-      `get : ⊤ × (S → X) → ΣState X
-      `set : S × (⊤ → X) → ΣState X
+      data ΣState (X : Set) : Set where
+         {- COMPLETE -}
+ 
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-ΣState where
+
+      data ΣState (X : Set) : Set where
+        `get : ⊤ × (S → X) → ΣState X
+        `set : S × (⊤ → X) → ΣState X
+
+    open Solution-ΣState
+.. END HIDE
+
 
 .. BEGIN HIDE
   ::
@@ -194,21 +214,47 @@ notes using that language.
 Free term algebra for State
 --------------------------------
 
+.. BEGIN HIDE
+  ::
+    module Exercise-StateF where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 From a signature, we can build a *syntax* for writing stateful
 programs: we just need to combine 'get's, 'set's and pure computations
 ('return'). The resulting syntactic object is easily described by an
 inductive type::
 
-    data StateF (V : Set) : Set where
-      return : V → StateF V
-      op : ΣState (StateF V) → StateF V
+      data StateF (V : Set) : Set where
+        {- COMPLETE -}
+
+      return : ∀ {V} → V → StateF V
+      return = {!!}
 
 In this (very small) language, we have two smart constructors, ``get``
 and ``set``, whose definition can be `automatically derived from the
 signature <https://doi.org/10.1023/A:1023064908962>`_::
 
-    get : ⊤ → StateF S
-    get tt = op (`get (tt , λ s → return s))
+      get : ⊤ → StateF S
+      get tt = {!!}
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-StateF where
+
+      data StateF (V : Set) : Set where
+        return : V → StateF V
+        op : ΣState (StateF V) → StateF V
+
+      get : ⊤ → StateF S
+      get tt = op (`get (tt , λ s → return s))
+
+    open Solution-StateF
+.. END HIDE
+
 
 .. BEGIN HIDE
   ::
@@ -600,21 +646,44 @@ already know a State monad, which is usually defined as ``S → S × V``
 to represent stateful computations using a single memory reference of
 sort ``S`` and returning a result of sort ``V``.
 
+.. BEGIN HIDE
+   ::
+    module Exercise-State where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 However, in type theory (and in programming in general) quotienting
 must be engineered. After thinking very hard, one realizes that every
 term of ``StateF`` quotiented by ``∼`` will start with a ``get``,
 followed by a ``set``, concluded with a ``return``. We thus expect the
 following normal form::
 
-    State : Set → Set
-    State V = ΣGet (ΣSet V)
+      State : Set → Set
+      State V = {!!}
 
 Unfolding the definition of ``ΣGet`` and ``ΣSet``, we realize that
 this type is in fact isomorphic to ``S → S × V``: we have recovered
 Haskell's ``State`` monad::
 
-    STATE : Set → Set
-    STATE V = S → S × V
+      STATE : Set → Set
+      STATE V = {!!}
+
+.. END BLOCK
+
+
+.. BEGIN HIDE
+   ::
+    module Solution-State where
+
+       State : Set → Set
+       State V = ΣGet (ΣSet V)
+
+       STATE : Set → Set
+       STATE V = S → S × V
+
+    open Solution-State
+.. END HIDE
 
 It remains to substantiate this claim that *every* stateful program is
 equivalent to a ``get`` followed by a ``set``. In the great tradition
@@ -993,17 +1062,40 @@ stateful computation, which is useful in and of itself: this is the
 foundation for effect handlers. The above proof establish the
 correctness of our definitions.
 
+.. BEGIN HIDE
+  :: 
+    module Exercise-tests where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 However, being in type theory, we can also consider the above proofs
 as providing us a reflexive decision procedure for equality of
 stateful programs. For instance we can "prove" (by a trivial
 reasoning) that our earlier programs ``test0``, ``test1`` and
 ``test2`` are all equivalent::
 
-    test01 : test0 ∼ test1
-    test01 = sound test0 test1 refl
+      test01 : test0 ∼ test1
+      test01 = {!!}
 
-    test12 : test1 ∼ test2
-    test12 = sound test1 test2 refl
+      test12 : test1 ∼ test2
+      test12 = {!!}
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  :: 
+    module Solution-tests where
+
+      test01 : test0 ∼ test1
+      test01 = sound test0 test1 refl
+
+      test12 : test1 ∼ test2
+      test12 = sound test1 test2 refl
+
+    open Solution-tests
+
+.. END HIDE
 
 The trick here is to rely on the soundness of normalization and
 compare the norm forms for (propositional!) equality. This proof

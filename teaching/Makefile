@@ -1,5 +1,4 @@
-TARGETS=01-effectful/Monad.lagda.rst   \
-        02-dependent/Indexed.lagda.rst \
+TARGETS=02-dependent/Indexed.lagda.rst \
 	03-total/Recursion.lagda.rst \
 	04-generic/Desc.lagda.rst \
 	05-open/Problems.lagda.rst
