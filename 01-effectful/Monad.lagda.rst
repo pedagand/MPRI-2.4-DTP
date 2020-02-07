@@ -1697,8 +1697,10 @@ About syntax
 The ``return`` and bind operator ``_>>=_`` are so ubiquitous that
 `syntactic sugar`_ has been introduced to lighten the notational load
 of monadic programs. Haskell introduced the ``do`` notation, which has
-been adapted to Agda. One can for example write the following in the
-``List`` monad::
+been adapted to Agda, starting with version 2.6. One can for example
+write the following in the ``List`` monad:
+
+.. code-block:: agda
 
   open import Category.Monad
   import Data.List.Categorical
