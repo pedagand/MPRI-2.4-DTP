@@ -586,7 +586,7 @@ Iteratively, a substitution counts the upper-bound of variables::
 .. END HIDE
 
 .. BEGIN BLOCK
-::
+  ::
 
       ⟦_⟧ : ∀ {m n} → Subst m n → (Var m → Term n)
       ⟦ ρ ⟧ = {!!}
@@ -1132,9 +1132,10 @@ predicate transformer computing the necessary hypothesis::
 .. END HIDE
 
 .. BEGIN BLOCK
-::
+  ::
         Rec-ℕ : RecStruct ℕ
         Rec-ℕ P n = {!!}
+
 .. END BLOCK
 
 .. BEGIN HIDE
@@ -1162,9 +1163,10 @@ able to prove any induction hypothesis::
 .. END HIDE
 
 .. BEGIN BLOCK
-::
+  ::
         rec-ℕ-builder : RecursorBuilder Rec-ℕ
         rec-ℕ-builder P f n = {!!}
+
 .. END BLOCK
 
 .. BEGIN HIDE
