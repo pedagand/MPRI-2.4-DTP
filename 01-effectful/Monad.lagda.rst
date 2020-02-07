@@ -85,9 +85,9 @@ Nowadays:
   open import Level hiding (suc)
 
   open import Data.Unit hiding (setoid ; _≟_)
-  open import Data.Nat renaming (_*_ to _*ℕ_)
+  open import Data.Nat renaming (_*_ to _*ℕ_ ; _≟_ to _≟ℕ_)
   open import Data.Nat.DivMod
-  open import Data.Fin hiding (_+_ ; raise ; _-_ ; _≟_)
+  open import Data.Fin hiding (_+_ ; raise ; _-_ )
   open import Data.Product
 
   open import Function
@@ -1378,7 +1378,7 @@ Quicksort in Coq`_ ).
 
         insert : ℕ → List ℕ → Count (List ℕ)
         insert n [] = returnC (n ∷ [])
-        insert n (m ∷ xs) = count (n ≟ m) >>=C (λ {
+        insert n (m ∷ xs) = count (n ≟ℕ m) >>=C (λ {
                             (yes p) → returnC (n ∷ m ∷ xs) ;
                             (no ¬p) → insert n xs >>=C λ xs' →
                                       returnC (m ∷ xs') })

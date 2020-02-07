@@ -69,7 +69,7 @@ Extensional Generic Programming
     open import Data.Nat
     open import Data.Fin hiding (_+_)
     open import Data.List
-      hiding (map ; replicate ; zipWith ; foldr ; sum ; lookup ; tabulate)
+      hiding (map ; replicate ; zipWith ; foldr ; sum ; tabulate ; lookup)
 
     open import Relation.Binary.PropositionalEquality
 

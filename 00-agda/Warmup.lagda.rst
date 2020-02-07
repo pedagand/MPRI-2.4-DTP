@@ -6,9 +6,9 @@
 Warming up
 ================================================================
 
-These lecture notes have been prepared with Agda (version TODO) and
-the Agda standard library (version TODO). These are readily available
-in Debian TODO and Ubuntu TODO, for example.
+These lecture notes have been prepared with Agda (version 2.5.4.1) and
+the Agda standard library (version 0.17). These are readily available
+in Debian buster and Ubuntu disco, for example.
 
 Cheatsheets:
   - `Install Agda`_

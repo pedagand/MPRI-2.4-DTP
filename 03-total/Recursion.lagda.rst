@@ -670,16 +670,16 @@ is able to spot it::
 
     flex-flex {zero} ()
     flex-flex {suc _} x y with x Δ y
-    ... | just y' = -, id ∷[ var y' / x ]
-    ... | nothing = -, id
+    ... | just y' = _ , id ∷[ var y' / x ]
+    ... | nothing = _ , id
 
     flex-rigid {0} ()
     flex-rigid {suc _} x t = check x t >>= λ t' →
-                             return (-, id ∷[ t' / x ])
+                             return (_ , id ∷[ t' / x ])
 
 
     mgu : ∀ {m} → (s t : Term m) → Maybe (∃ (Subst m))
-    mgu s t = amgu s t (-, id)
+    mgu s t = amgu s t (_ , id)
 
 .. BEGIN HIDE
   ::
@@ -691,11 +691,11 @@ is able to spot it::
     v₃ = var (suc (suc (suc zero)))
 
     test₁ : mgu (fork v₀ leaf) (fork (fork leaf leaf) v₁)
-          ≡ just (-, ((id ∷[ leaf / zero ]) ∷[ (fork leaf leaf) / zero ]))
+          ≡ just (_ , ((id ∷[ leaf / zero ]) ∷[ (fork leaf leaf) / zero ]))
     test₁ = refl
 
     test₂ : mgu (fork v₀ leaf) (fork (fork leaf leaf) v₃)
-          ≡ just (-, ((id ∷[ leaf / (suc (suc zero)) ]) ∷[ (fork leaf leaf) / zero ]))
+          ≡ just (_ , ((id ∷[ leaf / (suc (suc zero)) ]) ∷[ (fork leaf leaf) / zero ]))
     test₂ = refl
 
     test₃ : mgu v₀ (fork leaf v₀)
@@ -707,7 +707,7 @@ is able to spot it::
     test₄ = refl
 
     test₅ : mgu (fork v₀ v₁) (fork (fork leaf v₁) (fork leaf leaf))
-            ≡ just (-, id ∷[ fork leaf leaf / zero ] ∷[ fork leaf (var zero) / zero ])
+            ≡ just (_ , id ∷[ fork leaf leaf / zero ] ∷[ fork leaf (var zero) / zero ])
     test₅ = refl
 
 .. END HIDE
@@ -922,14 +922,14 @@ context/list::
 
         []C : ∀ {n} → Context n
         []C {zero} = tt
-        []C {suc n} = (-, []) , []C
+        []C {suc n} = (_ , []) , []C
 
         _▹C_ : ∀ {n} → Context (suc n) → Formula n → Context (suc n)
-        _▹C_ ((_ , B) , Γ) P = (-, B ▹ P) , Γ
+        _▹C_ ((_ , B) , Γ) P = (_ , B ▹ P) , Γ
 
         _++C_ : ∀ {n} → Context n → Context n → Context n
         _++C_ {zero} tt tt = tt
-        _++C_ {suc n} ((_ , B₁) , Γ₁) ((_ , B₂) , Γ₂) = (-, B₁ ++ B₂) , Γ₁ ++C Γ₂
+        _++C_ {suc n} ((_ , B₁) , Γ₁) ((_ , B₂) , Γ₂) = (_ , B₁ ++ B₂) , Γ₁ ++C Γ₂
 
       open Solution-context public
 .. END HIDE
@@ -962,7 +962,7 @@ obvious (to us, not to Agda)::
       _/_[_]⊢_ : ∀ {n l} → Vec (Formula n) l → Context n → Formula n → A → Bool
       search : ∀ {n} → Context n → A → Bool
 
-      B / Γ      ⊢ Atom α      = search ((-, B) , Γ) α
+      B / Γ      ⊢ Atom α      = search ((_ , B) , Γ) α
       B / B₂ , Γ ⊢ P ⊃ Q       = B / B₂ , Γ ▹C P  ⊢ Q
 
       B / Γ [ Atom α ]⊢ β      = ⌊ α ≟ β ⌋
@@ -1042,7 +1042,7 @@ definitions on ``Formulas``::
                 B / Γ [ Atom α ]⊢ β = ⌊ α ≟ β ⌋
                 B / Γ [ _⊃_ {n} P Q  ]⊢ β = B / Γ [ Q ]⊢ β ∧ B / Γ ⊢ P
                   where  _/_⊢_ : Vec (Formula (suc n)) (pred l) → Context (suc n) → Formula n → Bool
-                         B / Γ ⊢ Atom α = search ((-, B) , Γ) α
+                         B / Γ ⊢ Atom α = search ((_ , B) , Γ) α
                          B / B' , Γ ⊢ P ⊃ Q  = B / B' , Γ ▹C P  ⊢ Q
 
       _⊢_ : ∀ {n} → Context n → Formula n → Bool
