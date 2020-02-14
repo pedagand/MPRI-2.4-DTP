@@ -77,48 +77,82 @@ the value of its arguments depending on the user-provided format.
    sprintf "bar %s"    : String → String
    sprintf "baz %d %s" : ℕ → String → String
 
+.. BEGIN HIDE
+  ::
+    module Exercise-Format where
+
+.. END HIDE
+
+.. BEGIN BLOCK
+
 Formats are not random strings of characters:
   - structure = syntax (`format`)
-  - from string to structure = parser
+  - from string to structure = parser::
 
-::
+      data format : Set where
+        -- XXX: COMPLETE
 
-    data format : Set where
-      digit  : (k : format) → format
-      string : (k : format) → format
-      symb   : (c : Char)(k : format) → format
-      end    : format
-
-    parse : List Char → format
-    parse ('%' ∷ 'd' ∷ cs ) = digit (parse cs)
-    parse ('%' ∷ 's' ∷ cs ) = string (parse cs)
-    parse ('%' ∷ c ∷ cs )   = symb c (parse cs)
-    parse ( c ∷ cs)         = symb c (parse cs)
-    parse []                = end
+      parse : List Char → format
+      parse s = {!!}
 
 We can *embed* the semantics of a format by describing its meaning
 within Agda itself::
 
-    ⟦_⟧ : format → Set
-    ⟦ digit k ⟧  = ℕ → ⟦ k ⟧
-    ⟦ string k ⟧ = String → ⟦ k ⟧
-    ⟦ symb c k ⟧ = ⟦ k ⟧
-    ⟦ end ⟧      = String
+      ⟦_⟧ : format → Set
+      ⟦ fmt ⟧ = {!!}
 
-    ⟦p_⟧ : String → Set
-    ⟦p_⟧ = ⟦_⟧ ∘ parse ∘ toList
+      ⟦p_⟧ : String → Set
+      ⟦p_⟧ = ⟦_⟧ ∘ parse ∘ toList
 
 
 And we can easily realize this semantics::
 
-    eval : (fmt : format) → String → ⟦ fmt ⟧
-    eval (digit k) acc  = λ n → eval k (acc ++ showNat n)
-    eval (string k) acc = λ s → eval k (acc ++ s)
-    eval (symb c k) acc = eval k (acc ++ fromList (c ∷ []))
-    eval end acc        = acc
+      eval : (fmt : format) → String → ⟦ fmt ⟧
+      eval fmt acc  = {!!}
 
-    sprintf : (fmt : String) → ⟦p fmt ⟧
-    sprintf fmt = eval (parse (toList fmt)) ""
+      sprintf : (fmt : String) → ⟦p fmt ⟧
+      sprintf fmt = eval (parse (toList fmt)) ""
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-Format where
+
+      data format : Set where
+        digit  : (k : format) → format
+        string : (k : format) → format
+        symb   : (c : Char)(k : format) → format
+        end    : format
+
+      parse : List Char → format
+      parse ('%' ∷ 'd' ∷ cs ) = digit (parse cs)
+      parse ('%' ∷ 's' ∷ cs ) = string (parse cs)
+      parse ('%' ∷ '%' ∷ cs ) = symb '%' (parse cs)
+      parse ( c  ∷ cs)        = symb c (parse cs)
+      parse []                = end
+
+      ⟦_⟧ : format → Set
+      ⟦ digit k ⟧  = ℕ → ⟦ k ⟧
+      ⟦ string k ⟧ = String → ⟦ k ⟧
+      ⟦ symb c k ⟧ = ⟦ k ⟧
+      ⟦ end ⟧      = String
+
+      ⟦p_⟧ : String → Set
+      ⟦p_⟧ = ⟦_⟧ ∘ parse ∘ toList
+
+      eval : (fmt : format) → String → ⟦ fmt ⟧
+      eval (digit k) acc  = λ n → eval k (acc ++ showNat n)
+      eval (string k) acc = λ s → eval k (acc ++ s)
+      eval (symb c k) acc = eval k (acc ++ fromList (c ∷ []))
+      eval end acc        = acc
+
+      sprintf : (fmt : String) → ⟦p fmt ⟧
+      sprintf fmt = eval (parse (toList fmt)) ""
+
+    open Solution-Format
+
+.. END HIDE
 
 ``sprintf`` can thus be seen as an interpreter for a small language
 (whose AST is described by ``format``) to the semantic domain
@@ -306,41 +340,91 @@ which we can then interpret back into actual (monotone) functions::
 
 .. END HIDE
 
+.. BEGIN HIDE
+  ::
+    module Exercise-Context where
+
+.. END HIDE
+
+.. BEGIN BLOCK
+
 We can adapt this intentional characterization of monotone functions
 to typed embeddings::
 
-    data _⊇_ : context → context → Set where
-      id    : ∀ {Γ} → Γ ⊇ Γ
-      weak1 : ∀ {Γ Δ A} → (wk : Δ ⊇ Γ) → Δ ▹ A ⊇ Γ
-      weak2 : ∀ {Γ Δ A} → (wk : Δ ⊇ Γ) → Δ ▹ A ⊇ Γ ▹ A
+      data _⊇_ : context → context → Set where
+        id    : ∀ {Γ} → Γ ⊇ Γ
+        -- XXX: COMPLETE
+        weak1 : {!!} → {!!} ⊇ {!!}
+        weak2 : {!!} → {!!} ⊇ {!!}
 
-    shift : ∀ {Γ Δ T} → Γ ⊇ Δ → T ∈ Δ → T ∈ Γ
-    shift id v                 = v
-    shift (weak1 wk) v         = there (shift wk v)
-    shift (weak2 wk) here      = here
-    shift (weak2 wk) (there v) = there (shift wk v)
+      shift : ∀ {Γ Δ T} → Γ ⊇ Δ → T ∈ Δ → T ∈ Γ
+      shift wk v = {!!}
 
-    rename : ∀ {Γ Δ T} → Γ ⊇ Δ → Δ ⊢ T → Γ ⊢ T
-    rename wk (lam t)    = lam (rename (weak2 wk) t)
-    rename wk (var v)    = var (shift wk v)
-    rename wk (f ! s)    = rename wk f ! rename wk s
-    rename wk tt         = tt
-    rename wk (pair a b) = pair (rename wk a) (rename wk b)
-    rename wk (fst p)    = fst (rename wk p)
-    rename wk (snd p)    = snd (rename wk p)
+      rename : ∀ {Γ Δ T} → Γ ⊇ Δ → Δ ⊢ T → Γ ⊢ T
+      rename wk (lam t)    = lam {!!}
+      rename wk (var v)    = var {!!}
+      rename wk (f ! s)    = rename wk f ! rename wk s
+      rename wk tt         = tt
+      rename wk (pair a b) = pair (rename wk a) (rename wk b)
+      rename wk (fst p)    = fst (rename wk p)
+      rename wk (snd p)    = snd (rename wk p)
 
-    sub : ∀ {Γ Δ T} → Γ ⊢ T → (∀ {S} → S ∈ Γ →  Δ ⊢ S) → Δ ⊢ T
-    sub (lam t) ρ    = lam (sub t (λ { here      → var here ;
-                                       (there v) → rename (weak1 id) (ρ v) }))
-    sub (var v) ρ    = ρ v
-    sub (f ! s) ρ    = sub f ρ ! sub s ρ
-    sub tt ρ         = tt
-    sub (pair a b) ρ = pair (sub a ρ) (sub b ρ)
-    sub (fst p) ρ    = fst (sub p ρ)
-    sub (snd p) ρ    = snd (sub p ρ)
+      sub : ∀ {Γ Δ T} → Γ ⊢ T → (∀ {S} → S ∈ Γ →  Δ ⊢ S) → Δ ⊢ T
+      sub (lam t) ρ    = lam {!!}
+      sub (var v) ρ    = {!!}
+      sub (f ! s) ρ    = sub f ρ ! sub s ρ
+      sub tt ρ         = tt
+      sub (pair a b) ρ = pair (sub a ρ) (sub b ρ)
+      sub (fst p) ρ    = fst (sub p ρ)
+      sub (snd p) ρ    = snd (sub p ρ)
 
-    sub1 : ∀ {Γ S T} → Γ ▹ S ⊢ T → Γ ⊢ S → Γ ⊢ T
-    sub1 t s = sub t (λ { here → s ; (there v) → var v })
+      sub1 : ∀ {Γ S T} → Γ ▹ S ⊢ T → Γ ⊢ S → Γ ⊢ T
+      sub1 t s = {!!}
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-Context where
+
+      data _⊇_ : context → context → Set where
+        id    : ∀ {Γ} → Γ ⊇ Γ
+        weak1 : ∀ {Γ Δ A} → (wk : Δ ⊇ Γ) → Δ ▹ A ⊇ Γ
+        weak2 : ∀ {Γ Δ A} → (wk : Δ ⊇ Γ) → Δ ▹ A ⊇ Γ ▹ A
+
+      shift : ∀ {Γ Δ T} → Γ ⊇ Δ → T ∈ Δ → T ∈ Γ
+      shift id v                 = v
+      shift (weak1 wk) v         = there (shift wk v)
+      shift (weak2 wk) here      = here
+      shift (weak2 wk) (there v) = there (shift wk v)
+
+      rename : ∀ {Γ Δ T} → Γ ⊇ Δ → Δ ⊢ T → Γ ⊢ T
+      rename wk (lam t)    = lam (rename (weak2 wk) t)
+      rename wk (var v)    = var (shift wk v)
+      rename wk (f ! s)    = rename wk f ! rename wk s
+      rename wk tt         = tt
+      rename wk (pair a b) = pair (rename wk a) (rename wk b)
+      rename wk (fst p)    = fst (rename wk p)
+      rename wk (snd p)    = snd (rename wk p)
+
+      sub : ∀ {Γ Δ T} → Γ ⊢ T → (∀ {S} → S ∈ Γ →  Δ ⊢ S) → Δ ⊢ T
+      sub (lam t) ρ    = lam (sub t (λ { here      → var here ;
+                                         (there v) → rename (weak1 id) (ρ v) }))
+      sub (var v) ρ    = ρ v
+      sub (f ! s) ρ    = sub f ρ ! sub s ρ
+      sub tt ρ         = tt
+      sub (pair a b) ρ = pair (sub a ρ) (sub b ρ)
+      sub (fst p) ρ    = fst (sub p ρ)
+      sub (snd p) ρ    = snd (sub p ρ)
+
+      sub1 : ∀ {Γ S T} → Γ ▹ S ⊢ T → Γ ⊢ S → Γ ⊢ T
+      sub1 t s = sub t (λ { here → s ; (there v) → var v })
+
+    open Solution-Context public
+
+.. END HIDE
+
+
 
 A formal treatment of this construction can be found in `Formalized
 metatheory with terms represented by an indexed family of types`_, for
@@ -544,14 +628,42 @@ Compute η-long β-normal forms for the simply typed λ-calculus:
        fst  : (p : term) → term
        snd  : (p : term) → term
 
-    ⟦_⟧Type : type → Set
-    ⟦ unit ⟧Type  = term
-    ⟦ S ⇒ T ⟧Type = ⟦ S ⟧Type → ⟦ T ⟧Type
-    ⟦ S * T ⟧Type = ⟦ S ⟧Type × ⟦ T ⟧Type
+.. BEGIN HIDE
+  ::
+    module Exercise-interp where
 
-    ⟦_⟧context : context → Set
-    ⟦ ε ⟧context     = ⊤
-    ⟦ Γ ▹ T ⟧context = ⟦ Γ ⟧context × ⟦ T ⟧Type
+.. END HIDE
+
+.. BEGIN BLOCK
+  ::
+
+      ⟦_⟧Type : type → Set
+      ⟦ T ⟧Type = {!!}
+
+      ⟦_⟧context : context → Set
+      ⟦ Γ ⟧context = {!!}
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+
+    module Solution-interp where
+
+      ⟦_⟧Type : type → Set
+      ⟦ unit ⟧Type  = term
+      ⟦ S ⇒ T ⟧Type = ⟦ S ⟧Type → ⟦ T ⟧Type
+      ⟦ S * T ⟧Type = ⟦ S ⟧Type × ⟦ T ⟧Type
+
+      ⟦_⟧context : context → Set
+      ⟦ ε ⟧context     = ⊤
+      ⟦ Γ ▹ T ⟧context = ⟦ Γ ⟧context × ⟦ T ⟧Type
+
+    open Solution-interp
+
+.. END HIDE
+
+::
 
     _⊩_ : context → type → Set
     Γ ⊩ T = ⟦ Γ ⟧context → ⟦ T ⟧Type
@@ -589,22 +701,46 @@ generator, ``gensym``::
 This would be the case if we were to write this program in OCaml, for
 instance.
 
+.. BEGIN HIDE
+  ::
+      module Exercise-reify-reflect1 where
+
+.. END HIDE
+
+.. BEGIN BLOCK
+
 We could then back-translate the objects in the model (``⟦_⟧Type``)
 back to raw terms (through ``reify``). However, to do so, one needs to
 inject variables *in η-long normal form* into the model: this is the
 role of ``reflect``::
 
-      reify : ∀{T} → ⟦ T ⟧Type → term
-      reflect : (T : type) → term → ⟦ T ⟧Type
+        reify : ∀{T} → ⟦ T ⟧Type → term
+        reflect : (T : type) → term → ⟦ T ⟧Type
 
-      reify {unit} nf       = nf
-      reify {A * B} (x , y) = pair (reify x) (reify y)
-      reify {S ⇒ T} f       = let s = gensym tt in
-                              lam s (reify (f (reflect S (var s))))
+        reify {T} t = {!!}
+        reflect T t = {!!}
 
-      reflect unit nf     = nf
-      reflect (A * B) nf  = reflect A (fst nf) , reflect B (snd nf)
-      reflect (S ⇒ T) neu = λ s → reflect T (neu ! reify s)
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+      module Solution-reify-reflect1 where
+
+        reify : ∀{T} → ⟦ T ⟧Type → term
+        reflect : (T : type) → term → ⟦ T ⟧Type
+
+        reify {unit} nf       = nf
+        reify {A * B} (x , y) = pair (reify x) (reify y)
+        reify {S ⇒ T} f       = let s = gensym tt in
+                                lam s (reify (f (reflect S (var s))))
+
+        reflect unit nf     = nf
+        reflect (A * B) nf  = reflect A (fst nf) , reflect B (snd nf)
+        reflect (S ⇒ T) neu = λ s → reflect T (neu ! reify s)
+
+      open Solution-reify-reflect1
+
+.. END HIDE
 
 Given a λ-term, we can thus compute its normal form::
 
@@ -865,25 +1001,57 @@ An implication in ``Sem`` is a family of implications for each context::
       where open Sem P renaming (_⊢ to _⊢P)
             open Sem Q renaming (_⊢ to _⊢Q)
 
+.. BEGIN HIDE
+  ::
+    module Exercise-rename where
+
+.. END HIDE
+
+.. BEGIN BLOCK
+
 We easily check that normal forms and neutral terms implement this
 interface::
 
-    rename-Nf : ∀{Γ Δ T} → Γ ⊇ Δ → Δ ⊢Nf T → Γ ⊢Nf T
-    rename-Ne : ∀{Γ Δ T} → Γ ⊇ Δ → Δ ⊢Ne T → Γ ⊢Ne T
+      rename-Nf : ∀{Γ Δ T} → Γ ⊇ Δ → Δ ⊢Nf T → Γ ⊢Nf T
+      rename-Ne : ∀{Γ Δ T} → Γ ⊇ Δ → Δ ⊢Ne T → Γ ⊢Ne T
 
-    rename-Nf wk (lam b)       = lam (rename-Nf (weak2 wk) b)
-    rename-Nf wk (ground grnd) = ground (rename-Ne wk grnd)
-    rename-Nf wk (pair a b)    = pair (rename-Nf wk a) (rename-Nf wk b)
-    rename-Nf wk tt            = tt
+      rename-Nf wk (lam b)       = lam {!!}
+      rename-Nf wk (ground grnd) = ground (rename-Ne wk grnd)
+      rename-Nf wk (pair a b)    = pair (rename-Nf wk a) (rename-Nf wk b)
+      rename-Nf wk tt            = tt
 
-    rename-Ne wk (var v)       = var (shift wk v)
-    rename-Ne wk (f ! s)       = (rename-Ne wk f) ! (rename-Nf wk s)
-    rename-Ne wk (fst p)       = fst (rename-Ne wk p)
-    rename-Ne wk (snd p)       = snd (rename-Ne wk p)
+      rename-Ne wk (var v)       = {!!}
+      rename-Ne wk (f ! s)       = (rename-Ne wk f) ! (rename-Nf wk s)
+      rename-Ne wk (fst p)       = fst (rename-Ne wk p)
+      rename-Ne wk (snd p)       = snd (rename-Ne wk p)
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+    module Solution-rename where
+
+      rename-Nf : ∀{Γ Δ T} → Γ ⊇ Δ → Δ ⊢Nf T → Γ ⊢Nf T
+      rename-Ne : ∀{Γ Δ T} → Γ ⊇ Δ → Δ ⊢Ne T → Γ ⊢Ne T
+
+      rename-Nf wk (lam b)       = lam (rename-Nf (weak2 wk) b)
+      rename-Nf wk (ground grnd) = ground (rename-Ne wk grnd)
+      rename-Nf wk (pair a b)    = pair (rename-Nf wk a) (rename-Nf wk b)
+      rename-Nf wk tt            = tt
+
+      rename-Ne wk (var v)       = var (shift wk v)
+      rename-Ne wk (f ! s)       = (rename-Ne wk f) ! (rename-Nf wk s)
+      rename-Ne wk (fst p)       = fst (rename-Ne wk p)
+      rename-Ne wk (snd p)       = snd (rename-Ne wk p)
+
+    open Solution-rename
+  
+.. END HIDE
+  ::
 
     Nf̂ : type → Sem
     Nf̂ T = record { _⊢ = λ Γ → Γ ⊢Nf T
-                    ; ren = rename-Nf }
+                  ; ren = rename-Nf }
 
     Nê : type → Sem
     Nê T = record { _⊢ = λ Γ → Γ ⊢Ne T
@@ -932,11 +1100,11 @@ We may be tempted to define the exponential in a pointwise manner too:
 
     _⟦⇒⟧_ : Sem → Sem → Sem
     P ⟦⇒⟧ Q = record { _⊢ = λ Γ → Γ ⊢P → Γ ⊢Q
-                   ; ren = ?! }
+                     ; ren = ?! }
       where open Sem P renaming (_⊢ to _⊢P)
             open Sem Q renaming (_⊢ to _⊢Q)
 
-However, we are bitten by the contra-variance of the domain: there is
+However, we are bitten by the contravariance of the domain: there is
 no way to implement ``ren`` with such a definition.
 
 -------------------------------------
@@ -958,9 +1126,10 @@ application of ``ren-T``, we can implement::
       ψ t wk = ren-T wk t
 
 where the ``∀ {Δ} →`` quantifier of the codomain type must be
-understood in a polymorphic sense. Surprisingly (perhaps), we can go
-from the polymorphic function back to a single element, by providing
-the ``id`` continuation::
+understood in a polymorphic sense (more precisely, parametric
+polymorphism). Surprisingly (perhaps), we can go from the polymorphic
+function back to a single element, by providing the ``id``
+continuation::
 
       φ : (∀ {Δ} → Δ ⊇ Γ → Δ ⊢T) → Γ ⊢T
       φ k = k id
@@ -994,6 +1163,10 @@ isomorphism between the object ``Γ ⊢T`` and the morphisms in ``⊇[ Γ ]
 
       φ' : ⊇[ Γ ] ⟦⊢⟧ T → Γ ⊢T
       φ' k = k id
+
+      postulate
+        ψ'∘φ'≡id : ψ' ∘ φ' ≡ λ k → k
+        φ'∘ψ'≡id : φ' ∘ ψ' ≡ λ t → t
 
 
 Being isomorphic to ``_ ⊢T``, we expect the type ``λ Γ → ∀ {Δ} → Δ ⊇ Γ
@@ -1087,14 +1260,42 @@ syntactic object to its semantical counterpart::
     lookup here (_ , v)      = v
     lookup (there x) (γ , _) = lookup x γ
 
-    eval : ∀{Γ T} → Γ ⊢ T → Γ ⊩ T
-    eval {Γ} (lam {S}{T} b)    = ⟦lam⟧ {⟦ Γ ⟧C}{⟦ S ⟧}{⟦ T ⟧} (eval b)
-    eval (var v)               = lookup v
-    eval {Γ}{T} (_!_ {S} f s)  = ⟦app⟧ {⟦ Γ ⟧C}{⟦ S ⟧}{⟦ T ⟧} (eval f) (eval s)
-    eval {Γ} tt                = ⟦tt⟧ {⟦ Γ ⟧C}
-    eval {Γ} (pair {A}{B} a b) = ⟦pair⟧ {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval a) (eval b)
-    eval {Γ} (fst {A}{B} p)    = ⟦fst⟧ {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval p)
-    eval {Γ} (snd {A}{B} p)    = ⟦snd⟧ {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval p)
+.. BEGIN HIDE
+  ::
+    module Exercise-eval where
+.. END HIDE
+
+.. BEGIN BLOCK
+  ::
+
+      eval : ∀{Γ T} → Γ ⊢ T → Γ ⊩ T
+      eval {Γ} (lam {S}{T} b)    = {!!}
+      eval (var v)               = {!!}
+      eval {Γ}{T} (_!_ {S} f s)  = {!!}
+      eval {Γ} tt                = {!!}
+      eval {Γ} (pair {A}{B} a b) = {!!}
+      eval {Γ} (fst {A}{B} p)    = {!!}
+      eval {Γ} (snd {A}{B} p)    = {!!}
+
+.. END BLOCK
+
+.. BEGIN HIDE
+  ::
+
+    module Solution-eval where
+
+      eval : ∀{Γ T} → Γ ⊢ T → Γ ⊩ T
+      eval {Γ} (lam {S}{T} b)    = ⟦lam⟧ {⟦ Γ ⟧C}{⟦ S ⟧}{⟦ T ⟧} (eval b)
+      eval (var v)               = lookup v
+      eval {Γ}{T} (_!_ {S} f s)  = ⟦app⟧ {⟦ Γ ⟧C}{⟦ S ⟧}{⟦ T ⟧} (eval f) (eval s)
+      eval {Γ} tt                = ⟦tt⟧ {⟦ Γ ⟧C}
+      eval {Γ} (pair {A}{B} a b) = ⟦pair⟧ {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval a) (eval b)
+      eval {Γ} (fst {A}{B} p)    = ⟦fst⟧ {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval p)
+      eval {Γ} (snd {A}{B} p)    = ⟦snd⟧ {⟦ Γ ⟧C}{⟦ A ⟧}{⟦ B ⟧} (eval p)
+
+    open Solution-eval
+
+.. END HIDE
 
 Reify and reflect are defined for a given syntactic context, we
 therefore introduce suitable notations::
@@ -1107,26 +1308,57 @@ therefore introduce suitable notations::
     [ Γ ]⊩C Δ = Γ ⊢⟦Δ⟧C
       where open Sem ⟦ Δ ⟧C renaming (_⊢ to _⊢⟦Δ⟧C)
 
+.. BEGIN HIDE
+  ::
+    module Exercise-reify2 where
+.. END HIDE
+
+.. BEGIN BLOCK
+
 The sea has sufficiently risen: we can implement our initial plan,
 using the renaming operator ``ren`` equipping ``Sem`` in the function
 case in ``reify``::
 
-    reify : ∀ {T Γ} → [ Γ ]⊩ T  → Γ ⊢Nf T
-    reflect : ∀ {Γ} → (T : type) → Γ ⊢Ne T → [ Γ ]⊩ T
+      reify : ∀ {T Γ} → [ Γ ]⊩ T  → Γ ⊢Nf T
+      reflect : ∀ {Γ} → (T : type) → Γ ⊢Ne T → [ Γ ]⊩ T
 
-    reify {unit} v        = v
-    reify {A * B} (a , b) = pair (reify a) (reify b)
-    reify {S ⇒ T} f       = lam (reify (app {S}{T} (ren (weak1 id) f) (reflect S (var here))))
-      where open Sem ⟦ S ⇒ T ⟧
+      reify {unit} v        = {!!}
+      reify {A * B} (a , b) = {!!}
+      reify {S ⇒ T} f       = {!!}
+        where open Sem ⟦ S ⇒ T ⟧
+              app : ∀{S T Γ} → [ Γ ]⊩ (S ⇒ T) → [ Γ ]⊩ S → [ Γ ]⊩ T
+              app f s = f id s
 
-            app : ∀{S T Γ} → [ Γ ]⊩ (S ⇒ T) → [ Γ ]⊩ S → [ Γ ]⊩ T
-            app f s = f id s
+      reflect unit v    = {!!}
+      reflect (A * B) v = {!!}
+      reflect (S ⇒ T) v = {!!}
+        where open Sem (Nê (S ⇒ T))
 
-    reflect unit v    = ground v
-    reflect (A * B) v = reflect A (fst v) , reflect B (snd v)
-    reflect (S ⇒ T) v = λ w s → reflect T (ren w v ! reify s)
-      where open Sem (Nê (S ⇒ T))
+.. END BLOCK
 
+.. BEGIN HIDE
+  ::
+    module Solution-reify2 where
+
+      reify : ∀ {T Γ} → [ Γ ]⊩ T  → Γ ⊢Nf T
+      reflect : ∀ {Γ} → (T : type) → Γ ⊢Ne T → [ Γ ]⊩ T
+
+      reify {unit} v        = v
+      reify {A * B} (a , b) = pair (reify a) (reify b)
+      reify {S ⇒ T} f       = lam (reify (app {S}{T} (ren (weak1 id) f) (reflect S (var here))))
+        where open Sem ⟦ S ⇒ T ⟧
+
+              app : ∀{S T Γ} → [ Γ ]⊩ (S ⇒ T) → [ Γ ]⊩ S → [ Γ ]⊩ T
+              app f s = f id s
+
+      reflect unit v    = ground v
+      reflect (A * B) v = reflect A (fst v) , reflect B (snd v)
+      reflect (S ⇒ T) v = λ w s → reflect T (ren w v ! reify s)
+        where open Sem (Nê (S ⇒ T))
+
+    open Solution-reify2
+
+.. END HIDE
 
 We generalize ``reify`` to work on any "term in an environement",
 using the identity context, from which we obtain the normalization
@@ -1174,11 +1406,11 @@ implementation::
 Conclusion
 ************************************************
 
-In the first and second part, we have seen how inductive types and
+In the first part, we have seen how inductive types and
 families can be used to build initial models, supporting the
 definition of various interpretations in Agda itself.
 
-In the third part, we have seen how, by defining a richly-structured
+In the second part, we have seen how, by defining a richly-structured
 model, we could implement a typed model of the λ-calculus and
 manipulate binders in the model.
 
