@@ -904,13 +904,13 @@ To remedy this, let us
     data _⊢Nf_ (Γ : context) : type → Set
     data _⊢Ne_ (Γ : context) : type → Set
 
-    data _⊢Nf_ (Γ : context) where
+    data _⊢Nf_ Γ where
          lam    : ∀ {S T} → (b : Γ ▹ S ⊢Nf T) → Γ ⊢Nf S ⇒ T
          pair   : ∀ {A B} → Γ ⊢Nf A → Γ ⊢Nf B → Γ ⊢Nf A * B
          tt     : Γ ⊢Nf unit
          ground : (grnd : Γ ⊢Ne unit) → Γ ⊢Nf unit
 
-    data _⊢Ne_ (Γ : context) where
+    data _⊢Ne_ Γ where
        var : ∀{T} → (v : T ∈ Γ) → Γ ⊢Ne T
        _!_ : ∀{S T} → (f : Γ ⊢Ne S ⇒ T)(s : Γ ⊢Nf S) → Γ ⊢Ne T
        fst : ∀ {A B} → (p : Γ ⊢Ne A * B) → Γ ⊢Ne A
