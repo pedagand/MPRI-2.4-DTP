@@ -77,14 +77,14 @@ Module NormalForms.
   Notation "Γ ▷ t" := (ext_context Γ t) (at level 40).
   Derive NoConfusion for context.
 
-  Inductive in_env : type -> context -> Prop :=
+  Inductive in_env : type -> context -> Type :=
   | here {t Γ} : in_env t (Γ ▷ t)
   | there {t t' Γ} : in_env t Γ -> in_env t (Γ ▷ t').
   Notation "t ∈ Γ" := (in_env t Γ) (at level 50).
   Derive Signature for in_env.
 
   Reserved Notation "Γ ⊢ t" (at level 50).
-  Inductive has_type : context -> type -> Prop :=
+  Inductive has_type : context -> type -> Type :=
   | lam {Γ s t} :
       (Γ ▷ s) ⊢ t ->
       Γ ⊢ s ⇒ t
@@ -113,6 +113,13 @@ Module NormalForms.
     | zero {n : nat} : fin (S n)
     | suc {n : nat} (i : fin n) : fin (S n).
     Derive Signature for fin.
+
+    Fact fin_eq_suc {n} : forall (i j : fin n), suc i = suc j -> i = j.
+    Proof.
+      intros i j Heq.
+      inversion Heq.
+      apply Eqdep.EqdepTheory.inj_pair2 in H0. assumption.
+    Qed.
 
     Reserved Notation "x ⊇ y" (at level 50).
     Inductive geq : nat -> nat -> Type :=
@@ -320,4 +327,32 @@ Module NormalForms.
     | Γ ▷ T1 => ⟦ Γ ⟧context * ⟦ T1 ⟧Type
     end
   where "⟦ Γ ⟧context" := (interp_context Γ).
+
+  Definition interp_type_context (Γ : context) (T : type) : Type :=
+    ⟦ Γ ⟧context -> ⟦ T ⟧Type.
+  Notation "Γ ⊩ T" := (interp_type_context Γ T) (at level 50).
+
+  Fixpoint lookup {Γ T} (v : T ∈ Γ) : Γ ⊩ T :=
+    match v with
+    | here => fun '(_, x) => x
+    | there h => fun '(γ, _) => lookup h γ
+    end.
+
+  Fixpoint eval {Γ T} (t : Γ ⊢ T) : Γ ⊩ T :=
+    match t with
+    | var v => fun ρ => lookup v ρ
+    | app f s => fun ρ => eval f ρ (eval s ρ)
+    | lam b => fun ρ => fun s => eval b (ρ, s)
+    | pair a b => fun ρ => (eval a ρ , eval b ρ)
+    | fst p => fun ρ => Datatypes.fst (eval p ρ)
+    | snd p => fun ρ => Datatypes.snd (eval p ρ)
+    | tt => fun _ => Tt
+    end.
+
+  (** Let us, for simplicity, assume that we have access to a fresh name
+      generator, `gensym` *)
+  Axiom gensym : Datatypes.unit -> String.string.
+
+  (* TODO *)
+
 End NormalForms.

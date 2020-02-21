@@ -122,11 +122,11 @@ Module StateMonad.
     | red_set_get k s :
         StateF_red (set s >>= (fun _ => get tt >>= k))
                    (set s >>= fun _ => k s).
-  Notation "x ⇝ y" := (StateF_red x y) (at level 70).
+  Notation "x ⤳ y" := (StateF_red x y) (at level 70).
 
   Reserved Notation "x ∼ y" (at level 70).
   Inductive StateF_eq {V : Type} : StateF V -> StateF V -> Prop :=
-    | eq_red p q : (p ⇝ q) -> p ∼ q
+    | eq_red p q : (p ⤳ q) -> p ∼ q
     | eq_trans p q r : (p ∼ q) -> (q ∼ r) -> (p ∼ r)
     | eq_refl p : p ∼ p
     | eq_sym p q : p ∼ q -> q ∼ p
@@ -467,10 +467,14 @@ Module ND.
     end.
 
   (** Compute (non-deterministically) a permutation of list `l` *)
-  (* TODO *)
+  Fixpoint permut {X : Type} (l : list X) : Nondet (list X) :=
+    match l with
+    | nil => ret nil
+    | hd::tl => (permut tl >>= (fun tl => insert hd tl))
+    end.
 End ND.
 
-(* TODO random Monad *)
+(* TODO Random monad *)
 
 (** ***Counting/complexity monad *)
 Module Count.
@@ -556,3 +560,19 @@ Module CPS.
       bind _ _ x k := fun k' => x (fun x => k x k');
     }.
 End CPS.
+
+(** ***Maybe monad (for my personal use) *)
+Module Maybe.
+  Inductive Maybe (X : Type) : Type :=
+  | None : Maybe X
+  | Some : X -> Maybe X.
+  Arguments None {_}. Arguments Some {_}.
+
+  Program Instance MaybeMonad : Monad Maybe :=
+    {
+      ret _ x := Some x;
+      bind _ _ x k := match x with | Some x => k x | None => None end
+    }.
+  Next Obligation. destruct x; reflexivity. Qed.
+  Next Obligation. destruct x; reflexivity. Qed.
+End Maybe.
