@@ -1,0 +1,6 @@
+opam info coq-typing-flags > /dev/null
+if [ $? -ne 0 ]; then
+   error "Error: coq-typing-flags is not installed"
+fi
+
+coq_makefile -f _CoqProject -o Makefile
